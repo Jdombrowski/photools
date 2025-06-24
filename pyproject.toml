@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "photools"
+version = "0.1.0"
+description = "Media cataloging suite for managing and executing AI model routing within a photo metadata database"
+authors = ["Jonathan Dombrowski <jdombrowski416@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+uvicorn = { extras = ["standard"], version = "^0.24.0" }
+
+## Dep Justification
+# fastapi: Core web framework - can't build the API without it
+# uvicorn: Need an ASGI (Asynchronous Server Gateway Interface) server to run FastAPI in development/production
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+black = "^25.1.0"
+ruff = "^0.12.0"
+
+## Justification for dev dependencies:
+# pytest: Need to write tests from day 1
+# black: Consistent code formatting, prevents style debates
+# ruff: Fast linting, catches bugs early
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+select = ["E", "W", "F", "I"]
