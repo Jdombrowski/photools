@@ -1,0 +1,110 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-15-alpine}
+    container_name: ${PROJECT_NAME:-photools}-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-photo_catalog}
+      POSTGRES_USER: ${POSTGRES_USER:-photo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-photo_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-photo_user} -d ${POSTGRES_DB:-photo_catalog}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Celery
+  redis:
+    image: redis:${REDIS_VERSION:-7-alpine}
+    container_name: ${PROJECT_NAME:-photools}-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: ${PROJECT_NAME:-photools}-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DEBUG=${DEBUG:-true}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+    volumes:
+      - .:/app
+      - ${UPLOAD_DIR:-./uploads}:/app/uploads
+      - ${MODELS_DIR:-./models}:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Celery Worker
+  worker:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: ${PROJECT_NAME:-photools}-worker
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+    volumes:
+      - .:/app
+      - ${UPLOAD_DIR:-./uploads}:/app/uploads
+      - ${MODELS_DIR:-./models}:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: poetry run celery -A src.workers.celery_app worker --loglevel=${CELERY_LOG_LEVEL:-info}
+
+  # Celery Flower (Optional - for monitoring)
+  flower:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: ${PROJECT_NAME:-photools}-flower
+    ports:
+      - "${FLOWER_PORT:-5555}:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+    command: poetry run celery -A src.workers.celery_app flower --port=5555
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: ${PROJECT_NAME:-photools}-network
