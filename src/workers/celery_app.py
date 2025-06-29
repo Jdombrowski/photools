@@ -1,43 +1,41 @@
-"""
-Simple Celery Application
-"""
-
 from celery import Celery
 import os
 
-# Get configuration from environment
-BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
-RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+# Get Redis URL from environment or use default
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-# Create Celery app
-app = Celery(
+# Create Celery instance
+celery_app = Celery(
     "photools",
-    broker=BROKER_URL,
-    backend=RESULT_BACKEND
+    broker=REDIS_URL,
+    backend=REDIS_URL,
+    include=["src.workers.photo_processor", "src.workers.model_indexer"],
 )
 
-# Basic configuration
-app.conf.update(
+# Celery configuration
+celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],
     result_serializer="json",
     timezone="UTC",
     enable_utc=True,
+    # Task routing
+    task_routes={
+        "src.workers.photo_processor.*": {"queue": "photo_processing"},
+        "src.workers.model_indexer.*": {"queue": "ai_processing"},
+    },
+    # Worker configuration
+    worker_prefetch_multiplier=1,
+    task_acks_late=True,
+    worker_max_tasks_per_child=1000,
+    # Task time limits
+    task_soft_time_limit=300,  # 5 minutes
+    task_time_limit=600,  # 10 minutes
+    # Result backend settings
+    result_expires=3600,  # 1 hour
+    # Beat schedule (for periodic tasks)
+    beat_schedule={},
 )
 
-@app.task
-def test_task(message: str = "Hello from Celery!"):
-    """Test task to verify Celery is working"""
-    return f"Task completed: {message}"
-
-@app.task
-def process_photo(photo_path: str):
-    """Process photo task (placeholder)"""
-    return {
-        "photo_path": photo_path,
-        "status": "processed",
-        "message": "Photo processing - ready for implementation"
-    }
-
 if __name__ == "__main__":
-    app.start()
+    celery_app.start()
