@@ -13,7 +13,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-photo_user} -d ${POSTGRES_DB:-photo_catalog}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-photo_user} -d ${POSTGRES_DB:-photo_catalog}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -108,3 +112,4 @@ volumes:
 networks:
   default:
     name: ${PROJECT_NAME:-photools}-network
+

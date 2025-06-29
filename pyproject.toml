@@ -4,17 +4,26 @@ version = "0.1.0"
 description = "Media cataloging suite for managing and executing AI model routing within a photo metadata database"
 authors = ["Jonathan Dombrowski <jdombrowski416@gmail.com>"]
 license = "MIT"
+package-mode = false
 readme = "README.md"
 
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
 [tool.poetry.dependencies]
-python = ">=3.12"
+python = "^3.12"
 fastapi = "^0.110.0"
 uvicorn = "^0.30.0"
-
-[poetry.group.dev.dependencies]
+psutil = "^7.0.0"
 black = "^25.1.0"
 pytest = "^8.4.1"
 ruff = "^0.12.0"
+python-multipart = "^0.0.20"
+pillow = "^11.2.1"
+redis = "4.6.0"
+aiofiles = "^24.1.0"
+celery = {version = "5.2.7", extras = ["redis"]}
 
 [tool.poetry.scripts]
 start = "photools.main:start"

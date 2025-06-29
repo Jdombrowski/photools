@@ -143,12 +143,6 @@ deps-lock-check: ## Check if poetry.lock is up to date
 	@poetry check --lock
 	@echo "✅ Lock file is up to date"
 
-deps-export: ## Export dependencies to requirements.txt
-	@echo "📄 Exporting dependencies to requirements.txt..."
-	@poetry export -f requirements.txt --output requirements.txt --without-hashes
-	@poetry export -f requirements.txt --output requirements-dev.txt --with=dev --without-hashes
-	@echo "✅ Requirements files generated"
-
 deps-audit: ## Audit dependencies for security vulnerabilities
 	@echo "🔍 Auditing dependencies for security issues..."
 	@poetry show --tree
@@ -233,15 +227,26 @@ env: ## Activate Poetry virtual environment
 
 dev: ## Start development servers with hot reload
 	@echo "🚀 Starting development environment..."
-	@docker compose -f $(COMPOSE_FILE) up -d postgres redis
-	@sleep 3
+	@echo "📋 Checking dependencies..."
+	@poetry install
+	@echo "🐳 Starting Docker services..."
+	@docker compose up -d postgres redis
+	@echo "⏳ Waiting for services to be ready..."
+	@sleep 5
+	@echo "🌐 Starting FastAPI server..."
 	@poetry run uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000 &
-	@poetry run celery -A src.workers.celery_app worker --loglevel=info &
-	@echo "✅ Development servers running:"
+	@echo "⚡ Checking if Celery is available..."
+	@if poetry run python -c "import celery" 2>/dev/null; then \
+		echo "🎯 Starting Celery worker..."; \
+		poetry run celery -A src.workers.celery_app worker --loglevel=info --concurrency=2 & \
+	else \
+		echo "⚠️  Celery not installed yet. Install with: poetry add celery[redis]"; \
+	fi
+	@echo "✅ Development servers starting:"
 	@echo "   🌐 API: http://localhost:8000"
 	@echo "   📊 API Docs: http://localhost:8000/docs"
-
-dev-full: ## Start full development environment with all services
+	@echo "   🐘 PostgreSQL: localhost:5432"
+	@echo "   🔴 Redis: localhost:6379"dev-full: ## Start full development environment with all services
 	@echo "🚀 Starting full development environment..."
 	@docker compose -f $(COMPOSE_FILE) up -d
 	@echo "✅ Full environment running - check docker compose logs"
@@ -487,7 +492,7 @@ docker-logs-worker: ## Show logs from worker service only
 docker-shell-api: ## Open shell in API container
 	@docker compose exec api bash
 
-docker-shell-postgres: ## Open psql shell in postgres container
+docker-shell-db: ## Open psql shell in postgres container
 	@docker compose exec postgres psql -U photo_user -d photo_catalog
 
 docker-shell-redis: ## Open redis-cli shell in redis container
