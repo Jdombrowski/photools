@@ -246,7 +246,9 @@ dev: ## Start development servers with hot reload
 	@echo "   🌐 API: http://localhost:8000"
 	@echo "   📊 API Docs: http://localhost:8000/docs"
 	@echo "   🐘 PostgreSQL: localhost:5432"
-	@echo "   🔴 Redis: localhost:6379"dev-full: ## Start full development environment with all services
+	@echo "   🔴 Redis: localhost:6379"
+
+dev-full: ## Start full development environment with all services
 	@echo "🚀 Starting full development environment..."
 	@docker compose -f $(COMPOSE_FILE) up -d
 	@echo "✅ Full environment running - check docker compose logs"
@@ -366,7 +368,7 @@ clean: ## Clean up generated files and caches
 
 check-health: ## Check health of all services
 	@echo "🏥 Checking service health..."
-	@curl -f http://localhost:8000/health || echo "❌ API unhealthy"
+	@curl -f http://localhost:8000/api/v1/health || echo "❌ API unhealthy"
 	@docker compose -f $(COMPOSE_FILE) ps
 
 ##@ Demo and Presentation
@@ -458,7 +460,7 @@ docker-build: docker-check ## Build development Docker images
 
 docker-dev: docker-check ## Start full development environment
 	@echo "🚀 Starting full development environment..."
-	@docker compose --profile app up -d
+	@docker compose up -d
 	@echo "✅ Development environment started"
 	@echo "   🌐 API: http://localhost:8000"
 	@echo "   📊 API Docs: http://localhost:8000/docs"
@@ -534,7 +536,7 @@ test-docker-coverage: ## Run tests with coverage in Docker
 
 
 ##@ Quick Development Workflow
-quick-start: setup-env docker-services ## Quick start: setup env and start services only
+quick-start: setup-env docker-dev ## Quick start: setup env and start services
 	@echo "🚀 Quick start complete!"
 	@echo "   Now run: make dev (for local development)"
 	@echo "   Or run: make docker-dev (for Docker development)"

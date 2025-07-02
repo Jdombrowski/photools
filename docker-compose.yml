@@ -11,7 +11,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
     healthcheck:
       test:
         [
@@ -53,6 +53,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - DEBUG=${DEBUG:-true}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/data/test_photos,/app/uploads
     volumes:
       - .:/app
       - ${UPLOAD_DIR:-./uploads}:/app/uploads
@@ -77,6 +78,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/data/test_photos,/app/uploads
     volumes:
       - .:/app
       - ${UPLOAD_DIR:-./uploads}:/app/uploads

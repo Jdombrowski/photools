@@ -21,7 +21,7 @@ RUN apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install poetry==1.6.0
+RUN pip install poetry==1.8.3
 
 # Configure Poetry
 RUN poetry config virtualenvs.create false
