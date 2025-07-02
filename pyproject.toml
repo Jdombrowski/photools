@@ -24,6 +24,8 @@ pillow = "^11.2.1"
 redis = "4.6.0"
 aiofiles = "^24.1.0"
 celery = {version = "5.2.7", extras = ["redis"]}
+pydantic-settings = "^2.10.1"
+httpx = "^0.28.1"
 
 [tool.poetry.scripts]
 start = "photools.main:start"
