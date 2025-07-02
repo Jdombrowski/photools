@@ -48,9 +48,16 @@ def generate_embeddings(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(f"Generated embeddings for: {file_path}")
         return result
 
-    except Exception as e:
-        logger.error(f"Error generating embeddings: {str(e)}")
-        self.retry(countdown=120, max_retries=2)
+    except self.MaxRetriesExceededError:
+        return {
+            "file_path": photo_metadata.get("file_path"),
+            "ai_model": None,
+            "features": {},
+            "confidence": 0.0,
+            "extracted_at": datetime.utcnow().isoformat(),
+            "status": "failed",
+            "error": str(self.exception),
+        }
 
 
 @celery_app.task(base=CallbackTask, bind=True)
@@ -82,9 +89,16 @@ def extract_ai_features(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(f"Extracted AI features for: {file_path}")
         return result
 
-    except Exception as e:
-        logger.error(f"Error extracting AI features: {str(e)}")
-        self.retry(countdown=120, max_retries=2)
+    except self.MaxRetriesExceededError:
+        return {
+            "file_path": photo_metadata.get("file_path"),
+            "ai_model": None,
+            "features": {},
+            "confidence": 0.0,
+            "extracted_at": datetime.utcnow().isoformat(),
+            "status": "failed",
+            "error": str(self.exception),
+        }
 
 
 @celery_app.task(base=CallbackTask)
@@ -104,7 +118,9 @@ def batch_process_ai_features(
     for photo_metadata in photo_metadata_list:
         try:
             # Queue embedding generation
-            embedding_task = generate_embeddings.delay(photo_metadata)
+            embedding_task = generate_embeddings.delay(
+                photo_metadata
+            )  # TODO: Replace with actual embedding generation logic
 
             # Queue feature extraction
             features_task = extract_ai_features.delay(photo_metadata)

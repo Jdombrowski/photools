@@ -202,4 +202,4 @@ def extract_image_metadata(file_path: str) -> Dict[str, Any]:
             "error": str(e),
             "format": "unknown",
             "metadata_extraction_failed": True,
- 
+        }
