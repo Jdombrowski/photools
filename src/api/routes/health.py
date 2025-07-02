@@ -1,9 +1,11 @@
-from fastapi import APIRouter
-from datetime import datetime
 import platform
+from datetime import datetime
+
 import psutil
+from fastapi import APIRouter
 
 router = APIRouter()
+
 
 @router.get("/health")
 async def health_check():
@@ -12,16 +14,17 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "service": "photools-api",
-        "version": "0.1.0"
+        "version": "0.1.0",
     }
+
 
 @router.get("/health/detailed")
 async def detailed_health_check():
     """Detailed health check with system information"""
     try:
         memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
-        
+        disk = psutil.disk_usage("/")
+
         return {
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
@@ -33,7 +36,7 @@ async def detailed_health_check():
                 "platform_version": platform.version(),
                 "architecture": platform.machine(),
                 "processor": platform.processor(),
-                "python_version": platform.python_version()
+                "python_version": platform.python_version(),
             },
             "resources": {
                 "memory": {
@@ -41,24 +44,24 @@ async def detailed_health_check():
                     "available": memory.available,
                     "percent": memory.percent,
                     "used": memory.used,
-                    "free": memory.free
+                    "free": memory.free,
                 },
                 "disk": {
                     "total": disk.total,
                     "used": disk.used,
                     "free": disk.free,
-                    "percent": (disk.used / disk.total) * 100
-                }
+                    "percent": (disk.used / disk.total) * 100,
+                },
             },
             "dependencies": {
                 "database": "pending",  # Will check DB connection when implemented
-                "redis": "pending",     # Will check Redis connection when implemented
-                "models": "pending"     # Will check AI models when implemented
-            }
+                "redis": "pending",  # Will check Redis connection when implemented
+                "models": "pending",  # Will check AI models when implemented
+            },
         }
     except Exception as e:
         return {
             "status": "unhealthy",
             "timestamp": datetime.utcnow().isoformat(),
-            "error": str(e)
+            "error": str(e),
         }

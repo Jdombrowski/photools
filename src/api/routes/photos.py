@@ -149,4 +149,3 @@ async def scan_directory(directory_path: str):
         "estimated_files": "calculating...",
         "scan_id": f"scan_{datetime.utcnow().timestamp()}",
     }
-
