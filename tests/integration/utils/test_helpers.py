@@ -17,7 +17,7 @@ from PIL import Image
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_processor import PhotoProcessor
-from tests.config.test_settings import TestEnvironment
+from tests.integration.config.test_settings import TestEnvironment
 
 
 class TestPhotoFactory:
