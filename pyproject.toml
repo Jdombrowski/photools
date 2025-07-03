@@ -7,6 +7,9 @@ license = "MIT"
 package-mode = false
 readme = "README.md"
 
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^6.2.1"
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
@@ -26,6 +29,8 @@ aiofiles = "^24.1.0"
 celery = {version = "5.2.7", extras = ["redis"]}
 pydantic-settings = "^2.10.1"
 httpx = "^0.28.1"
+alembic = "^1.16.2"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.scripts]
 start = "photools.main:start"
