@@ -66,11 +66,14 @@ class LocalStorageBackend(StorageBackend):
             full_path.parent.mkdir(parents=True, exist_ok=True)
             
             # Write file
+            print(f"DEBUG: Writing file to {full_path}")
             async with aiofiles.open(full_path, 'wb') as f:
                 await f.write(file_content)
+            print(f"DEBUG: File written successfully, size: {len(file_content)}")
             
             # Create hash index entry for duplicate detection
             await self._create_hash_index(file_hash, relative_path)
+            print(f"DEBUG: Hash index created for {file_hash}")
             
             return StorageResult(
                 result=StorageOperationResult.SUCCESS,

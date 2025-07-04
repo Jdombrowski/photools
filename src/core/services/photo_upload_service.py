@@ -23,10 +23,11 @@ class PhotoUploadService:
         if storage_backend:
             self.storage = storage_backend
         else:
-            # Use first allowed directory as base path for uploads
-            base_path = Path.home() / "Pictures" / "photools_uploads"
-            if hasattr(self.settings, 'photos') and self.settings.photos.allowed_photo_directories:
-                base_path = Path(self.settings.photos.allowed_photo_directories[0]) / "uploads"
+            # Use project's uploads directory as base path (hardcoded for now)
+            base_path = Path("./uploads").resolve()
+            
+            # Ensure the uploads directory exists
+            base_path.mkdir(parents=True, exist_ok=True)
             
             storage_config = StorageConfig(
                 base_path=base_path,
@@ -60,7 +61,8 @@ class PhotoUploadService:
         
         try:
             # Extract metadata first (before storage)
-            metadata_result = await self._extract_metadata_from_content(file_content, filename)
+            # TODO: Temporarily disable to isolate async issue
+            metadata_result = None  # await self._extract_metadata_from_content(file_content, filename)
             
             # Store file using storage backend
             storage_result = await self.storage.store_file(
@@ -233,6 +235,16 @@ class PhotoUploadService:
             print(f"Metadata extraction failed for {filename}: {e}")
             return None
 
+    def _parse_datetime(self, date_str: Optional[str]) -> Optional[datetime]:
+        """Parse ISO datetime string to datetime object."""
+        if not date_str:
+            return None
+        try:
+            # Handle ISO format strings
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        except (ValueError, AttributeError):
+            return None
+
     async def _create_photo_record(
         self,
         db_session: AsyncSession,
@@ -253,7 +265,9 @@ class PhotoUploadService:
             width = metadata_result.get("width")
             height = metadata_result.get("height")
             if metadata_result.get("file_modified"):
-                file_modified = metadata_result["file_modified"]
+                parsed_date = self._parse_datetime(metadata_result["file_modified"])
+                if parsed_date:
+                    file_modified = parsed_date
         
         # Create Photo record
         photo = Photo(
@@ -292,9 +306,9 @@ class PhotoUploadService:
                 exposure_mode=metadata_result.get("exposure_mode"),
                 metering_mode=metadata_result.get("metering_mode"),
                 white_balance=metadata_result.get("white_balance"),
-                date_taken=metadata_result.get("date_taken"),
-                date_digitized=metadata_result.get("date_digitized"),
-                date_modified=metadata_result.get("date_modified"),
+                date_taken=self._parse_datetime(metadata_result.get("date_taken")),
+                date_digitized=self._parse_datetime(metadata_result.get("date_digitized")),
+                date_modified=self._parse_datetime(metadata_result.get("date_modified")),
                 gps_latitude=metadata_result.get("gps_latitude"),
                 gps_longitude=metadata_result.get("gps_longitude"),
                 gps_altitude=metadata_result.get("gps_altitude"),

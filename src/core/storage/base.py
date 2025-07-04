@@ -106,7 +106,19 @@ class StorageBackend(ABC):
         """Generate storage path based on configuration."""
         
         # Use date_taken if available, otherwise current date
-        target_date = date_taken or datetime.utcnow()
+        # Handle both datetime objects and ISO string formats
+        target_date = datetime.utcnow()  # default
+        
+        if date_taken:
+            if isinstance(date_taken, str):
+                try:
+                    # Try to parse ISO format string
+                    target_date = datetime.fromisoformat(date_taken.replace('Z', '+00:00'))
+                except ValueError:
+                    # If parsing fails, use current date
+                    target_date = datetime.utcnow()
+            else:
+                target_date = date_taken
         
         # Get file extension
         file_ext = Path(filename).suffix.lower()

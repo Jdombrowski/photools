@@ -127,7 +127,7 @@ class PhotoMetadata(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
-    photo = relationship("Photo", back_populates="metadata")
+    photo = relationship("Photo", back_populates="photo_metadata")
 
     def __repr__(self):
         return f"<PhotoMetadata(photo_id={self.photo_id}, camera={self.camera_make} {self.camera_model})>"
