@@ -303,38 +303,31 @@ class PhotoProcessor:
     async def process_photo_async(self, file_path: str) -> Dict[str, Any]:
         """
         Async wrapper for photo processing that returns a dict result.
-        
+
         Args:
             file_path: Path to photo file as string
-            
+
         Returns:
             Dict with success status and metadata
         """
         import asyncio
-        
+
         def _process_sync():
             try:
                 file_path_obj = Path(file_path)
                 metadata = self.process_photo(file_path_obj)
-                return {
-                    "success": True,
-                    "metadata": metadata.to_dict()
-                }
+                return {"success": True, "metadata": metadata.to_dict()}
             except PhotoProcessingError as e:
                 logger.error(f"Photo processing failed: {e}")
-                return {
-                    "success": False,
-                    "error": str(e),
-                    "metadata": None
-                }
+                return {"success": False, "error": str(e), "metadata": None}
             except Exception as e:
                 logger.error(f"Unexpected error in photo processing: {e}")
                 return {
                     "success": False,
                     "error": f"Unexpected error: {str(e)}",
-                    "metadata": None
+                    "metadata": None,
                 }
-        
+
         # Run the synchronous processing in a thread pool
         return await asyncio.get_event_loop().run_in_executor(None, _process_sync)
 

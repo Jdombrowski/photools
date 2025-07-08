@@ -9,12 +9,12 @@ import pytest
 from PIL import Image
 
 from src.core.services.file_system_service import (AccessLevel,
-                                                    FileSystemEntry,
-                                                    FileSystemSecurityError,
-                                                    SecureFileSystemService)
+                                                   FileSystemEntry,
+                                                   FileSystemSecurityError,
+                                                   SecureFileSystemService)
 from src.core.services.photo_processor import (PhotoMetadata,
-                                                PhotoProcessingError,
-                                                PhotoProcessor)
+                                               PhotoProcessingError,
+                                               PhotoProcessor)
 
 
 class TestPhotoMetadata:

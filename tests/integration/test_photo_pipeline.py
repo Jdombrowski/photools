@@ -11,10 +11,12 @@ import pytest
 
 from src.core.models.scan_result import ScanOptions, ScanStrategy
 from tests.integration.config.test_settings import TestEnvironment
-from tests.integration.utils.test_helpers import (ServiceTestBuilder, TestAssertions,
-                                      TestFileSystemBuilder, TestReporter,
-                                      isolated_test_environment,
-                                      temporary_test_directory)
+from tests.integration.utils.test_helpers import (ServiceTestBuilder,
+                                                  TestAssertions,
+                                                  TestFileSystemBuilder,
+                                                  TestReporter,
+                                                  isolated_test_environment,
+                                                  temporary_test_directory)
 
 
 class TestPhotoProcessingPipeline:

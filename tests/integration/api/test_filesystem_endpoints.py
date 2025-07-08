@@ -12,9 +12,10 @@ from fastapi.testclient import TestClient
 
 from src.api.main import app
 from tests.integration.config.test_settings import (TestEnvironment,
-                                        isolated_test_environment)
-from tests.integration.utils.test_helpers import (TestFileSystemBuilder, TestReporter,
-                                      temporary_test_directory)
+                                                    isolated_test_environment)
+from tests.integration.utils.test_helpers import (TestFileSystemBuilder,
+                                                  TestReporter,
+                                                  temporary_test_directory)
 
 
 class FilesystemAPITester:

@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.core.models.scan_result import ScanResult, ScanStatus, ScanStrategy, ScanOptions, ScanProgress
+from src.core.models.scan_result import (ScanOptions, ScanProgress, ScanResult,
+                                         ScanStatus, ScanStrategy)
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import (AccessLevel,
                                                    FileSystemEntry,

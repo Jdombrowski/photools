@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.core.services.file_system_service import (AccessLevel,
-                                                    FileSystemEntry,
-                                                    FileSystemSecurityError,
-                                                    SecureFileSystemService,
-                                                    SecurityConstraints)
+                                                   FileSystemEntry,
+                                                   FileSystemSecurityError,
+                                                   SecureFileSystemService,
+                                                   SecurityConstraints)
 
 
 class TestSecurityConstraints:

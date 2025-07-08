@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.config.settings import get_settings
@@ -23,7 +24,9 @@ class DatabaseManager:
         """Get synchronous database engine."""
         if self._engine is None:
             # Convert async URL to sync URL for SQLAlchemy
-            sync_url = self.settings.database.database_url.replace("postgresql+asyncpg://", "postgresql://")
+            sync_url = self.settings.database.database_url.replace(
+                "postgresql+asyncpg://", "postgresql://"
+            )
             self._engine = create_engine(
                 sync_url,
                 echo=self.settings.api.debug,
@@ -40,7 +43,7 @@ class DatabaseManager:
             async_url = self.settings.database.database_url
             if not async_url.startswith("postgresql+asyncpg://"):
                 async_url = async_url.replace("postgresql://", "postgresql+asyncpg://")
-            
+
             self._async_engine = create_async_engine(
                 async_url,
                 echo=self.settings.api.debug,

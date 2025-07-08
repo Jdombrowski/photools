@@ -3,18 +3,8 @@ from enum import Enum
 from typing import Dict, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import (
-    JSON,
-    Boolean,
-    Column,
-    DateTime,
-    Float,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    UniqueConstraint,
-)
+from sqlalchemy import (JSON, Boolean, Column, DateTime, Float, ForeignKey,
+                        Integer, String, Text, UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -23,13 +13,14 @@ Base = declarative_base()
 
 class ProcessingStage(Enum):
     """Photo processing stages for progressive workflow (V2 feature)."""
-    INCOMING = "incoming"           # Just imported, needs first review
-    REVIEWED = "reviewed"           # Quick preview done, kept/rejected
-    BASIC_EDIT = "basic_edit"       # Exposure/basic corrections applied  
-    CURATED = "curated"            # Selected as "good enough to work on"
-    REFINED = "refined"            # Detailed editing in progress
-    FINAL = "final"                # Ready for delivery/export
-    REJECTED = "rejected"          # Marked for deletion/archive
+
+    INCOMING = "incoming"  # Just imported, needs first review
+    REVIEWED = "reviewed"  # Quick preview done, kept/rejected
+    BASIC_EDIT = "basic_edit"  # Exposure/basic corrections applied
+    CURATED = "curated"  # Selected as "good enough to work on"
+    REFINED = "refined"  # Detailed editing in progress
+    FINAL = "final"  # Ready for delivery/export
+    REJECTED = "rejected"  # Marked for deletion/archive
 
 
 class Photo(Base):
@@ -54,22 +45,35 @@ class Photo(Base):
     height = Column(Integer)
 
     # Processing status
-    processing_status = Column(String, default="pending")  # pending, processing, completed, failed
+    processing_status = Column(
+        String, default="pending"
+    )  # pending, processing, completed, failed
     processing_error = Column(Text)
-    
+
     # V2: Progressive workflow fields
     processing_stage = Column(String, default="incoming")  # ProcessingStage enum values
     priority_level = Column(Integer, default=0)  # 0=normal, 1=good, 2=excellent
     needs_attention = Column(Boolean, default=True, index=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    photo_metadata = relationship("PhotoMetadata", back_populates="photo", uselist=False, cascade="all, delete-orphan")
-    tags = relationship("PhotoTag", back_populates="photo", cascade="all, delete-orphan")
-    ai_analysis = relationship("PhotoAIAnalysis", back_populates="photo", cascade="all, delete-orphan")
-    scan_entries = relationship("ScanPhotoEntry", back_populates="photo", cascade="all, delete-orphan")
+    photo_metadata = relationship(
+        "PhotoMetadata",
+        back_populates="photo",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    tags = relationship(
+        "PhotoTag", back_populates="photo", cascade="all, delete-orphan"
+    )
+    ai_analysis = relationship(
+        "PhotoAIAnalysis", back_populates="photo", cascade="all, delete-orphan"
+    )
+    scan_entries = relationship(
+        "ScanPhotoEntry", back_populates="photo", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Photo(id={self.id}, filename={self.filename}, status={self.processing_status})>"
@@ -81,7 +85,9 @@ class PhotoMetadata(Base):
     __tablename__ = "photo_metadata"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    photo_id = Column(String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True)
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     # Camera information
     camera_make = Column(String)
@@ -139,7 +145,9 @@ class PhotoTag(Base):
     __tablename__ = "photo_tags"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    photo_id = Column(String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True)
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     tag = Column(String, nullable=False, index=True)
     tag_type = Column(String, default="manual")  # manual, ai_generated, extracted
@@ -152,7 +160,9 @@ class PhotoTag(Base):
     photo = relationship("Photo", back_populates="tags")
 
     # Ensure no duplicate tags per photo
-    __table_args__ = (UniqueConstraint("photo_id", "tag", "tag_type", name="unique_photo_tag"),)
+    __table_args__ = (
+        UniqueConstraint("photo_id", "tag", "tag_type", name="unique_photo_tag"),
+    )
 
     def __repr__(self):
         return f"<PhotoTag(photo_id={self.photo_id}, tag={self.tag}, type={self.tag_type})>"
@@ -164,10 +174,14 @@ class PhotoAIAnalysis(Base):
     __tablename__ = "photo_ai_analysis"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    photo_id = Column(String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True)
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     # Analysis metadata
-    analysis_type = Column(String, nullable=False)  # embedding, object_detection, scene_classification
+    analysis_type = Column(
+        String, nullable=False
+    )  # embedding, object_detection, scene_classification
     model_name = Column(String, nullable=False)
     model_version = Column(String)
     confidence_threshold = Column(Float)
@@ -197,15 +211,21 @@ class DirectoryScan(Base):
 
     # Basic scan information
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    scan_id = Column(String, nullable=False, unique=True, index=True)  # External scan identifier
+    scan_id = Column(
+        String, nullable=False, unique=True, index=True
+    )  # External scan identifier
     directory_path = Column(String, nullable=False, index=True)
 
     # Scan configuration
-    scan_strategy = Column(String, nullable=False)  # fast_metadata_only, full_metadata, incremental
+    scan_strategy = Column(
+        String, nullable=False
+    )  # fast_metadata_only, full_metadata, incremental
     scan_options = Column(JSON)  # Store ScanOptions as JSON
 
     # Status and progress
-    status = Column(String, nullable=False, default="pending")  # pending, running, completed, failed, cancelled
+    status = Column(
+        String, nullable=False, default="pending"
+    )  # pending, running, completed, failed, cancelled
     total_files = Column(Integer, default=0)
     processed_files = Column(Integer, default=0)
     successful_files = Column(Integer, default=0)
@@ -224,7 +244,9 @@ class DirectoryScan(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    photo_entries = relationship("ScanPhotoEntry", back_populates="scan", cascade="all, delete-orphan")
+    photo_entries = relationship(
+        "ScanPhotoEntry", back_populates="scan", cascade="all, delete-orphan"
+    )
 
     @property
     def duration_seconds(self) -> Optional[float]:
@@ -250,8 +272,15 @@ class ScanPhotoEntry(Base):
     __tablename__ = "scan_photo_entries"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    scan_id = Column(String, ForeignKey("directory_scans.id", ondelete="CASCADE"), nullable=False, index=True)
-    photo_id = Column(String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=True, index=True)
+    scan_id = Column(
+        String,
+        ForeignKey("directory_scans.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=True, index=True
+    )
 
     # File discovery information
     discovered_path = Column(String, nullable=False)
@@ -259,7 +288,9 @@ class ScanPhotoEntry(Base):
     file_modified = Column(DateTime)
 
     # Processing status for this entry
-    processing_status = Column(String, default="discovered")  # discovered, processed, failed, skipped
+    processing_status = Column(
+        String, default="discovered"
+    )  # discovered, processed, failed, skipped
     processing_error = Column(Text)
     processed_at = Column(DateTime)
 
@@ -305,22 +336,26 @@ class ProcessingAction(Base):
     __tablename__ = "processing_actions"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
-    photo_id = Column(String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True)
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     # Stage transition tracking
     stage_from = Column(String, index=True)  # ProcessingStage enum values
-    stage_to = Column(String, index=True)    # ProcessingStage enum values
-    
+    stage_to = Column(String, index=True)  # ProcessingStage enum values
+
     # Action details
-    action_type = Column(String, nullable=False)  # "basic_exposure", "crop", "color_grade", "batch_select"
+    action_type = Column(
+        String, nullable=False
+    )  # "basic_exposure", "crop", "color_grade", "batch_select"
     parameters = Column(JSON)  # Non-destructive edit parameters
     app_used = Column(String)  # "photools", "lightroom", "photoshop", etc.
-    
+
     # Processing metadata
     processing_time_ms = Column(Integer)
     batch_id = Column(String, index=True)  # Group related actions together
     user_notes = Column(Text)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships

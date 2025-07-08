@@ -19,7 +19,7 @@ class PhotoDirectorySettings(BaseSettings):
     allowed_photo_directories_str: str = Field(
         default=str(Path.home() / "Pictures"),
         description="Allowed directories for photo scanning (comma-separated)",
-        alias="allowed_photo_directories"
+        alias="allowed_photo_directories",
     )
 
     # Security constraints
@@ -96,7 +96,11 @@ class PhotoDirectorySettings(BaseSettings):
     def allowed_photo_directories(self) -> List[str]:
         """Get parsed list of allowed photo directories."""
         if isinstance(self.allowed_photo_directories_str, str):
-            return [d.strip() for d in self.allowed_photo_directories_str.split(",") if d.strip()]
+            return [
+                d.strip()
+                for d in self.allowed_photo_directories_str.split(",")
+                if d.strip()
+            ]
         return [self.allowed_photo_directories_str]
 
     @field_validator("photo_extensions", mode="before")
@@ -128,7 +132,7 @@ class PhotoDirectorySettings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
         env_parse_none_str="",
-        env_parse_enums=False
+        env_parse_enums=False,
     )
 
 
@@ -151,7 +155,7 @@ class DatabaseSettings(BaseSettings):
     model_config = {
         "env_prefix": "DATABASE_",
         "case_sensitive": False,
-        "extra": "ignore"
+        "extra": "ignore",
     }
 
 
@@ -176,11 +180,7 @@ class CelerySettings(BaseSettings):
 
     enable_utc: bool = Field(default=True, description="Enable UTC timezone")
 
-    model_config = {
-        "env_prefix": "CELERY_",
-        "case_sensitive": False,
-        "extra": "ignore"
-    }
+    model_config = {"env_prefix": "CELERY_", "case_sensitive": False, "extra": "ignore"}
 
 
 class APISettings(BaseSettings):
@@ -221,11 +221,7 @@ class APISettings(BaseSettings):
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
-    model_config = {
-        "env_prefix": "API_",
-        "case_sensitive": False,
-        "extra": "ignore"
-    }
+    model_config = {"env_prefix": "API_", "case_sensitive": False, "extra": "ignore"}
 
 
 class LoggingSettings(BaseSettings):
@@ -250,11 +246,7 @@ class LoggingSettings(BaseSettings):
         default=5, description="Maximum number of log files to keep"
     )
 
-    model_config = {
-        "env_prefix": "LOG_",
-        "case_sensitive": False,
-        "extra": "ignore"
-    }
+    model_config = {"env_prefix": "LOG_", "case_sensitive": False, "extra": "ignore"}
 
 
 class Settings(BaseSettings):
@@ -290,7 +282,7 @@ class Settings(BaseSettings):
         "env_file": ".env",
         "env_file_encoding": "utf-8",
         "case_sensitive": False,
-        "extra": "ignore"
+        "extra": "ignore",
     }
 
 
