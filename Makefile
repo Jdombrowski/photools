@@ -281,6 +281,28 @@ test-integration: ## Run integration tests only
 	@echo "🧪 Running integration tests..."
 	@poetry run pytest tests/integration/ -v
 
+test-service: ## Run tests for specific service directory (usage: make test-service SERVICE=storage)
+	@if [ -z "$(SERVICE)" ]; then \
+		echo "❌ Usage: make test-service SERVICE=service-name"; \
+		echo "   Available services: storage, photo_processor, file_system_service, etc."; \
+		exit 1; \
+	fi
+	@echo "🧪 Running tests for $(SERVICE) service..."
+	@echo "🔍 Checking for test files..."
+	@if [ -f "tests/unit/core/services/test_$(SERVICE).py" ]; then \
+		echo "✅ Found service test file: tests/unit/core/services/test_$(SERVICE).py"; \
+		poetry run pytest tests/unit/core/services/test_$(SERVICE).py -v; \
+	elif [ -d "tests/unit/core/$(SERVICE)/" ]; then \
+		echo "✅ Found service test directory: tests/unit/core/$(SERVICE)/"; \
+		poetry run pytest tests/unit/core/$(SERVICE)/ -v; \
+	else \
+		echo "❌ No tests found for service: $(SERVICE)"; \
+		echo "   Looked for:"; \
+		echo "   - tests/unit/core/services/test_$(SERVICE).py"; \
+		echo "   - tests/unit/core/$(SERVICE)/"; \
+		exit 1; \
+	fi
+
 lint: ## Run code linting
 	@echo "🔍 Linting code..."
 	@poetry run $(LINT_COMMAND)
