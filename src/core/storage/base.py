@@ -97,12 +97,13 @@ class StorageBackend(ABC):
         """Check if file with hash already exists, return storage path if found."""
         pass
 
-
-
-        filename=""
-        file_hash=""
-        target_date: Optional[datetime] = None
-
+    def generate_storage_path(
+        self,
+        filename: str,
+        file_hash: str,
+        target_date: Optional[datetime] = None,
+    ) -> str:
+        """Generate storage path based on configuration."""
         if target_date is None:
             target_date = datetime.now(timezone.utc)
 
