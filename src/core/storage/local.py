@@ -1,5 +1,4 @@
 import hashlib
-import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -7,8 +6,7 @@ from typing import Dict, List, Optional
 
 import aiofiles
 
-from .base import (StorageBackend, StorageConfig, StorageOperationResult,
-                   StorageResult)
+from .base import StorageBackend, StorageConfig, StorageOperationResult, StorageResult
 
 
 class LocalStorageBackend(StorageBackend):

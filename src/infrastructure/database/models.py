@@ -1,10 +1,20 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import (JSON, Boolean, Column, DateTime, Float, ForeignKey,
-                        Integer, String, Text, UniqueConstraint)
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -251,16 +261,21 @@ class DirectoryScan(Base):
     @property
     def duration_seconds(self) -> Optional[float]:
         """Calculate scan duration in seconds."""
-        if self.start_time and self.end_time:
-            return (self.end_time - self.start_time).total_seconds()
+        start_time = getattr(self, "start_time", None)
+        end_time = getattr(self, "end_time", None)
+        if start_time is not None and end_time is not None:
+            return (end_time - start_time).total_seconds()
         return None
 
     @property
     def success_rate(self) -> float:
         """Calculate success rate as percentage."""
-        if self.processed_files == 0:
+        processed = getattr(self, "processed_files", 0)
+        successful = getattr(self, "successful_files", 0)
+        
+        if not processed:
             return 0.0
-        return (self.successful_files / self.processed_files) * 100
+        return (successful / processed) * 100
 
     def __repr__(self):
         return f"<DirectoryScan(id={self.scan_id}, directory={self.directory_path}, status={self.status})>"
@@ -327,7 +342,7 @@ class BatchScan(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return f"<BatchScan(id={self.batch_id}, directories={len(self.directories)}, status={self.status})>"
+        return f"<BatchScan(id={self.batch_id}, directories={self.directories}, status={self.status})>"
 
 
 class ProcessingAction(Base):

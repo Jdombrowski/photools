@@ -1,16 +1,16 @@
 import os
-import stat
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.core.services.file_system_service import (AccessLevel,
-                                                   FileSystemEntry,
-                                                   FileSystemSecurityError,
-                                                   SecureFileSystemService,
-                                                   SecurityConstraints)
+from src.core.services.file_system_service import (
+    AccessLevel,
+    FileSystemEntry,
+    FileSystemSecurityError,
+    SecureFileSystemService,
+    SecurityConstraints,
+)
 
 
 class TestSecurityConstraints:
@@ -314,7 +314,6 @@ class TestSecureFileSystemService:
     def test_concurrent_access(self, service, temp_directory, sample_photo):
         """Test concurrent access to the service."""
         import threading
-        import time
 
         results = []
         errors = []

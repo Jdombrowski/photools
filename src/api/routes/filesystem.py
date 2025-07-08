@@ -4,14 +4,17 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 
-from ...config.settings import (get_photo_directories, get_photo_extensions,
-                                get_settings)
-from ...core.models.scan_result import ScanResult, ScanStrategy
-from ...core.services.directory_scanner import (ScanOptions, ScanProgress,
-                                                SecureDirectoryScanner)
-from ...core.services.file_system_service import (FileSystemSecurityError,
-                                                  SecureFileSystemService,
-                                                  SecurityConstraints)
+from ...config.settings import get_photo_directories, get_photo_extensions, get_settings
+from ...core.models.scan_result import ScanStrategy
+from ...core.services.directory_scanner import (
+    ScanOptions,
+    SecureDirectoryScanner,
+)
+from ...core.services.file_system_service import (
+    FileSystemSecurityError,
+    SecureFileSystemService,
+    SecurityConstraints,
+)
 from ...core.services.photo_processor import PhotoProcessor
 
 logger = logging.getLogger(__name__)

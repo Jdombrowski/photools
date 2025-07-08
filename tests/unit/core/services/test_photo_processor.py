@@ -1,20 +1,23 @@
-import io
 import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from PIL import Image
 
-from src.core.services.file_system_service import (AccessLevel,
-                                                   FileSystemEntry,
-                                                   FileSystemSecurityError,
-                                                   SecureFileSystemService)
-from src.core.services.photo_processor import (PhotoMetadata,
-                                               PhotoProcessingError,
-                                               PhotoProcessor)
+from src.core.services.file_system_service import (
+    AccessLevel,
+    FileSystemEntry,
+    FileSystemSecurityError,
+    SecureFileSystemService,
+)
+from src.core.services.photo_processor import (
+    PhotoMetadata,
+    PhotoProcessingError,
+    PhotoProcessor,
+)
 
 
 class TestPhotoMetadata:
@@ -659,8 +662,7 @@ class TestPhotoProcessorIntegration:
             img.save(jpeg_path, "JPEG")
 
             # Create file system service
-            from src.core.services.file_system_service import \
-                SecurityConstraints
+            from src.core.services.file_system_service import SecurityConstraints
 
             constraints = SecurityConstraints(max_file_size_mb=1)
             file_system_service = SecureFileSystemService(

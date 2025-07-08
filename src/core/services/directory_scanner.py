@@ -1,17 +1,17 @@
-import asyncio
 import logging
-from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
-from typing import Any, AsyncIterator, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
-from ..models.scan_result import (ScanOptions, ScanProgress, ScanResult,
-                                  ScanStatus, ScanStrategy)
-from .file_system_service import (AccessLevel, FileSystemEntry,
-                                  SecureFileSystemService, SecurityConstraints)
-from .photo_processor import (PhotoMetadata, PhotoProcessingError,
-                              PhotoProcessor)
+from ..models.scan_result import (
+    ScanOptions,
+    ScanProgress,
+    ScanResult,
+    ScanStatus,
+    ScanStrategy,
+)
+from .file_system_service import SecureFileSystemService, SecurityConstraints
+from .photo_processor import PhotoProcessingError, PhotoProcessor
 
 logger = logging.getLogger(__name__)
 

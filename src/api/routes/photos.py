@@ -96,7 +96,7 @@ async def list_photos(
         count_query = count_query.where(and_(*filters))
 
     total_result = await db.execute(count_query)
-    total = total_result.scalar()
+    total = total_result.scalar() or 0
 
     # Apply pagination and ordering
     query = query.order_by(Photo.created_at.desc()).offset(offset).limit(limit)
@@ -312,7 +312,7 @@ async def get_photo_file(photo_id: str, db: AsyncSession = Depends(get_db_sessio
 
     return Response(
         content=file_content,
-        media_type=photo.mime_type,
+        media_type=getattr(photo, "mime_type", None),
         headers={
             "Content-Disposition": f'inline; filename="{photo.filename}"',
             "Content-Length": str(len(file_content)),
@@ -383,12 +383,12 @@ async def get_preview_storage_stats(db: AsyncSession = Depends(get_db_session)):
 @router.post("/admin/bulk-generate-previews")
 async def trigger_bulk_preview_generation(
     batch_size: int = 10,
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
 ):
-    """Trigger background bulk preview generation for all photos"""
+    """Trigger background bulk preview generation with smart queueing"""
+    from src.core.services.preview_queue_service import preview_queue, PreviewPriority
     from sqlalchemy import select
     from src.infrastructure.database.models import Photo
-    from src.core.services.preview_service import PreviewService
     
     try:
         # Get photos that need preview generation
@@ -401,49 +401,32 @@ async def trigger_bulk_preview_generation(
                 "message": "No photos found to process",
                 "processed": 0
             }
-        
-        preview_service = PreviewService(db)
-        processed_count = 0
+        ""
+        queued_count = 0
         results = []
         
         for photo in photos:
-            try:
-                # Check if photo already has previews
-                preview_info = preview_service.get_preview_info(photo.id)
-                
-                # Skip if all preview sizes exist (4 sizes)
-                if len(preview_info) >= 4:
-                    results.append({
-                        "photo_id": photo.id,
-                        "filename": photo.filename,
-                        "status": "already_exists"
-                    })
-                    continue
-                
-                # Generate missing previews
-                result = await preview_service.generate_all_previews_for_photo(photo.id)
-                processed_count += 1
-                
-                results.append({
-                    "photo_id": photo.id,
-                    "filename": photo.filename,
-                    "status": "processed",
-                    "generated_count": result.get("total_generated", 0)
-                })
-                
-            except Exception as e:
-                logger.error(f"Failed to generate previews for photo {photo.id}: {e}")
-                results.append({
-                    "photo_id": photo.id,
-                    "filename": photo.filename,
-                    "status": "error",
-                    "error": str(e)
-                })
+            queue_result = preview_queue.queue_preview_generation(
+                photo_id=str(photo.id),
+                storage_path=str(photo.file_path),
+                filename=str(photo.filename),
+                priority=PreviewPriority.NORMAL  # Use normal priority for bulk operations
+            )
+            
+            if queue_result["status"] in ["queued", "existing"]:
+                queued_count += 1
+            
+            results.append({
+                "photo_id": photo.id,
+                "filename": photo.filename,
+                "status": queue_result["status"],
+                "task_id": queue_result.get("task_id")
+            })
         
         return {
-            "message": f"Bulk preview generation completed for {processed_count} photos",
+            "message": f"Bulk preview generation initiated for {queued_count} photos",
             "total_photos": len(photos),
-            "processed": processed_count,
+            "queued": queued_count,
             "results": results[:5],  # Show first 5 results
             "has_more": len(results) > 5
         }

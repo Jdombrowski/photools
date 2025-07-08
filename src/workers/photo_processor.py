@@ -157,6 +157,198 @@ def generate_file_hash(file_path: str) -> str:
     return hash_sha256.hexdigest()
 
 
+@celery_app.task(base=CallbackTask, bind=True)
+def generate_preview_task(
+    self,
+    photo_id: str,
+    storage_path: str,
+    filename: str,
+    priority: str = "normal",
+    requested_sizes: list = None
+) -> Dict[str, Any]:
+    """
+    Generate preview(s) for a photo with priority-aware execution.
+    
+    Args:
+        photo_id: Photo identifier
+        storage_path: Path to original file in storage
+        filename: Original filename
+        priority: urgent|high|normal|low (affects routing and execution)
+        requested_sizes: List of specific sizes to generate, or None for all
+    """
+    from pathlib import Path
+
+    from src.core.services.photo_upload_service import PhotoUploadService
+    from src.core.services.preview_generator import PreviewGenerator, PreviewSize
+
+    # Set task priority metadata for monitoring
+    self.update_state(
+        state='PROGRESS',
+        meta={'priority': priority, 'photo_id': photo_id, 'stage': 'starting'}
+    )
+
+    try:
+        # Initialize services
+        preview_generator = PreviewGenerator()
+        upload_service = PhotoUploadService()
+
+        # Construct full storage path
+        full_storage_path = Path(upload_service.storage.config.base_path) / storage_path
+
+        if not full_storage_path.exists():
+            return {
+                "photo_id": photo_id,
+                "success": False,
+                "error": f"Source file not found: {full_storage_path}",
+                "priority": priority
+            }
+
+        # Determine which sizes to generate
+        if requested_sizes:
+            sizes_to_generate = [PreviewSize(size) for size in requested_sizes if size in [s.value for s in PreviewSize]]
+        else:
+            sizes_to_generate = list(PreviewSize)
+
+        # For urgent requests, check what already exists to minimize work
+        if priority == "urgent":
+            existing_previews = preview_generator.get_preview_info(photo_id)
+            # Only generate missing sizes for urgent requests
+            sizes_to_generate = [
+                size for size in sizes_to_generate
+                if size.value not in existing_previews
+            ]
+
+        self.update_state(
+            state='PROGRESS',
+            meta={
+                'priority': priority,
+                'photo_id': photo_id,
+                'stage': 'generating',
+                'sizes_count': len(sizes_to_generate)
+            }
+        )
+
+        # Generate previews
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        try:
+            if requested_sizes and len(requested_sizes) == 1:
+                # Single size request - generate immediately
+                size = PreviewSize(requested_sizes[0])
+                result_path = loop.run_until_complete(
+                    preview_generator.generate_preview(full_storage_path, photo_id, size)
+                )
+                results = {size.value: result_path}
+            else:
+                # Multiple sizes - generate all requested
+                if sizes_to_generate:
+                    # Generate only requested/missing sizes
+                    results = {}
+                    for size in sizes_to_generate:
+                        result_path = loop.run_until_complete(
+                            preview_generator.generate_preview(full_storage_path, photo_id, size)
+                        )
+                        results[size.value] = result_path
+                else:
+                    # All sizes already exist
+                    results = {}
+
+            successful_previews = {
+                size: str(path) if path else None
+                for size, path in results.items()
+                if path
+            }
+
+            return {
+                "photo_id": photo_id,
+                "success": True,
+                "generated_previews": successful_previews,
+                "total_generated": len(successful_previews),
+                "priority": priority,
+                "execution_time": getattr(self.request, 'time_start', None)
+            }
+
+        finally:
+            loop.close()
+
+    except Exception as e:
+        logger.error(f"Preview generation failed for {photo_id} (priority: {priority}): {e}")
+        return {
+            "photo_id": photo_id,
+            "success": False,
+            "error": str(e),
+            "priority": priority
+        }
+
+
+@celery_app.task(base=CallbackTask)
+def bulk_generate_previews_task(batch_size: int = 10) -> Dict[str, Any]:
+    """Generate previews for all photos that don't have them."""
+    from sqlalchemy import create_engine, select
+    from sqlalchemy.orm import sessionmaker
+
+    from src.config.settings import get_settings
+    from src.core.services.preview_generator import PreviewGenerator
+    from src.infrastructure.database.models import Photo
+
+    settings = get_settings()
+    engine = create_engine(settings.database.url)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    try:
+        with SessionLocal() as db:
+            # Get photos that need preview generation
+            stmt = select(Photo).limit(batch_size)
+            result = db.execute(stmt)
+            photos = result.scalars().all()
+
+            if not photos:
+                return {
+                    "success": True,
+                    "message": "No photos found to process",
+                    "processed": 0
+                }
+
+            # Initialize preview generator
+            preview_generator = PreviewGenerator()
+
+            processed_count = 0
+            errors = []
+
+            for photo in photos:
+                try:
+                    # Check if photo already has previews
+                    existing_previews = preview_generator.get_preview_info(photo.id)
+
+                    # Skip if all preview sizes exist
+                    if len(existing_previews) >= 4:  # All 4 sizes
+                        continue
+
+                    # Queue individual preview generation task
+                    generate_preview_task.delay(photo.id, photo.file_path, photo.filename)
+                    processed_count += 1
+
+                except Exception as e:
+                    logger.error(f"Failed to queue preview generation for {photo.id}: {e}")
+                    errors.append(f"Photo {photo.id}: {str(e)}")
+
+            return {
+                "success": True,
+                "processed": processed_count,
+                "total_photos": len(photos),
+                "errors": errors
+            }
+
+    except Exception as e:
+        logger.error(f"Bulk preview generation failed: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
 def extract_image_metadata(file_path: str) -> Dict[str, Any]:
     """Extract basic image metadata using PIL"""
 

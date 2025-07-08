@@ -59,6 +59,8 @@ class PhotoUploadService:
                 "existing_path": existing_photo.file_path,
             }
 
+        storage_result = None
+
         try:
             # Extract metadata first (before storage)
             # TODO: Temporarily disable to isolate async issue
@@ -80,35 +82,39 @@ class PhotoUploadService:
                 else:
                     return {"status": "error", "error": storage_result.error_message}
 
-            # Create database records
-            photo_record = await self._create_photo_record(
-                db_session,
-                storage_result.storage_path,
-                file_hash,
-                filename,
-                content_type,
-                len(file_content),
-                metadata_result,
-            )
+            if storage_result.storage_path is not None:
+                # Create database records
+                photo_record = await self._create_photo_record(
+                    db_session,
+                    storage_result.storage_path,
+                    file_hash,
+                    filename,
+                    content_type,
+                    len(file_content),
+                    metadata_result,
+                )
 
-            await db_session.commit()
+                await db_session.commit()
 
-            return {
-                "status": "success",
-                "photo_id": photo_record.id,
-                "filename": filename,
-                "storage_path": storage_result.storage_path,
-                "file_size": len(file_content),
-                "file_hash": file_hash,
-                "processing_status": photo_record.processing_status,
-                "processing_stage": photo_record.processing_stage,
-                "metadata_extracted": bool(metadata_result),
-            }
+                return {
+                    "status": "success",
+                    "photo_id": photo_record.id,
+                    "filename": filename,
+                    "storage_path": storage_result.storage_path,
+                    "file_size": len(file_content),
+                    "file_hash": file_hash,
+                    "processing_status": photo_record.processing_status,
+                    "processing_stage": photo_record.processing_stage,
+                    "metadata_extracted": bool(metadata_result),
+                }
+            else:
+                # Handle the error or raise an exception
+                raise ValueError("storage_path is None")
 
         except Exception as e:
             await db_session.rollback()
             # Attempt cleanup of stored file if it was saved
-            if "storage_result" in locals() and storage_result.success:
+            if storage_result and storage_result.storage_path:
                 await self.storage.delete_file(storage_result.storage_path)
 
             return {"status": "error", "error": f"Upload processing failed: {str(e)}"}
@@ -163,10 +169,10 @@ class PhotoUploadService:
         result = await db_session.execute(stmt)
         photo = result.scalar_one_or_none()
 
-        if not photo:
+        if photo is None or photo.file_path is None:
             return None
 
-        return await self.storage.retrieve_file(photo.file_path)
+        return await self.storage.retrieve_file(str(photo.file_path))
 
     async def delete_photo(self, photo_id: str, db_session: AsyncSession) -> bool:
         """Delete photo from both storage and database."""
@@ -181,7 +187,7 @@ class PhotoUploadService:
 
         try:
             # Delete from storage
-            storage_deleted = await self.storage.delete_file(photo.file_path)
+            storage_deleted = await self.storage.delete_file(str(photo.file_path))
 
             # Delete from database
             await db_session.delete(photo)
@@ -331,7 +337,7 @@ class PhotoUploadService:
     def get_storage_info(self) -> Dict:
         """Get information about the current storage backend."""
         if hasattr(self.storage, "get_storage_stats"):
-            return self.storage.get_storage_stats()
+            return getattr(self.storage, "get_storage_stats")()
         else:
             return {
                 "backend_type": type(self.storage).__name__,

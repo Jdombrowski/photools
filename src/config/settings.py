@@ -9,7 +9,6 @@ try:
 except ImportError:
     from pydantic import BaseSettings
 
-import os
 
 
 class PhotoDirectorySettings(BaseSettings):

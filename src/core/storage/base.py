@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -21,7 +21,7 @@ class StorageResult:
     """Result of a storage operation."""
 
     result: StorageOperationResult
-    storage_path: Optional[str] = None
+    storage_path: Optional[str] = ""
     file_hash: Optional[str] = None
     file_size: Optional[int] = None
     metadata: Optional[Dict] = None
@@ -97,28 +97,14 @@ class StorageBackend(ABC):
         """Check if file with hash already exists, return storage path if found."""
         pass
 
-    # Convenience methods
-    def generate_storage_path(
-        self, filename: str, file_hash: str, date_taken: Optional[datetime] = None
-    ) -> str:
-        """Generate storage path based on configuration."""
 
-        # Use date_taken if available, otherwise current date
-        # Handle both datetime objects and ISO string formats
-        target_date = datetime.utcnow()  # default
 
-        if date_taken:
-            if isinstance(date_taken, str):
-                try:
-                    # Try to parse ISO format string
-                    target_date = datetime.fromisoformat(
-                        date_taken.replace("Z", "+00:00")
-                    )
-                except ValueError:
-                    # If parsing fails, use current date
-                    target_date = datetime.utcnow()
-            else:
-                target_date = date_taken
+        filename=""
+        file_hash=""
+        target_date: Optional[datetime] = None
+
+        if target_date is None:
+            target_date = datetime.now(timezone.utc)
 
         # Get file extension
         file_ext = Path(filename).suffix.lower()
