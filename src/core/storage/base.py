@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Union
 
 
 class StorageOperationResult(Enum):
@@ -21,11 +20,11 @@ class StorageResult:
     """Result of a storage operation."""
 
     result: StorageOperationResult
-    storage_path: Optional[str] = ""
-    file_hash: Optional[str] = None
-    file_size: Optional[int] = None
-    metadata: Optional[Dict] = None
-    error_message: Optional[str] = None
+    storage_path: str | None = ""
+    file_hash: str | None = None
+    file_size: int | None = None
+    metadata: dict | None = None
+    error_message: str | None = None
 
     @property
     def success(self) -> bool:
@@ -40,7 +39,7 @@ class StorageResult:
 class StorageConfig:
     """Configuration for storage backends."""
 
-    base_path: Union[str, Path]
+    base_path: str | Path
     organize_by_date: bool = True
     date_format: str = "%Y/%m/%d"  # Year/Month/Day
     preserve_original_names: bool = False
@@ -60,13 +59,13 @@ class StorageBackend(ABC):
         file_content: bytes,
         filename: str,
         content_type: str,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
     ) -> StorageResult:
         """Store a file and return storage result."""
         pass
 
     @abstractmethod
-    async def retrieve_file(self, storage_path: str) -> Optional[bytes]:
+    async def retrieve_file(self, storage_path: str) -> bytes | None:
         """Retrieve file content by storage path."""
         pass
 
@@ -81,19 +80,19 @@ class StorageBackend(ABC):
         pass
 
     @abstractmethod
-    async def get_file_info(self, storage_path: str) -> Optional[Dict]:
+    async def get_file_info(self, storage_path: str) -> dict | None:
         """Get file metadata/info."""
         pass
 
     @abstractmethod
     async def list_files(
-        self, path_prefix: str = "", limit: Optional[int] = None
-    ) -> List[Dict]:
+        self, path_prefix: str = "", limit: int | None = None
+    ) -> list[dict]:
         """List files with optional path prefix and limit."""
         pass
 
     @abstractmethod
-    async def check_duplicate(self, file_hash: str) -> Optional[str]:
+    async def check_duplicate(self, file_hash: str) -> str | None:
         """Check if file with hash already exists, return storage path if found."""
         pass
 
@@ -101,11 +100,11 @@ class StorageBackend(ABC):
         self,
         filename: str,
         file_hash: str,
-        target_date: Optional[datetime] = None,
+        target_date: datetime | None = None,
     ) -> str:
         """Generate storage path based on configuration."""
         if target_date is None:
-            target_date = datetime.now(timezone.utc)
+            target_date = datetime.now(UTC)
 
         # Get file extension
         file_ext = Path(filename).suffix.lower()
@@ -135,9 +134,8 @@ class StorageBackend(ABC):
 
     def validate_file(
         self, file_content: bytes, filename: str, content_type: str
-    ) -> Optional[str]:
+    ) -> str | None:
         """Validate file before storage. Returns error message if invalid."""
-
         # Check file size
         file_size_mb = len(file_content) / (1024 * 1024)
         if file_size_mb > self.config.max_file_size_mb:

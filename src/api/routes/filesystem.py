@@ -1,15 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 
 from ...config.settings import get_photo_directories, get_photo_extensions, get_settings
 from ...core.models.scan_result import ScanStrategy
-from ...core.services.directory_scanner import (
-    ScanOptions,
-    SecureDirectoryScanner,
-)
+from ...core.services.directory_scanner import ScanOptions, SecureDirectoryScanner
 from ...core.services.file_system_service import (
     FileSystemSecurityError,
     SecureFileSystemService,
@@ -72,13 +69,13 @@ def get_directory_scanner(
     )
 
 
-@router.get("/directories", response_model=List[str])
-async def list_allowed_directories() -> List[str]:
-    """
-    Get list of allowed photo directories.
+@router.get("/directories", response_model=list[str])
+async def list_allowed_directories() -> list[str]:
+    """Get list of allowed photo directories.
 
     Returns:
         List of allowed directory paths
+
     """
     try:
         directories = get_photo_directories()
@@ -92,15 +89,15 @@ async def list_allowed_directories() -> List[str]:
 async def get_directory_info(
     directory_path: str,
     file_system_service: SecureFileSystemService = Depends(get_file_system_service),
-) -> Dict[str, Any]:
-    """
-    Get information about a specific directory.
+) -> dict[str, Any]:
+    """Get information about a specific directory.
 
     Args:
         directory_path: Path to directory
 
     Returns:
         Directory information and statistics
+
     """
     try:
         path = Path(directory_path)
@@ -143,13 +140,12 @@ async def get_directory_info(
 async def list_directory_files(
     directory_path: str,
     recursive: bool = Query(default=True, description="Scan recursively"),
-    max_depth: Optional[int] = Query(
+    max_depth: int | None = Query(
         default=None, description="Maximum depth for recursive scan"
     ),
     file_system_service: SecureFileSystemService = Depends(get_file_system_service),
-) -> Dict[str, Any]:
-    """
-    List files in a directory with security filtering.
+) -> dict[str, Any]:
+    """List files in a directory with security filtering.
 
     Args:
         directory_path: Path to directory
@@ -158,6 +154,7 @@ async def list_directory_files(
 
     Returns:
         List of accessible files and directories
+
     """
     try:
         path = Path(directory_path)
@@ -209,9 +206,8 @@ async def list_photo_files(
     directory_path: str,
     recursive: bool = Query(default=True, description="Scan recursively"),
     file_system_service: SecureFileSystemService = Depends(get_file_system_service),
-) -> Dict[str, Any]:
-    """
-    List photo files in a directory.
+) -> dict[str, Any]:
+    """List photo files in a directory.
 
     Args:
         directory_path: Path to directory
@@ -219,6 +215,7 @@ async def list_photo_files(
 
     Returns:
         List of accessible photo files
+
     """
     try:
         path = Path(directory_path)
@@ -271,9 +268,8 @@ async def estimate_scan(
     directory_path: str,
     recursive: bool = Query(default=True, description="Scan recursively"),
     directory_scanner: SecureDirectoryScanner = Depends(get_directory_scanner),
-) -> Dict[str, Any]:
-    """
-    Estimate the size and duration of a directory scan.
+) -> dict[str, Any]:
+    """Estimate the size and duration of a directory scan.
 
     Args:
         directory_path: Path to directory to scan
@@ -281,6 +277,7 @@ async def estimate_scan(
 
     Returns:
         Scan size estimates and timing information
+
     """
     try:
         path = Path(directory_path)
@@ -303,14 +300,13 @@ async def start_directory_scan(
         default=ScanStrategy.FULL_METADATA, description="Scan strategy"
     ),
     recursive: bool = Query(default=True, description="Scan recursively"),
-    max_files: Optional[int] = Query(
+    max_files: int | None = Query(
         default=None, description="Maximum number of files to scan"
     ),
     batch_size: int = Query(default=50, description="Batch size for processing"),
     directory_scanner: SecureDirectoryScanner = Depends(get_directory_scanner),
-) -> Dict[str, Any]:
-    """
-    Start a directory scan operation.
+) -> dict[str, Any]:
+    """Start a directory scan operation.
 
     Args:
         directory_path: Path to directory to scan
@@ -321,6 +317,7 @@ async def start_directory_scan(
 
     Returns:
         Scan result information
+
     """
     try:
         path = Path(directory_path)
@@ -354,15 +351,15 @@ async def start_directory_scan(
 async def get_scan_status(
     scan_id: str,
     directory_scanner: SecureDirectoryScanner = Depends(get_directory_scanner),
-) -> Dict[str, Any]:
-    """
-    Get status of an active scan operation.
+) -> dict[str, Any]:
+    """Get status of an active scan operation.
 
     Args:
         scan_id: ID of the scan to check
 
     Returns:
         Scan progress and status information
+
     """
     try:
         progress = directory_scanner.get_scan_progress(scan_id)
@@ -398,12 +395,12 @@ async def get_scan_status(
 @router.get("/scans/active")
 async def list_active_scans(
     directory_scanner: SecureDirectoryScanner = Depends(get_directory_scanner),
-) -> Dict[str, Any]:
-    """
-    List all active scan operations.
+) -> dict[str, Any]:
+    """List all active scan operations.
 
     Returns:
         List of active scan IDs and basic information
+
     """
     try:
         active_scans = directory_scanner.list_active_scans()
@@ -432,15 +429,15 @@ async def list_active_scans(
 async def cancel_scan(
     scan_id: str,
     directory_scanner: SecureDirectoryScanner = Depends(get_directory_scanner),
-) -> Dict[str, Any]:
-    """
-    Cancel an active scan operation.
+) -> dict[str, Any]:
+    """Cancel an active scan operation.
 
     Args:
         scan_id: ID of the scan to cancel
 
     Returns:
         Cancellation status
+
     """
     try:
         success = directory_scanner.cancel_scan(scan_id)
@@ -462,12 +459,12 @@ async def cancel_scan(
 
 
 @router.get("/config")
-async def get_filesystem_config() -> Dict[str, Any]:
-    """
-    Get current filesystem configuration and constraints.
+async def get_filesystem_config() -> dict[str, Any]:
+    """Get current filesystem configuration and constraints.
 
     Returns:
         Current filesystem service configuration
+
     """
     try:
         settings = get_settings()

@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS
 
-from .file_system_service import (
+from ..file_system_service import (
     AccessLevel,
     FileSystemSecurityError,
     SecureFileSystemService,
@@ -28,11 +28,11 @@ class PhotoMetadata:
         file_size: int,
         mime_type: str,
         dimensions: tuple[int, int],
-        date_taken: Optional[datetime] = None,
-        camera_make: Optional[str] = None,
-        camera_model: Optional[str] = None,
-        gps_coordinates: Optional[tuple[float, float]] = None,
-        raw_exif: Optional[Dict[str, Any]] = None,
+        date_taken: datetime | None = None,
+        camera_make: str | None = None,
+        camera_model: str | None = None,
+        gps_coordinates: tuple[float, float] | None = None,
+        raw_exif: dict[str, Any] | None = None,
     ):
         self.file_path = file_path
         self.file_hash = file_hash
@@ -45,7 +45,7 @@ class PhotoMetadata:
         self.gps_coordinates = gps_coordinates
         self.raw_exif = raw_exif or {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API responses and database storage."""
         return {
             "file_path": str(self.file_path),
@@ -64,8 +64,7 @@ class PhotoMetadata:
 
 
 class PhotoProcessor:
-    """
-    Core photo processing service with security-first design.
+    """Core photo processing service with security-first design.
 
     Design principles:
     - Single responsibility: just extract metadata
@@ -80,7 +79,7 @@ class PhotoProcessor:
     def __init__(
         self,
         use_exiftool: bool = False,
-        file_system_service: Optional[SecureFileSystemService] = None,
+        file_system_service: SecureFileSystemService | None = None,
         max_file_size_mb: int = 500,
     ):
         self.use_exiftool = use_exiftool
@@ -95,14 +94,14 @@ class PhotoProcessor:
             self.use_exiftool = False
 
     def validate_file_access(self, file_path: Path) -> None:
-        """
-        Validate that file can be safely accessed for processing.
+        """Validate that file can be safely accessed for processing.
 
         Args:
             file_path: Path to validate
 
         Raises:
             PhotoProcessingError: If file access is not allowed
+
         """
         # Use file system service for validation if available
         if self.file_system_service:
@@ -142,8 +141,7 @@ class PhotoProcessor:
         return file_path.suffix.lower() in self.SUPPORTED_FORMATS
 
     def calculate_file_hash(self, file_path: Path) -> str:
-        """
-        Calculate SHA-256 hash for duplicate detection.
+        """Calculate SHA-256 hash for duplicate detection.
 
         Args:
             file_path: Path to file
@@ -153,6 +151,7 @@ class PhotoProcessor:
 
         Raises:
             PhotoProcessingError: If file cannot be read
+
         """
         try:
             sha256_hash = hashlib.sha256()
@@ -164,7 +163,7 @@ class PhotoProcessor:
         except (OSError, PermissionError) as e:
             raise PhotoProcessingError(f"Cannot read file for hashing: {e}")
 
-    def extract_exif_datetime(self, exif_data: Dict[str, Any]) -> Optional[datetime]:
+    def extract_exif_datetime(self, exif_data: dict[str, Any]) -> datetime | None:
         """Extract and parse datetime from EXIF data."""
         # Try multiple EXIF datetime fields
         datetime_tags = ["DateTime", "DateTimeOriginal", "DateTimeDigitized"]
@@ -181,8 +180,8 @@ class PhotoProcessor:
         return None
 
     def extract_gps_coordinates(
-        self, exif_data: Dict[str, Any]
-    ) -> Optional[tuple[float, float]]:
+        self, exif_data: dict[str, Any]
+    ) -> tuple[float, float] | None:
         """Extract GPS coordinates from EXIF data."""
         if "GPSInfo" not in exif_data:
             return None
@@ -268,8 +267,7 @@ class PhotoProcessor:
             raise PhotoProcessingError(f"Cannot process image {file_path}: {e}")
 
     def process_photo(self, file_path: Path) -> PhotoMetadata:
-        """
-        Main entry point for photo processing with security validation.
+        """Main entry point for photo processing with security validation.
 
         Args:
             file_path: Path to photo file
@@ -279,6 +277,7 @@ class PhotoProcessor:
 
         Raises:
             PhotoProcessingError: If processing fails or security validation fails
+
         """
         logger.debug(f"Starting photo processing: {file_path}")
 
@@ -303,15 +302,15 @@ class PhotoProcessor:
             logger.error(f"Failed to process photo {file_path}: {e}")
             raise
 
-    async def process_photo_async(self, file_path: str) -> Dict[str, Any]:
-        """
-        Async wrapper for photo processing that returns a dict result.
+    async def process_photo_async(self, file_path: str) -> dict[str, Any]:
+        """Async wrapper for photo processing that returns a dict result.
 
         Args:
             file_path: Path to photo file as string
 
         Returns:
             Dict with success status and metadata
+
         """
         import asyncio
 
@@ -336,9 +335,8 @@ class PhotoProcessor:
 
     def process_directory(
         self, directory_path: Path, recursive: bool = True
-    ) -> List[PhotoMetadata]:
-        """
-        Process all supported images in a directory with security validation.
+    ) -> list[PhotoMetadata]:
+        """Process all supported images in a directory with security validation.
 
         Args:
             directory_path: Directory to process
@@ -350,6 +348,7 @@ class PhotoProcessor:
         Note:
             This method is deprecated in favor of using SecureDirectoryScanner
             for better security, progress tracking, and error handling.
+
         """
         logger.warning(
             "PhotoProcessor.process_directory is deprecated. "

@@ -48,6 +48,7 @@ app.include_router(filesystem.router, prefix="/api/v1")
 @app.get("/")
 async def root():
     from fastapi.responses import RedirectResponse
+
     return RedirectResponse(url="/static/index.html")
 
 

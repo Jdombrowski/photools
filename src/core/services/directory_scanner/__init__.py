@@ -3,22 +3,21 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ..models.scan_result import (
+from ...models.scan_result import (
     ScanOptions,
     ScanProgress,
     ScanResult,
     ScanStatus,
     ScanStrategy,
 )
-from .file_system_service import SecureFileSystemService, SecurityConstraints
-from .photo_processor import PhotoProcessingError, PhotoProcessor
+from ..file_system_service import SecureFileSystemService, SecurityConstraints
+from ..photo_processor import PhotoProcessingError, PhotoProcessor
 
 logger = logging.getLogger(__name__)
 
 
 class SecureDirectoryScanner:
-    """
-    Secure directory scanner with readonly access and comprehensive metadata extraction.
+    """Secure directory scanner with readonly access and comprehensive metadata extraction.
 
     Features:
     - Security-first design with path validation
@@ -32,29 +31,28 @@ class SecureDirectoryScanner:
     def __init__(
         self,
         file_system_service: SecureFileSystemService,
-        photo_processor: Optional[PhotoProcessor] = None,
-        security_constraints: Optional[SecurityConstraints] = None,
+        photo_processor: PhotoProcessor | None = None,
+        security_constraints: SecurityConstraints | None = None,
     ):
-        """
-        Initialize secure directory scanner.
+        """Initialize secure directory scanner.
 
         Args:
             file_system_service: Secure file system service instance
             photo_processor: Photo processor for metadata extraction
             security_constraints: Additional security constraints
+
         """
         self.file_system_service = file_system_service
         self.photo_processor = photo_processor or PhotoProcessor()
         self.security_constraints = security_constraints or SecurityConstraints()
 
         # Track active scans
-        self._active_scans: Dict[str, ScanProgress] = {}
+        self._active_scans: dict[str, ScanProgress] = {}
 
         logger.info("SecureDirectoryScanner initialized")
 
     def validate_scan_request(self, directory_path: Path, options: ScanOptions) -> None:
-        """
-        Validate scan request for security and feasibility.
+        """Validate scan request for security and feasibility.
 
         Args:
             directory_path: Directory to scan
@@ -63,6 +61,7 @@ class SecureDirectoryScanner:
         Raises:
             ValueError: If scan request is invalid
             FileSystemSecurityError: If security validation fails
+
         """
         # Security validation through file system service
         self.file_system_service.validate_path_access(directory_path)
@@ -85,9 +84,8 @@ class SecureDirectoryScanner:
 
     def estimate_scan_size(
         self, directory_path: Path, recursive: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Estimate the size and scope of a directory scan.
+    ) -> dict[str, Any]:
+        """Estimate the size and scope of a directory scan.
 
         Args:
             directory_path: Directory to analyze
@@ -95,6 +93,7 @@ class SecureDirectoryScanner:
 
         Returns:
             Dictionary with scan size estimates
+
         """
         try:
             photo_files = self.file_system_service.get_photo_files(
@@ -128,8 +127,7 @@ class SecureDirectoryScanner:
     def scan_directory_fast(
         self, directory_path: Path, options: ScanOptions
     ) -> ScanResult:
-        """
-        Fast directory scan - file system metadata only.
+        """Fast directory scan - file system metadata only.
 
         Args:
             directory_path: Directory to scan
@@ -137,6 +135,7 @@ class SecureDirectoryScanner:
 
         Returns:
             ScanResult with file system information
+
         """
         try:
             self.validate_scan_request(directory_path, options)
@@ -216,8 +215,7 @@ class SecureDirectoryScanner:
     def scan_directory_full(
         self, directory_path: Path, options: ScanOptions
     ) -> ScanResult:
-        """
-        Full directory scan with complete metadata extraction.
+        """Full directory scan with complete metadata extraction.
 
         Args:
             directory_path: Directory to scan
@@ -225,6 +223,7 @@ class SecureDirectoryScanner:
 
         Returns:
             ScanResult with complete photo metadata
+
         """
         try:
             self.validate_scan_request(directory_path, options)
@@ -315,10 +314,9 @@ class SecureDirectoryScanner:
             )
 
     def scan_directory(
-        self, directory_path: Path, options: Optional[ScanOptions] = None
+        self, directory_path: Path, options: ScanOptions | None = None
     ) -> ScanResult:
-        """
-        Main entry point for directory scanning.
+        """Main entry point for directory scanning.
 
         Args:
             directory_path: Directory to scan
@@ -326,6 +324,7 @@ class SecureDirectoryScanner:
 
         Returns:
             ScanResult based on the chosen strategy
+
         """
         options = options or ScanOptions()
 
@@ -345,23 +344,23 @@ class SecureDirectoryScanner:
         else:
             raise ValueError(f"Unknown scan strategy: {options.strategy}")
 
-    def get_scan_progress(self, scan_id: str) -> Optional[ScanProgress]:
+    def get_scan_progress(self, scan_id: str) -> ScanProgress | None:
         """Get progress information for an active scan."""
         return self._active_scans.get(scan_id)
 
-    def list_active_scans(self) -> List[str]:
+    def list_active_scans(self) -> list[str]:
         """Get list of active scan IDs."""
         return list(self._active_scans.keys())
 
     def cancel_scan(self, scan_id: str) -> bool:
-        """
-        Cancel an active scan.
+        """Cancel an active scan.
 
         Args:
             scan_id: ID of scan to cancel
 
         Returns:
             True if scan was cancelled, False if not found
+
         """
         if scan_id in self._active_scans:
             del self._active_scans[scan_id]

@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from celery import Task
 from PIL import Image
@@ -23,9 +23,8 @@ class CallbackTask(Task):
 
 
 @celery_app.task(base=CallbackTask, bind=True)
-def process_single_photo(self, file_path: str) -> Dict[str, Any]:
+def process_single_photo(self, file_path: str) -> dict[str, Any]:
     """Process a single photo file and extract metadata"""
-
     try:
         # Validate file exists and is accessible
         if not os.path.exists(file_path):
@@ -62,9 +61,8 @@ def process_single_photo(self, file_path: str) -> Dict[str, Any]:
 
 
 @celery_app.task(base=CallbackTask)
-def process_batch_photos(file_paths: list) -> Dict[str, Any]:
+def process_batch_photos(file_paths: list) -> dict[str, Any]:
     """Process multiple photos in batch"""
-
     results = {"total": len(file_paths), "successful": 0, "failed": 0, "results": []}
 
     for file_path in file_paths:
@@ -87,9 +85,8 @@ def process_batch_photos(file_paths: list) -> Dict[str, Any]:
 
 
 @celery_app.task(base=CallbackTask)
-def scan_directory(directory_path: str, recursive: bool = True) -> Dict[str, Any]:
+def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any]:
     """Scan a directory for photo files"""
-
     photo_extensions = {
         ".jpg",
         ".jpeg",
@@ -164,17 +161,17 @@ def generate_preview_task(
     storage_path: str,
     filename: str,
     priority: str = "normal",
-    requested_sizes: list = None
-) -> Dict[str, Any]:
-    """
-    Generate preview(s) for a photo with priority-aware execution.
-    
+    requested_sizes: list = None,
+) -> dict[str, Any]:
+    """Generate preview(s) for a photo with priority-aware execution.
+
     Args:
         photo_id: Photo identifier
         storage_path: Path to original file in storage
         filename: Original filename
         priority: urgent|high|normal|low (affects routing and execution)
         requested_sizes: List of specific sizes to generate, or None for all
+
     """
     from pathlib import Path
 
@@ -183,8 +180,8 @@ def generate_preview_task(
 
     # Set task priority metadata for monitoring
     self.update_state(
-        state='PROGRESS',
-        meta={'priority': priority, 'photo_id': photo_id, 'stage': 'starting'}
+        state="PROGRESS",
+        meta={"priority": priority, "photo_id": photo_id, "stage": "starting"},
     )
 
     try:
@@ -200,12 +197,16 @@ def generate_preview_task(
                 "photo_id": photo_id,
                 "success": False,
                 "error": f"Source file not found: {full_storage_path}",
-                "priority": priority
+                "priority": priority,
             }
 
         # Determine which sizes to generate
         if requested_sizes:
-            sizes_to_generate = [PreviewSize(size) for size in requested_sizes if size in [s.value for s in PreviewSize]]
+            sizes_to_generate = [
+                PreviewSize(size)
+                for size in requested_sizes
+                if size in [s.value for s in PreviewSize]
+            ]
         else:
             sizes_to_generate = list(PreviewSize)
 
@@ -214,22 +215,24 @@ def generate_preview_task(
             existing_previews = preview_generator.get_preview_info(photo_id)
             # Only generate missing sizes for urgent requests
             sizes_to_generate = [
-                size for size in sizes_to_generate
+                size
+                for size in sizes_to_generate
                 if size.value not in existing_previews
             ]
 
         self.update_state(
-            state='PROGRESS',
+            state="PROGRESS",
             meta={
-                'priority': priority,
-                'photo_id': photo_id,
-                'stage': 'generating',
-                'sizes_count': len(sizes_to_generate)
-            }
+                "priority": priority,
+                "photo_id": photo_id,
+                "stage": "generating",
+                "sizes_count": len(sizes_to_generate),
+            },
         )
 
         # Generate previews
         import asyncio
+
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -238,7 +241,9 @@ def generate_preview_task(
                 # Single size request - generate immediately
                 size = PreviewSize(requested_sizes[0])
                 result_path = loop.run_until_complete(
-                    preview_generator.generate_preview(full_storage_path, photo_id, size)
+                    preview_generator.generate_preview(
+                        full_storage_path, photo_id, size
+                    )
                 )
                 results = {size.value: result_path}
             else:
@@ -248,7 +253,9 @@ def generate_preview_task(
                     results = {}
                     for size in sizes_to_generate:
                         result_path = loop.run_until_complete(
-                            preview_generator.generate_preview(full_storage_path, photo_id, size)
+                            preview_generator.generate_preview(
+                                full_storage_path, photo_id, size
+                            )
                         )
                         results[size.value] = result_path
                 else:
@@ -267,24 +274,26 @@ def generate_preview_task(
                 "generated_previews": successful_previews,
                 "total_generated": len(successful_previews),
                 "priority": priority,
-                "execution_time": getattr(self.request, 'time_start', None)
+                "execution_time": getattr(self.request, "time_start", None),
             }
 
         finally:
             loop.close()
 
     except Exception as e:
-        logger.error(f"Preview generation failed for {photo_id} (priority: {priority}): {e}")
+        logger.error(
+            f"Preview generation failed for {photo_id} (priority: {priority}): {e}"
+        )
         return {
             "photo_id": photo_id,
             "success": False,
             "error": str(e),
-            "priority": priority
+            "priority": priority,
         }
 
 
 @celery_app.task(base=CallbackTask)
-def bulk_generate_previews_task(batch_size: int = 10) -> Dict[str, Any]:
+def bulk_generate_previews_task(batch_size: int = 10) -> dict[str, Any]:
     """Generate previews for all photos that don't have them."""
     from sqlalchemy import create_engine, select
     from sqlalchemy.orm import sessionmaker
@@ -308,7 +317,7 @@ def bulk_generate_previews_task(batch_size: int = 10) -> Dict[str, Any]:
                 return {
                     "success": True,
                     "message": "No photos found to process",
-                    "processed": 0
+                    "processed": 0,
                 }
 
             # Initialize preview generator
@@ -327,31 +336,31 @@ def bulk_generate_previews_task(batch_size: int = 10) -> Dict[str, Any]:
                         continue
 
                     # Queue individual preview generation task
-                    generate_preview_task.delay(photo.id, photo.file_path, photo.filename)
+                    generate_preview_task.delay(
+                        photo.id, photo.file_path, photo.filename
+                    )
                     processed_count += 1
 
                 except Exception as e:
-                    logger.error(f"Failed to queue preview generation for {photo.id}: {e}")
+                    logger.error(
+                        f"Failed to queue preview generation for {photo.id}: {e}"
+                    )
                     errors.append(f"Photo {photo.id}: {str(e)}")
 
             return {
                 "success": True,
                 "processed": processed_count,
                 "total_photos": len(photos),
-                "errors": errors
+                "errors": errors,
             }
 
     except Exception as e:
         logger.error(f"Bulk preview generation failed: {e}")
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
-def extract_image_metadata(file_path: str) -> Dict[str, Any]:
+def extract_image_metadata(file_path: str) -> dict[str, Any]:
     """Extract basic image metadata using PIL"""
-
     try:
         with Image.open(file_path) as img:
             # Basic image info

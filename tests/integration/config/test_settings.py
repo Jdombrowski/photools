@@ -8,13 +8,12 @@ separate from production business logic.
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
 
 from src.core.services.file_system_service import SecurityConstraints
 
 
 @dataclass
-class TestPaths:
+class TestingPaths:
     """Test-specific path configuration."""
 
     project_root: Path
@@ -23,7 +22,7 @@ class TestPaths:
     test_output_dir: Path
 
     @classmethod
-    def create_default(cls) -> "TestPaths":
+    def create_default(cls) -> "TestingPaths":
         """Create default test paths relative to project root."""
         project_root = Path(__file__).parent.parent.parent
         return cls(
@@ -41,7 +40,7 @@ class TestPaths:
 
 
 @dataclass
-class TestSecurityConfig:
+class TestingSecurityConfig:
     """Security configuration for testing."""
 
     max_file_size_mb: int = 50  # Smaller for tests
@@ -80,18 +79,18 @@ class TestSecurityConfig:
         )
 
 
-class TestEnvironment:
+class TestingEnvironment:
     """Manages test environment configuration and setup."""
 
     def __init__(self, use_test_photos: bool = True):
-        self.paths = TestPaths.create_default()
-        self.security = TestSecurityConfig()
+        self.paths = TestingPaths.create_default()
+        self.security = TestingSecurityConfig()
         self.use_test_photos = use_test_photos
 
         # Ensure test directories exist
         self.paths.ensure_directories_exist()
 
-    def get_allowed_directories(self) -> List[Path]:
+    def get_allowed_directories(self) -> list[Path]:
         """Get list of directories allowed for testing."""
         directories = []
 
@@ -171,14 +170,14 @@ class TestEnvironment:
 
 
 # Global test environment instance for convenience
-_test_env: Optional[TestEnvironment] = None
+_test_env: TestingEnvironment | None = None
 
 
-def get_test_environment(use_test_photos: bool = True) -> TestEnvironment:
+def get_test_environment(use_test_photos: bool = True) -> TestingEnvironment:
     """Get or create the global test environment."""
     global _test_env
     if _test_env is None:
-        _test_env = TestEnvironment(use_test_photos=use_test_photos)
+        _test_env = TestingEnvironment(use_test_photos=use_test_photos)
     return _test_env
 
 
@@ -192,4 +191,4 @@ def reset_test_environment():
 
 def isolated_test_environment():
     """Context manager for isolated test environment."""
-    return TestEnvironment()
+    return TestingEnvironment()

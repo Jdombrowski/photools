@@ -28,7 +28,7 @@ class PreviewGenerator:
         PreviewSize.LARGE: 1200,
     }
 
-    def __init__(self, base_preview_path: Optional[Path] = None):
+    def __init__(self, base_preview_path: Path | None = None):
         """Initialize preview generator with configurable base path."""
         self.base_preview_path = base_preview_path or Path("./uploads/previews")
         self.base_preview_path.mkdir(parents=True, exist_ok=True)
@@ -49,8 +49,8 @@ class PreviewGenerator:
         return preview_dir / f"{photo_id}_{size.value}.{format}"
 
     def _calculate_dimensions(
-        self, original_size: Tuple[int, int], target_size: int
-    ) -> Tuple[int, int]:
+        self, original_size: tuple[int, int], target_size: int
+    ) -> tuple[int, int]:
         """Calculate optimal preview dimensions maintaining aspect ratio."""
         width, height = original_size
 
@@ -72,7 +72,7 @@ class PreviewGenerator:
         photo_id: str,
         size: PreviewSize,
         format: str = "jpg",
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Generate a preview image for the given photo."""
 
         def _generate_sync():
@@ -130,7 +130,7 @@ class PreviewGenerator:
 
     async def generate_all_previews(
         self, original_image_path: Path, photo_id: str
-    ) -> Dict[str, Optional[Path]]:
+    ) -> dict[str, Path | None]:
         """Generate all preview sizes for a photo."""
         results = {}
 
@@ -149,7 +149,7 @@ class PreviewGenerator:
 
     async def get_preview_path(
         self, photo_id: str, size: PreviewSize, format: str = "jpg"
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Get existing preview path or None if it doesn't exist."""
         preview_path = self._get_preview_path(photo_id, size, format)
         return preview_path if preview_path.exists() else None
@@ -160,7 +160,7 @@ class PreviewGenerator:
         photo_id: str,
         size: PreviewSize,
         format: str = "jpg",
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Get existing preview or generate if it doesn't exist."""
         # Check if preview already exists
         existing_path = await self.get_preview_path(photo_id, size, format)
@@ -191,7 +191,7 @@ class PreviewGenerator:
             logger.error(f"Failed to delete previews for photo {photo_id}: {e}")
             return False
 
-    def get_preview_info(self, photo_id: str) -> Dict[str, Dict]:
+    def get_preview_info(self, photo_id: str) -> dict[str, dict]:
         """Get information about existing previews for a photo."""
         info = {}
 
@@ -240,7 +240,7 @@ class PreviewGenerator:
             logger.error(f"Preview cleanup failed: {e}")
             return 0
 
-    def get_storage_stats(self) -> Dict:
+    def get_storage_stats(self) -> dict:
         """Get storage statistics for the preview system."""
         stats = {
             "total_files": 0,

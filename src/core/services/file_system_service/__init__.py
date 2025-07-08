@@ -22,13 +22,13 @@ class SecurityConstraints:
     """Security constraints for file system access."""
 
     max_file_size_mb: int = 500  # Maximum file size in MB
-    allowed_extensions: Set[str] = None
+    allowed_extensions: set[str] = None
     max_depth: int = 10  # Maximum directory traversal depth
     follow_symlinks: bool = False
     skip_hidden_files: bool = True
     skip_hidden_directories: bool = True
     max_path_length: int = 4096  # Maximum path length
-    allowed_drives: Set[str] = None  # Windows: allowed drive letters
+    allowed_drives: set[str] = None  # Windows: allowed drive letters
     block_executable_extensions: bool = True  # Block potentially dangerous files
     strict_extension_validation: bool = True  # Only allow explicitly listed extensions
     enable_symlink_escape_detection: bool = True  # Check for symlink escapes
@@ -89,7 +89,7 @@ class FileSystemEntry:
     permissions: str
     last_modified: float
     is_symlink: bool = False
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class FileSystemSecurityError(Exception):
@@ -99,8 +99,7 @@ class FileSystemSecurityError(Exception):
 
 
 class SecureFileSystemService:
-    """
-    Secure file system service with readonly access and security constraints.
+    """Secure file system service with readonly access and security constraints.
 
     This service provides controlled access to the file system with:
     - Path traversal protection
@@ -112,15 +111,15 @@ class SecureFileSystemService:
 
     def __init__(
         self,
-        allowed_directories: List[Path],
-        constraints: Optional[SecurityConstraints] = None,
+        allowed_directories: list[Path],
+        constraints: SecurityConstraints | None = None,
     ):
-        """
-        Initialize secure file system service.
+        """Initialize secure file system service.
 
         Args:
             allowed_directories: List of allowed root directories
             constraints: Security constraints configuration
+
         """
         self.allowed_directories = [Path(d).resolve() for d in allowed_directories]
         self.constraints = constraints or SecurityConstraints()
@@ -155,8 +154,7 @@ class SecureFileSystemService:
                 )
 
     def _normalize_path(self, path: Path) -> Path:
-        """
-        Normalize and resolve path with extensive security validation.
+        """Normalize and resolve path with extensive security validation.
 
         This method prevents:
         - Path traversal attacks (../, .\\, etc.)
@@ -219,8 +217,7 @@ class SecureFileSystemService:
             raise FileSystemSecurityError(f"Invalid path: {path}, error: {e}")
 
     def _is_path_allowed(self, path: Path) -> bool:
-        """
-        Check if path is within allowed directories with strict validation.
+        """Check if path is within allowed directories with strict validation.
 
         Uses multiple validation methods to prevent bypass attempts.
         """
@@ -259,8 +256,7 @@ class SecureFileSystemService:
         return False
 
     def _verify_no_symlink_escape(self, target_path: Path, allowed_root: Path) -> bool:
-        """
-        Verify that no symlinks in the path escape the allowed root directory.
+        """Verify that no symlinks in the path escape the allowed root directory.
 
         This prevents attacks where symlinks are used to escape the jail.
         """
@@ -301,8 +297,7 @@ class SecureFileSystemService:
             return False
 
     def _check_system_directory_access(self, path: Path) -> None:
-        """
-        Prevent access to system-critical directories.
+        """Prevent access to system-critical directories.
 
         Raises FileSystemSecurityError if path accesses dangerous system directories.
         """
@@ -352,8 +347,7 @@ class SecureFileSystemService:
                     )
 
     def _check_dangerous_file_types(self, path: Path) -> None:
-        """
-        Prevent access to potentially dangerous file types.
+        """Prevent access to potentially dangerous file types.
 
         Raises FileSystemSecurityError for dangerous file extensions.
         """
@@ -467,8 +461,7 @@ class SecureFileSystemService:
             return "unknown"
 
     def validate_path_access(self, path: Path) -> bool:
-        """
-        Validate that a path can be safely accessed with comprehensive security checks.
+        """Validate that a path can be safely accessed with comprehensive security checks.
 
         Args:
             path: Path to validate
@@ -478,6 +471,7 @@ class SecureFileSystemService:
 
         Raises:
             FileSystemSecurityError: If path represents a security violation
+
         """
         # First normalize and basic security check
         normalized_path = self._normalize_path(path)
@@ -526,14 +520,14 @@ class SecureFileSystemService:
         return True
 
     def get_file_info(self, file_path: Path) -> FileSystemEntry:
-        """
-        Get secure file information for a single file.
+        """Get secure file information for a single file.
 
         Args:
             file_path: Path to the file
 
         Returns:
             FileSystemEntry with file information and access level
+
         """
         try:
             self.validate_path_access(file_path)
@@ -596,10 +590,9 @@ class SecureFileSystemService:
         self,
         directory_path: Path,
         recursive: bool = False,
-        max_depth: Optional[int] = None,
-    ) -> List[FileSystemEntry]:
-        """
-        Safely list directory contents with security constraints.
+        max_depth: int | None = None,
+    ) -> list[FileSystemEntry]:
+        """Safely list directory contents with security constraints.
 
         Args:
             directory_path: Directory to list
@@ -608,6 +601,7 @@ class SecureFileSystemService:
 
         Returns:
             List of FileSystemEntry objects for accessible files/directories
+
         """
         try:
             self.validate_path_access(directory_path)
@@ -641,7 +635,7 @@ class SecureFileSystemService:
     def _list_directory_recursive(
         self,
         directory: Path,
-        entries: List[FileSystemEntry],
+        entries: list[FileSystemEntry],
         current_depth: int,
         max_depth: int,
     ) -> None:
@@ -684,9 +678,8 @@ class SecureFileSystemService:
 
     def get_photo_files(
         self, directory_path: Path, recursive: bool = True
-    ) -> List[FileSystemEntry]:
-        """
-        Get list of photo files from directory with security filtering.
+    ) -> list[FileSystemEntry]:
+        """Get list of photo files from directory with security filtering.
 
         Args:
             directory_path: Directory to scan for photos
@@ -694,6 +687,7 @@ class SecureFileSystemService:
 
         Returns:
             List of FileSystemEntry objects for accessible photo files
+
         """
         all_entries = self.list_directory(directory_path, recursive=recursive)
 
@@ -713,15 +707,15 @@ class SecureFileSystemService:
         )
         return photo_files
 
-    def get_directory_stats(self, directory_path: Path) -> Dict[str, Any]:
-        """
-        Get statistics about a directory and its contents.
+    def get_directory_stats(self, directory_path: Path) -> dict[str, Any]:
+        """Get statistics about a directory and its contents.
 
         Args:
             directory_path: Directory to analyze
 
         Returns:
             Dictionary with directory statistics
+
         """
         try:
             photo_files = self.get_photo_files(directory_path, recursive=True)
@@ -751,10 +745,9 @@ class SecureFileSystemService:
 
     @staticmethod
     def create_readonly_photo_service(
-        allowed_directories: List[Path],
+        allowed_directories: list[Path],
     ) -> "SecureFileSystemService":
-        """
-        Create a SecureFileSystemService with the most restrictive security settings
+        """Create a SecureFileSystemService with the most restrictive security settings
         for readonly photo access.
 
         Args:
@@ -762,6 +755,7 @@ class SecureFileSystemService:
 
         Returns:
             SecureFileSystemService configured with maximum security constraints
+
         """
         # Most restrictive security constraints
         constraints = SecurityConstraints(

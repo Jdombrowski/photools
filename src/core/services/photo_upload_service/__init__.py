@@ -15,7 +15,7 @@ from src.infrastructure.database.models import Photo, PhotoMetadata
 class PhotoUploadService:
     """Service for handling photo uploads with abstracted storage and database persistence."""
 
-    def __init__(self, storage_backend: Optional[StorageBackend] = None):
+    def __init__(self, storage_backend: StorageBackend | None = None):
         self.settings = get_settings()
         self.photo_processor = PhotoProcessor()
 
@@ -43,9 +43,8 @@ class PhotoUploadService:
         filename: str,
         content_type: str,
         db_session: AsyncSession,
-    ) -> Dict:
+    ) -> dict:
         """Process a single photo upload and store in database."""
-
         # Calculate file hash for duplicate detection
         file_hash = hashlib.sha256(file_content).hexdigest()
 
@@ -121,11 +120,10 @@ class PhotoUploadService:
 
     async def process_batch_upload(
         self,
-        files_data: List[Tuple[bytes, str, str]],  # (content, filename, content_type)
+        files_data: list[tuple[bytes, str, str]],  # (content, filename, content_type)
         db_session: AsyncSession,
-    ) -> Dict:
+    ) -> dict:
         """Process multiple photo uploads in batch."""
-
         results = []
         successful_uploads = 0
         duplicate_count = 0
@@ -161,7 +159,7 @@ class PhotoUploadService:
 
     async def get_photo_content(
         self, photo_id: str, db_session: AsyncSession
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
         """Retrieve photo content from storage."""
         from sqlalchemy import select
 
@@ -200,7 +198,7 @@ class PhotoUploadService:
 
     async def _check_existing_photo(
         self, db_session: AsyncSession, file_hash: str
-    ) -> Optional[Photo]:
+    ) -> Photo | None:
         """Check if a photo with the same hash already exists."""
         from sqlalchemy import select
 
@@ -210,7 +208,7 @@ class PhotoUploadService:
 
     async def _extract_metadata_from_content(
         self, file_content: bytes, filename: str
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Extract metadata from file content without saving to disk first."""
         try:
             # For now, we'll use a temporary file approach
@@ -237,7 +235,7 @@ class PhotoUploadService:
             print(f"Metadata extraction failed for {filename}: {e}")
             return None
 
-    def _parse_datetime(self, date_str: Optional[str]) -> Optional[datetime]:
+    def _parse_datetime(self, date_str: str | None) -> datetime | None:
         """Parse ISO datetime string to datetime object."""
         if not date_str:
             return None
@@ -255,10 +253,9 @@ class PhotoUploadService:
         filename: str,
         content_type: str,
         file_size: int,
-        metadata_result: Optional[Dict],
+        metadata_result: dict | None,
     ) -> Photo:
         """Create Photo and PhotoMetadata database records."""
-
         # Extract basic image dimensions from metadata if available
         width = height = None
         file_modified = datetime.utcnow()
@@ -334,10 +331,10 @@ class PhotoUploadService:
 
         return photo
 
-    def get_storage_info(self) -> Dict:
+    def get_storage_info(self) -> dict:
         """Get information about the current storage backend."""
         if hasattr(self.storage, "get_storage_stats"):
-            return getattr(self.storage, "get_storage_stats")()
+            return self.storage.get_storage_stats()
         else:
             return {
                 "backend_type": type(self.storage).__name__,

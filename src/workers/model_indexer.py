@@ -1,7 +1,7 @@
 # src/workers/model_indexer.py
 import logging
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from celery import Task
 
@@ -21,9 +21,8 @@ class CallbackTask(Task):
 
 
 @celery_app.task(base=CallbackTask, bind=True)
-def generate_embeddings(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
+def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
     """Generate AI embeddings for a photo (placeholder for now)"""
-
     try:
         # This is a placeholder - in the future this will:
         # 1. Load the image
@@ -61,9 +60,8 @@ def generate_embeddings(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @celery_app.task(base=CallbackTask, bind=True)
-def extract_ai_features(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
+def extract_ai_features(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
     """Extract AI features like objects, faces, scenes (placeholder)"""
-
     try:
         file_path = photo_metadata.get("file_path")
 
@@ -103,10 +101,9 @@ def extract_ai_features(self, photo_metadata: Dict[str, Any]) -> Dict[str, Any]:
 
 @celery_app.task(base=CallbackTask)
 def batch_process_ai_features(
-    photo_metadata_list: List[Dict[str, Any]],
-) -> Dict[str, Any]:
+    photo_metadata_list: list[dict[str, Any]],
+) -> dict[str, Any]:
     """Process AI features for multiple photos in batch"""
-
     results = {
         "total": len(photo_metadata_list),
         "embeddings_queued": 0,
@@ -145,9 +142,8 @@ def batch_process_ai_features(
 
 
 @celery_app.task(base=CallbackTask)
-def update_search_index(photo_data: Dict[str, Any]) -> Dict[str, Any]:
+def update_search_index(photo_data: dict[str, Any]) -> dict[str, Any]:
     """Update search index with processed photo data (placeholder)"""
-
     try:
         # This would typically:
         # 1. Update PostgreSQL with metadata

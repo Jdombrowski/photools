@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 
 class ScanStrategy(Enum):
@@ -30,10 +31,10 @@ class ScanProgress:
     processed_files: int = 0
     successful_files: int = 0
     failed_files: int = 0
-    current_file: Optional[str] = None
-    start_time: Optional[datetime] = None
-    estimated_completion: Optional[datetime] = None
-    errors: List[str] = field(default_factory=list)
+    current_file: str | None = None
+    start_time: datetime | None = None
+    estimated_completion: datetime | None = None
+    errors: list[str] = field(default_factory=list)
 
     @property
     def progress_percent(self) -> float:
@@ -62,12 +63,12 @@ class ScanOptions:
 
     strategy: ScanStrategy = ScanStrategy.FULL_METADATA
     recursive: bool = True
-    max_files: Optional[int] = None
+    max_files: int | None = None
     batch_size: int = 50
     include_metadata: bool = True
     include_thumbnails: bool = False
     skip_duplicates: bool = True
-    progress_callback: Optional[Callable[["ScanProgress"], None]] = None
+    progress_callback: Callable[["ScanProgress"], None] | None = None
 
 
 @dataclass
@@ -87,19 +88,19 @@ class ScanResult:
     failed_files: int
 
     # Results and errors
-    files: List[Dict[str, Any]] = field(default_factory=list)
-    errors: List[str] = field(default_factory=list)
+    files: list[dict[str, Any]] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
     # Timing information
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
 
     # Additional metadata
-    scan_options: Optional[Dict[str, Any]] = None
-    directory_stats: Optional[Dict[str, Any]] = None
+    scan_options: dict[str, Any] | None = None
+    directory_stats: dict[str, Any] | None = None
 
     @property
-    def duration_seconds(self) -> Optional[float]:
+    def duration_seconds(self) -> float | None:
         """Calculate scan duration in seconds."""
         if self.start_time and self.end_time:
             return (self.end_time - self.start_time).total_seconds()
@@ -121,7 +122,7 @@ class ScanResult:
             ScanStatus.CANCELLED,
         ]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert scan result to dictionary for API responses."""
         return {
             "directory": self.directory,
@@ -146,7 +147,7 @@ class ScanResult:
             "directory_stats": self.directory_stats,
         }
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get summary information without detailed file results."""
         result = self.to_dict()
         # Remove detailed file information for summary
@@ -161,12 +162,12 @@ class ScanResult:
 class BatchScanResult:
     """Result of scanning multiple directories."""
 
-    directories: List[str]
+    directories: list[str]
     batch_id: str
     status: ScanStatus
 
     # Individual scan results
-    scan_results: List[ScanResult] = field(default_factory=list)
+    scan_results: list[ScanResult] = field(default_factory=list)
 
     # Aggregate statistics
     total_directories: int = 0
@@ -174,8 +175,8 @@ class BatchScanResult:
     failed_directories: int = 0
 
     # Timing
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
 
     @property
     def total_files_found(self) -> int:
@@ -197,7 +198,7 @@ class BatchScanResult:
             return 0.0
         return (total_successful / total_processed) * 100
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert batch scan result to dictionary."""
         return {
             "directories": self.directories,

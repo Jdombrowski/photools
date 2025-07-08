@@ -1,7 +1,6 @@
 import logging
 import os
 from datetime import datetime
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -22,17 +21,17 @@ class PhotoMetadata(BaseModel):
     filename: str
     file_size: int
     mime_type: str
-    width: Optional[int] = None
-    height: Optional[int] = None
-    created_date: Optional[datetime] = None
-    camera_make: Optional[str] = None
-    camera_model: Optional[str] = None
-    iso: Optional[int] = None
-    aperture: Optional[float] = None
-    shutter_speed: Optional[str] = None
-    focal_length: Optional[float] = None
-    gps_latitude: Optional[float] = None
-    gps_longitude: Optional[float] = None
+    width: int | None = None
+    height: int | None = None
+    created_date: datetime | None = None
+    camera_make: str | None = None
+    camera_model: str | None = None
+    iso: int | None = None
+    aperture: float | None = None
+    shutter_speed: str | None = None
+    focal_length: float | None = None
+    gps_latitude: float | None = None
+    gps_longitude: float | None = None
 
 
 class PhotoResponse(BaseModel):
@@ -47,9 +46,9 @@ class PhotoResponse(BaseModel):
 async def list_photos(
     limit: int = 50,
     offset: int = 0,
-    search: Optional[str] = None,
-    processing_stage: Optional[str] = None,
-    camera_make: Optional[str] = None,
+    search: str | None = None,
+    processing_stage: str | None = None,
+    camera_make: str | None = None,
     db: AsyncSession = Depends(get_db_session),
 ):
     """List photos with pagination and optional search/filtering"""
@@ -156,7 +155,6 @@ async def upload_photo(
     file: UploadFile = File(...), db: AsyncSession = Depends(get_db_session)
 ):
     """Upload a single photo for processing"""
-
     if not file.filename:
         raise HTTPException(status_code=400, detail="No filename provided")
 
@@ -183,10 +181,9 @@ async def upload_photo(
 
 @router.post("/photos/batch-upload")
 async def batch_upload_photos(
-    files: List[UploadFile] = File(...), db: AsyncSession = Depends(get_db_session)
+    files: list[UploadFile] = File(...), db: AsyncSession = Depends(get_db_session)
 ):
     """Upload multiple photos for batch processing"""
-
     if len(files) > 100:  # Reasonable limit
         raise HTTPException(
             status_code=400, detail="Too many files. Maximum 100 files per batch."
@@ -273,12 +270,12 @@ async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
 async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
     """Delete a photo by ID (TODO: Phase 2/3 - implement soft-delete with compaction)"""
     from src.core.services.preview_service import PreviewService
-    
+
     preview_service = PreviewService(db)
-    
+
     # Delete previews first
     await preview_service.delete_photo_previews(photo_id)
-    
+
     # Delete photo and storage
     success = await upload_service.delete_photo(photo_id, db)
 
@@ -329,13 +326,13 @@ async def get_photo_preview(
 ):
     """Get a preview/thumbnail of the photo"""
     from src.core.services.preview_service import PreviewService
-    
+
     preview_service = PreviewService(db)
     return await preview_service.get_or_generate_preview(
         photo_id=photo_id,
-        size=size, 
+        size=size,
         format=format,
-        is_user_request=True  # This is a direct user request
+        is_user_request=True,  # This is a direct user request
     )
 
 
@@ -345,12 +342,12 @@ async def get_photo_preview_info(
 ):
     """Get information about available previews for a photo"""
     from src.core.services.preview_service import PreviewService
-    
+
     preview_service = PreviewService(db)
     # This will validate photo exists and return preview info
     await preview_service._get_photo_or_404(photo_id)  # Validate photo exists
     preview_info = preview_service.get_preview_info(photo_id)
-    
+
     return {"photo_id": photo_id, "previews": preview_info}
 
 
@@ -360,7 +357,7 @@ async def generate_photo_previews(
 ):
     """Generate all preview sizes for a photo"""
     from src.core.services.preview_service import PreviewService
-    
+
     preview_service = PreviewService(db)
     return await preview_service.generate_all_previews_for_photo(photo_id)
 
@@ -375,7 +372,7 @@ async def get_storage_info():
 async def get_preview_storage_stats(db: AsyncSession = Depends(get_db_session)):
     """Get preview storage statistics"""
     from src.core.services.preview_service import PreviewService
-    
+
     preview_service = PreviewService(db)
     return preview_service.get_storage_stats()
 
@@ -386,55 +383,54 @@ async def trigger_bulk_preview_generation(
     db: AsyncSession = Depends(get_db_session),
 ):
     """Trigger background bulk preview generation with smart queueing"""
-    from src.core.services.preview_queue_service import preview_queue, PreviewPriority
     from sqlalchemy import select
+
+    from src.core.services.preview_queue_service import PreviewPriority, preview_queue
     from src.infrastructure.database.models import Photo
-    
+
     try:
         # Get photos that need preview generation
         stmt = select(Photo).limit(batch_size)
         result = await db.execute(stmt)
         photos = result.scalars().all()
-        
+
         if not photos:
-            return {
-                "message": "No photos found to process",
-                "processed": 0
-            }
+            return {"message": "No photos found to process", "processed": 0}
         ""
         queued_count = 0
         results = []
-        
+
         for photo in photos:
             queue_result = preview_queue.queue_preview_generation(
                 photo_id=str(photo.id),
                 storage_path=str(photo.file_path),
                 filename=str(photo.filename),
-                priority=PreviewPriority.NORMAL  # Use normal priority for bulk operations
+                priority=PreviewPriority.NORMAL,  # Use normal priority for bulk operations
             )
-            
+
             if queue_result["status"] in ["queued", "existing"]:
                 queued_count += 1
-            
-            results.append({
-                "photo_id": photo.id,
-                "filename": photo.filename,
-                "status": queue_result["status"],
-                "task_id": queue_result.get("task_id")
-            })
-        
+
+            results.append(
+                {
+                    "photo_id": photo.id,
+                    "filename": photo.filename,
+                    "status": queue_result["status"],
+                    "task_id": queue_result.get("task_id"),
+                }
+            )
+
         return {
             "message": f"Bulk preview generation initiated for {queued_count} photos",
             "total_photos": len(photos),
             "queued": queued_count,
             "results": results[:5],  # Show first 5 results
-            "has_more": len(results) > 5
+            "has_more": len(results) > 5,
         }
-        
+
     except Exception as e:
         raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to start bulk preview generation: {str(e)}"
+            status_code=500, detail=f"Failed to start bulk preview generation: {str(e)}"
         )
 
 
@@ -442,21 +438,20 @@ async def trigger_bulk_preview_generation(
 async def get_queue_statistics():
     """Get current preview generation queue statistics"""
     from src.core.services.preview_queue_service import preview_queue
-    
+
     try:
         stats = preview_queue.get_queue_stats()
-        
+
         # Cleanup completed tasks
         cleaned_count = preview_queue.cleanup_completed_tasks()
         if cleaned_count > 0:
             stats["cleaned_completed_tasks"] = cleaned_count
-        
+
         return stats
-        
+
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get queue statistics: {str(e)}"
+            status_code=500, detail=f"Failed to get queue statistics: {str(e)}"
         )
 
 
@@ -464,29 +459,27 @@ async def get_queue_statistics():
 async def get_task_status(task_id: str):
     """Get status of a background task"""
     from src.workers.celery_app import celery_app
-    
+
     try:
         task_result = celery_app.AsyncResult(task_id)
-        
+
         return {
             "task_id": task_id,
             "status": task_result.status,
             "result": task_result.result if task_result.ready() else None,
             "successful": task_result.successful() if task_result.ready() else None,
             "failed": task_result.failed() if task_result.ready() else None,
-            "info": task_result.info if task_result.state == 'PROGRESS' else None
+            "info": task_result.info if task_result.state == "PROGRESS" else None,
         }
     except Exception as e:
         raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to get task status: {str(e)}"
+            status_code=500, detail=f"Failed to get task status: {str(e)}"
         )
 
 
 @router.post("/photos/scan-directory")
 async def scan_directory(directory_path: str):
     """Scan a directory for photos to import"""
-
     if not os.path.exists(directory_path):
         raise HTTPException(
             status_code=400, detail=f"Directory does not exist: {directory_path}"

@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -259,7 +258,7 @@ class DirectoryScan(Base):
     )
 
     @property
-    def duration_seconds(self) -> Optional[float]:
+    def duration_seconds(self) -> float | None:
         """Calculate scan duration in seconds."""
         start_time = getattr(self, "start_time", None)
         end_time = getattr(self, "end_time", None)
@@ -272,7 +271,7 @@ class DirectoryScan(Base):
         """Calculate success rate as percentage."""
         processed = getattr(self, "processed_files", 0)
         successful = getattr(self, "successful_files", 0)
-        
+
         if not processed:
             return 0.0
         return (successful / processed) * 100

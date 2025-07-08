@@ -11,10 +11,10 @@ import pytest
 
 from src.core.models.scan_result import ScanOptions, ScanStrategy
 from tests.integration.utils.test_helpers import (
+    FileSystemBuilder,
+    ReportGenerator,
     ServiceTestBuilder,
     TestAssertions,
-    TestFileSystemBuilder,
-    TestReporter,
     isolated_test_environment,
     temporary_test_directory,
 )
@@ -25,7 +25,7 @@ class TestPhotoProcessingPipeline:
 
     def test_pipeline_with_real_photos(self):
         """Test the pipeline using real photos from test data."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with isolated_test_environment() as test_env:
             # Check if we have real test photos
@@ -131,12 +131,12 @@ class TestPhotoProcessingPipeline:
 
     def test_pipeline_with_synthetic_photos(self):
         """Test the pipeline using synthetic test photos."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with temporary_test_directory() as temp_dir:
             with isolated_test_environment() as test_env:
                 # Create synthetic test structure
-                builder = TestFileSystemBuilder(temp_dir)
+                builder = FileSystemBuilder(temp_dir)
                 test_dir = (
                     builder.add_photos("photos", 5).add_nested_structure().build()
                 )
@@ -196,7 +196,7 @@ class TestSecurityValidation:
 
     def test_path_traversal_protection(self):
         """Test that path traversal attacks are blocked."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with isolated_test_environment() as test_env:
             builder = ServiceTestBuilder(test_env)
@@ -240,7 +240,7 @@ class TestSecurityValidation:
 
     def test_file_type_filtering(self):
         """Test that dangerous file types are filtered."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with temporary_test_directory() as temp_dir:
             with isolated_test_environment() as test_env:

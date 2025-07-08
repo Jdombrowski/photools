@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import List, Optional, Set
 
-from pydantic import Field, field_validator 
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,7 +36,7 @@ class PhotoDirectorySettings(BaseSettings):
     )
 
     # Photo file extensions
-    photo_extensions: Set[str] = Field(
+    photo_extensions: set[str] = Field(
         default_factory=lambda: {
             ".jpg",
             ".jpeg",
@@ -86,7 +85,7 @@ class PhotoDirectorySettings(BaseSettings):
     )
 
     @property
-    def allowed_photo_directories(self) -> List[str]:
+    def allowed_photo_directories(self) -> list[str]:
         """Get parsed list of allowed photo directories."""
         if isinstance(self.allowed_photo_directories_str, str):
             return [
@@ -106,7 +105,7 @@ class PhotoDirectorySettings(BaseSettings):
             return {ext if ext.startswith(".") else f".{ext}" for ext in extensions}
         return v
 
-    def get_validated_directories(self) -> List[str]:
+    def get_validated_directories(self) -> list[str]:
         """Get validated list of directories that exist."""
         valid_dirs = []
         for dir_path in self.allowed_photo_directories:
@@ -201,7 +200,7 @@ class APISettings(BaseSettings):
         description="Secret key for security operations",
     )
 
-    cors_origins: List[str] = Field(
+    cors_origins: list[str] = Field(
         default_factory=lambda: ["http://localhost:3000", "http://localhost:8000"],
         description="CORS allowed origins",
     )
@@ -227,7 +226,7 @@ class LoggingSettings(BaseSettings):
         description="Log message format",
     )
 
-    log_file: Optional[str] = Field(
+    log_file: str | None = Field(
         default=None, description="Log file path (if None, logs to console)"
     )
 
@@ -280,7 +279,7 @@ class Settings(BaseSettings):
 
 
 # Global settings instance
-_settings: Optional[Settings] = None
+_settings: Settings | None = None
 
 
 def get_settings() -> Settings:
@@ -299,13 +298,13 @@ def reload_settings() -> Settings:
 
 
 # Convenience functions for commonly used settings
-def get_photo_directories() -> List[Path]:
+def get_photo_directories() -> list[Path]:
     """Get list of allowed photo directories as Path objects."""
     settings = get_settings()
     return [Path(d) for d in settings.photos.allowed_photo_directories]
 
 
-def get_photo_extensions() -> Set[str]:
+def get_photo_extensions() -> set[str]:
     """Get set of allowed photo file extensions."""
     settings = get_settings()
     return settings.photos.photo_extensions

@@ -4,15 +4,15 @@ Integration tests for Filesystem API endpoints.
 Tests API functionality while maintaining clean separation from business logic.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from fastapi.testclient import TestClient
 
 from src.api.main import app
 from tests.integration.config.test_settings import isolated_test_environment
 from tests.integration.utils.test_helpers import (
-    TestFileSystemBuilder,
-    TestReporter,
+    FileSystemBuilder,
+    ReportGenerator,
     temporary_test_directory,
 )
 
@@ -24,7 +24,7 @@ class FilesystemAPITester:
         self.client = client
         self.base_url = "/api/v1/filesystem"
 
-    def test_health_check(self) -> Dict[str, Any]:
+    def test_health_check(self) -> dict[str, Any]:
         """Test basic API health."""
         response = self.client.get("/")
         return {
@@ -33,7 +33,7 @@ class FilesystemAPITester:
             "status_code": response.status_code,
         }
 
-    def test_configuration(self) -> Dict[str, Any]:
+    def test_configuration(self) -> dict[str, Any]:
         """Test filesystem configuration endpoint."""
         response = self.client.get(f"{self.base_url}/config")
 
@@ -53,7 +53,7 @@ class FilesystemAPITester:
                 "error": response.text,
             }
 
-    def test_allowed_directories(self) -> Dict[str, Any]:
+    def test_allowed_directories(self) -> dict[str, Any]:
         """Test allowed directories endpoint."""
         response = self.client.get(f"{self.base_url}/directories")
 
@@ -67,7 +67,7 @@ class FilesystemAPITester:
         else:
             return {"success": False, "status_code": response.status_code}
 
-    def test_directory_info(self, directory_path: str) -> Dict[str, Any]:
+    def test_directory_info(self, directory_path: str) -> dict[str, Any]:
         """Test directory info endpoint."""
         # URL encode the path
         import urllib.parse
@@ -97,7 +97,7 @@ class FilesystemAPITester:
 
         return result
 
-    def test_directory_files(self, directory_path: str) -> Dict[str, Any]:
+    def test_directory_files(self, directory_path: str) -> dict[str, Any]:
         """Test directory files listing endpoint."""
         import urllib.parse
 
@@ -126,7 +126,7 @@ class FilesystemAPITester:
 
         return result
 
-    def test_photo_files(self, directory_path: str) -> Dict[str, Any]:
+    def test_photo_files(self, directory_path: str) -> dict[str, Any]:
         """Test photo files endpoint."""
         import urllib.parse
 
@@ -155,7 +155,7 @@ class FilesystemAPITester:
 
         return result
 
-    def test_scan_estimation(self, directory_path: str) -> Dict[str, Any]:
+    def test_scan_estimation(self, directory_path: str) -> dict[str, Any]:
         """Test scan estimation endpoint."""
         response = self.client.post(
             f"{self.base_url}/scan/estimate",
@@ -180,7 +180,7 @@ class FilesystemAPITester:
 
         return result
 
-    def test_security_violations(self) -> Dict[str, Any]:
+    def test_security_violations(self) -> dict[str, Any]:
         """Test security violation handling."""
         dangerous_paths = [
             "../../../etc/passwd",
@@ -222,7 +222,7 @@ class TestFilesystemAPI:
 
     def test_with_real_photos(self):
         """Test API with real photo data."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with isolated_test_environment() as test_env:
             # Setup test environment for API
@@ -302,11 +302,11 @@ class TestFilesystemAPI:
 
     def test_with_synthetic_data(self):
         """Test API with synthetic test data."""
-        reporter = TestReporter()
+        reporter = ReportGenerator()
 
         with temporary_test_directory() as temp_dir:
             # Create synthetic test structure
-            builder = TestFileSystemBuilder(temp_dir)
+            builder = FileSystemBuilder(temp_dir)
             test_dir = builder.add_photos("photos", 3).add_non_photo_files().build()
 
             with isolated_test_environment() as test_env:

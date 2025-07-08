@@ -2,7 +2,6 @@ import hashlib
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import aiofiles
 
@@ -26,10 +25,9 @@ class LocalStorageBackend(StorageBackend):
         file_content: bytes,
         filename: str,
         content_type: str,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
     ) -> StorageResult:
         """Store file to local filesystem."""
-
         # Validate file
         validation_error = self.validate_file(file_content, filename, content_type)
         if validation_error:
@@ -92,7 +90,7 @@ class LocalStorageBackend(StorageBackend):
                 error_message=f"Storage error: {str(e)}",
             )
 
-    async def retrieve_file(self, storage_path: str) -> Optional[bytes]:
+    async def retrieve_file(self, storage_path: str) -> bytes | None:
         """Retrieve file content from local storage."""
         full_path = self.base_path / storage_path
 
@@ -125,7 +123,7 @@ class LocalStorageBackend(StorageBackend):
         full_path = self.base_path / storage_path
         return full_path.exists()
 
-    async def get_file_info(self, storage_path: str) -> Optional[Dict]:
+    async def get_file_info(self, storage_path: str) -> dict | None:
         """Get file metadata from local storage."""
         full_path = self.base_path / storage_path
 
@@ -146,10 +144,9 @@ class LocalStorageBackend(StorageBackend):
             return None
 
     async def list_files(
-        self, path_prefix: str = "", limit: Optional[int] = None
-    ) -> List[Dict]:
+        self, path_prefix: str = "", limit: int | None = None
+    ) -> list[dict]:
         """List files in local storage with optional prefix and limit."""
-
         search_path = self.base_path / path_prefix if path_prefix else self.base_path
         files = []
 
@@ -183,13 +180,13 @@ class LocalStorageBackend(StorageBackend):
         except Exception:
             return []
 
-    async def check_duplicate(self, file_hash: str) -> Optional[str]:
+    async def check_duplicate(self, file_hash: str) -> str | None:
         """Check if file with hash exists in local storage."""
         hash_file = self.hash_index_path / f"{file_hash}.txt"
 
         try:
             if hash_file.exists():
-                async with aiofiles.open(hash_file, "r") as f:
+                async with aiofiles.open(hash_file) as f:
                     storage_path = (await f.read()).strip()
 
                 # Verify the file still exists
@@ -220,7 +217,7 @@ class LocalStorageBackend(StorageBackend):
             # Find hash file that contains this storage path
             for hash_file in self.hash_index_path.glob("*.txt"):
                 try:
-                    async with aiofiles.open(hash_file, "r") as f:
+                    async with aiofiles.open(hash_file) as f:
                         content = (await f.read()).strip()
 
                     if content == storage_path:
@@ -231,7 +228,7 @@ class LocalStorageBackend(StorageBackend):
         except Exception:
             pass  # Non-critical operation
 
-    def get_storage_stats(self) -> Dict:
+    def get_storage_stats(self) -> dict:
         """Get storage backend statistics."""
         try:
             total_size = 0

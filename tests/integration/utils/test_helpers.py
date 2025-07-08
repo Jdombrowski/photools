@@ -6,16 +6,17 @@ to specific implementations.
 """
 
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any
 
 from PIL import Image
 
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_processor import PhotoProcessor
-from tests.integration.config.test_settings import TestEnvironment
+from tests.integration.config.test_settings import TestingEnvironment
 
 
 class TestPhotoFactory:
@@ -43,7 +44,7 @@ class TestPhotoFactory:
     @staticmethod
     def create_test_photos_batch(
         directory: Path, count: int = 5, prefix: str = "test_photo"
-    ) -> List[Path]:
+    ) -> list[Path]:
         """Create a batch of test photos in a directory."""
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -61,20 +62,20 @@ class TestPhotoFactory:
         return photos
 
 
-class TestFileSystemBuilder:
+class FileSystemBuilder:
     """Builder for creating test file system scenarios."""
 
     def __init__(self, base_dir: Path):
         self.base_dir = base_dir
         self.base_dir.mkdir(parents=True, exist_ok=True)
 
-    def add_photos(self, subdir: str = "", count: int = 3) -> "TestFileSystemBuilder":
+    def add_photos(self, subdir: str = "", count: int = 3) -> "FileSystemBuilder":
         """Add photos to the test file system."""
         target_dir = self.base_dir / subdir if subdir else self.base_dir
         TestPhotoFactory.create_test_photos_batch(target_dir, count)
         return self
 
-    def add_nested_structure(self) -> "TestFileSystemBuilder":
+    def add_nested_structure(self) -> "FileSystemBuilder":
         """Add a nested directory structure with photos."""
         structure = {
             "level1/photos": 3,
@@ -87,7 +88,7 @@ class TestFileSystemBuilder:
 
         return self
 
-    def add_non_photo_files(self) -> "TestFileSystemBuilder":
+    def add_non_photo_files(self) -> "FileSystemBuilder":
         """Add non-photo files for testing filtering."""
         files = [
             ("readme.txt", "This is a text file"),
@@ -114,20 +115,20 @@ def temporary_test_directory() -> Generator[Path, None, None]:
 
 
 @contextmanager
-def isolated_test_environment() -> Generator[TestEnvironment, None, None]:
+def isolated_test_environment() -> Generator[TestingEnvironment, None, None]:
     """Context manager for isolated test environment."""
-    with TestEnvironment() as test_env:
+    with TestingEnvironment() as test_env:
         yield test_env
 
 
 class ServiceTestBuilder:
     """Builder for creating configured services for testing."""
 
-    def __init__(self, test_env: TestEnvironment):
+    def __init__(self, test_env: TestingEnvironment):
         self.test_env = test_env
 
     def build_file_system_service(
-        self, allowed_directories: Optional[List[Path]] = None
+        self, allowed_directories: list[Path] | None = None
     ) -> SecureFileSystemService:
         """Build a configured file system service for testing."""
         if allowed_directories is None:
@@ -140,7 +141,7 @@ class ServiceTestBuilder:
         )
 
     def build_photo_processor(
-        self, file_system_service: Optional[SecureFileSystemService] = None
+        self, file_system_service: SecureFileSystemService | None = None
     ) -> PhotoProcessor:
         """Build a configured photo processor for testing."""
         if file_system_service is None:
@@ -153,8 +154,8 @@ class ServiceTestBuilder:
 
     def build_directory_scanner(
         self,
-        file_system_service: Optional[SecureFileSystemService] = None,
-        photo_processor: Optional[PhotoProcessor] = None,
+        file_system_service: SecureFileSystemService | None = None,
+        photo_processor: PhotoProcessor | None = None,
     ) -> SecureDirectoryScanner:
         """Build a configured directory scanner for testing."""
         if file_system_service is None:
@@ -207,7 +208,7 @@ class TestAssertions:
 
     @staticmethod
     def assert_metadata_extracted(
-        metadata_dict: Dict[str, Any], required_fields: List[str]
+        metadata_dict: dict[str, Any], required_fields: list[str]
     ):
         """Assert that metadata contains required fields."""
         missing_fields = [
@@ -231,7 +232,7 @@ class TestAssertions:
             )
 
 
-class TestReporter:
+class ReportGenerator:
     """Utility for generating test reports."""
 
     def __init__(self):
