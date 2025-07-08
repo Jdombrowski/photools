@@ -284,12 +284,15 @@ test-integration: ## Run integration tests only
 test-service: ## Run tests for specific service directory (usage: make test-service SERVICE=storage)
 	@if [ -z "$(SERVICE)" ]; then \
 		echo "❌ Usage: make test-service SERVICE=service-name"; \
-		echo "   Available services: storage, photo_processor, file_system_service, etc."; \
+		echo "   Available services: storage, photo_processor, file_system_service, directory_scanner, etc."; \
 		exit 1; \
 	fi
 	@echo "🧪 Running tests for $(SERVICE) service..."
 	@echo "🔍 Checking for test files..."
-	@if [ -f "tests/unit/core/services/test_$(SERVICE).py" ]; then \
+	@if [ -d "tests/unit/core/services/$(SERVICE)/" ]; then \
+		echo "✅ Found service test directory: tests/unit/core/services/$(SERVICE)/"; \
+		poetry run pytest tests/unit/core/services/$(SERVICE)/ -v; \
+	elif [ -f "tests/unit/core/services/test_$(SERVICE).py" ]; then \
 		echo "✅ Found service test file: tests/unit/core/services/test_$(SERVICE).py"; \
 		poetry run pytest tests/unit/core/services/test_$(SERVICE).py -v; \
 	elif [ -d "tests/unit/core/$(SERVICE)/" ]; then \
@@ -298,14 +301,36 @@ test-service: ## Run tests for specific service directory (usage: make test-serv
 	else \
 		echo "❌ No tests found for service: $(SERVICE)"; \
 		echo "   Looked for:"; \
+		echo "   - tests/unit/core/services/$(SERVICE)/"; \
 		echo "   - tests/unit/core/services/test_$(SERVICE).py"; \
 		echo "   - tests/unit/core/$(SERVICE)/"; \
 		exit 1; \
 	fi
 
-lint: ## Run code linting
-	@echo "🔍 Linting code..."
-	@poetry run $(LINT_COMMAND)
+lint: lint-fast ## Run fast linting (alias for lint-fast)
+
+lint-fast: ## Run fast linting with Ruff (development workflow)
+	@echo "🚀 Running fast linting with Ruff..."
+	@poetry run ruff check src tests --fix
+
+lint-complexity: ## Run complexity analysis with Pylint (core modules only)
+	@echo "🔍 Running complexity analysis with Pylint..."
+	@echo "📊 Analyzing core services..."
+	@poetry run pylint src/core/services/ --reports=y --score=y
+	@echo "📊 Analyzing core models..."
+	@poetry run pylint src/core/models/ --reports=y --score=y 2>/dev/null || echo "⚠️  No models directory found"
+
+lint-full: lint-fast lint-complexity ## Complete linting suite (CI workflow)
+	@echo "✅ Complete linting analysis finished"
+
+lint-service: ## Run linting on specific service (usage: make lint-service SERVICE=storage)
+	@if [ -z "$(SERVICE)" ]; then \
+		echo "❌ Usage: make lint-service SERVICE=service-name"; \
+		exit 1; \
+	fi
+	@echo "🔍 Linting $(SERVICE) service..."
+	@poetry run ruff check src/core/services/$(SERVICE)/ --fix
+	@poetry run pylint src/core/services/$(SERVICE)/ --reports=y --score=y
 
 format: ## Format code with black and isort
 	@echo "🎨 Formatting code..."
@@ -315,7 +340,7 @@ type-check: ## Run type checking with mypy
 	@echo "🔍 Type checking..."
 	@poetry run mypy src/
 
-quality: lint type-check ## Run all code quality checks
+quality: lint-full type-check ## Run all code quality checks (full analysis)
 
 coverage: ## Generate coverage report
 	@echo "📊 Generating coverage report..."

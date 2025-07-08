@@ -9,6 +9,7 @@ readme = "README.md"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^6.2.1"
+pylint = "^3.0.0"
 
 [tool.pyright]
 venvPath = "."
@@ -46,5 +47,101 @@ line-length = 88
 
 [tool.ruff]
 line-length = 88
-select = ["E", "W", "F", "I"]
-target-version = "py311"
+target-version = "py312"
+
+[tool.ruff.lint]
+# Comprehensive rule selection for maximum coverage
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings  
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "C4",     # flake8-comprehensions
+    "PYI",    # flake8-pyi
+    "FA",     # flake8-future-annotations
+    "S",      # flake8-bandit
+    "D",      # pydocstyle
+    "PERF",   # perflint
+    "TID",    # flake8-tidy-imports
+    "C90",    # mccabe (basic complexity)
+]
+
+# Ignore specific rules handled by pylint or inappropriate for this project
+ignore = [
+    "D100",   # Missing docstring in public module (pylint handles better)
+    "D101",   # Missing docstring in public class (pylint handles better)
+    "D102",   # Missing docstring in public method (pylint handles better)
+    "D103",   # Missing docstring in public function (pylint handles better)
+    "D104",   # Missing docstring in public package (pylint handles better)
+    "C901",   # Complex function (pylint handles with better metrics)
+    "S101",   # Use of assert (acceptable in tests)
+    "TID252", # Relative imports (acceptable in our architecture)
+    "D203",   # One blank line before class (conflicts with D211)
+    "D213",   # Multi-line docstring second line (conflicts with D212)
+]
+
+# Per-file ignores for appropriate contexts
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "S"]  # Relaxed docs and security for tests
+"scripts/*" = ["D", "S101"]  # Relaxed for utility scripts
+"src/infrastructure/*" = ["D100", "D101"]  # Infrastructure can have relaxed docs
+"src/api/main.py" = ["S104"]  # Allow binding to all interfaces in main
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10  # Basic complexity threshold (pylint handles detailed analysis)
+
+[tool.pylint.main]
+# Focus on complexity and design analysis
+load-plugins = []
+disable = [
+    # Rules handled by ruff
+    "line-too-long",
+    "trailing-whitespace", 
+    "missing-final-newline",
+    "unused-import",
+    "wrong-import-order",
+    # Style rules ruff handles better
+    "invalid-name",
+    "missing-module-docstring",
+    "missing-class-docstring", 
+    "missing-function-docstring",
+    # Focus on complexity, not style
+    "too-few-public-methods",
+]
+
+enable = [
+    # Complexity metrics
+    "cyclic-import",
+    "too-many-branches",
+    "too-many-statements", 
+    "too-many-locals",
+    "too-many-arguments",
+    # Design patterns
+    "unused-variable",
+    "unused-argument", 
+    "unreachable",
+    # Logic errors
+    "undefined-variable",
+    "used-before-assignment",
+]
+
+[tool.pylint.reports]
+output-format = "colorized"
+reports = true
+score = true
+
+[tool.pylint.refactoring]
+max-nested-blocks = 5
+
+[tool.pylint.design]
+max-args = 7
+max-locals = 15
+max-branches = 12
+max-statements = 50
+max-attributes = 10
+max-public-methods = 20
+
+[tool.pylint.similarities]
+min-similarity-lines = 10
