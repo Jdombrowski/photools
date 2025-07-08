@@ -1,14 +1,8 @@
 from pathlib import Path
 from typing import List, Optional, Set
 
-from pydantic import Field, field_validator
-from pydantic_settings import SettingsConfigDict
-
-try:
-    from pydantic_settings import BaseSettings
-except ImportError:
-    from pydantic import BaseSettings
-
+from pydantic import Field, field_validator 
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class PhotoDirectorySettings(BaseSettings):
