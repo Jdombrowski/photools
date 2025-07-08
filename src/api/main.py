@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 # Import route modules
 from src.api.routes import filesystem, health, photos
@@ -35,6 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Include routers
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(photos.router, prefix="/api/v1")
@@ -43,11 +47,18 @@ app.include_router(filesystem.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/static/index.html")
+
+
+@app.get("/api")
+async def api_root():
     return {
         "message": "Photools API is running",
         "version": "0.1.0",
         "docs": "/docs",
         "health": "/api/v1/health",
+        "ui": "/static/index.html",
     }
 
 
