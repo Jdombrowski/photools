@@ -535,6 +535,82 @@ test-docker-coverage: ## Run tests with coverage in Docker
 	@echo "✅ Tests with coverage complete"
 
 
+##@ API Testing
+test-api: ## Test all API endpoints with sample requests
+	@echo "🔍 Testing API endpoints..."
+	@echo "📊 Testing API health..."
+	@curl -s http://localhost:8000/api/v1/health | jq '.' || echo "❌ Health check failed"
+	@echo
+	@echo "📊 Testing photo listing..."
+	@curl -s "http://localhost:8000/api/v1/photos?limit=5" | jq '.photos | length' || echo "❌ Photo listing failed"
+	@echo
+	@echo "📊 Testing storage stats..."
+	@curl -s http://localhost:8000/api/v1/storage/info | jq '.' || echo "❌ Storage info failed"
+	@echo
+	@echo "📊 Testing preview stats..."
+	@curl -s http://localhost:8000/api/v1/storage/preview-stats | jq '.' || echo "❌ Preview stats failed"
+	@echo "✅ API endpoint testing complete"
+
+test-api-verbose: ## Test API endpoints with full response output  
+	@echo "🔍 Testing API endpoints (verbose output)..."
+	@echo "========================================"
+	@echo "📊 API Health Check:"
+	@curl -s http://localhost:8000/api/v1/health | jq '.'
+	@echo
+	@echo "📊 Photo Listing (first 5):"
+	@curl -s "http://localhost:8000/api/v1/photos?limit=5" | jq '.'
+	@echo
+	@echo "📊 Storage Information:"
+	@curl -s http://localhost:8000/api/v1/storage/info | jq '.'
+	@echo
+	@echo "📊 Preview Storage Stats:"
+	@curl -s http://localhost:8000/api/v1/storage/preview-stats | jq '.'
+	@echo
+	@echo "📊 Testing first photo preview (if any photos exist):"
+	@PHOTO_ID=$$(curl -s "http://localhost:8000/api/v1/photos?limit=1" | jq -r '.photos[0].id // empty'); \
+	if [ -n "$$PHOTO_ID" ]; then \
+		echo "   🖼️  Testing preview for photo: $$PHOTO_ID"; \
+		curl -s -I "http://localhost:8000/api/v1/photos/$$PHOTO_ID/preview?size=thumbnail" | head -5; \
+	else \
+		echo "   ⚠️  No photos found to test preview generation"; \
+	fi
+	@echo "✅ Verbose API testing complete"
+
+test-api-snapshot: ## Generate API response snapshots for change tracking
+	@echo "📸 Generating API response snapshots..."
+	@mkdir -p tests/snapshots/api
+	@echo "📊 Capturing health endpoint..."
+	@curl -s http://localhost:8000/api/v1/health > tests/snapshots/api/health.json
+	@echo "📊 Capturing photo listing..."
+	@curl -s "http://localhost:8000/api/v1/photos?limit=10" > tests/snapshots/api/photos_list.json
+	@echo "📊 Capturing storage info..."
+	@curl -s http://localhost:8000/api/v1/storage/info > tests/snapshots/api/storage_info.json
+	@echo "📊 Capturing preview stats..."
+	@curl -s http://localhost:8000/api/v1/storage/preview-stats > tests/snapshots/api/preview_stats.json
+	@echo "📊 Capturing API root..."
+	@curl -s http://localhost:8000/api > tests/snapshots/api/api_root.json
+	@echo "✅ API snapshots saved to tests/snapshots/api/"
+	@echo "   📁 Use 'make test-api-diff' to compare changes"
+
+test-api-diff: ## Compare current API responses with snapshots
+	@echo "🔍 API Change Detection..."
+	@if [ ! -d tests/snapshots/api ]; then \
+		echo "❌ No snapshots found. Run 'make test-api-snapshot' first."; \
+		exit 1; \
+	fi
+	@./scripts/api-diff.sh
+
+api-check: test-api-diff ## Quick alias for API change detection
+
+api-workflow: ## Complete API testing workflow (snapshot → test → diff)
+	@echo "🔄 Running complete API workflow..."
+	@echo "📸 Step 1: Taking baseline snapshot..."
+	@$(MAKE) test-api-snapshot
+	@echo ""
+	@echo "🔍 Step 2: Checking for changes..."
+	@$(MAKE) test-api-diff
+
+
 ##@ Quick Development Workflow
 quick-start: setup-env docker-dev ## Quick start: setup env and start services
 	@echo "🚀 Quick start complete!"
