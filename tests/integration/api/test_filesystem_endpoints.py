@@ -26,7 +26,7 @@ class FilesystemAPITester:
 
     def test_health_check(self) -> dict[str, Any]:
         """Test basic API health."""
-        response = self.client.get("/")
+        response = self.client.get("/api")
         return {
             "success": response.status_code == 200,
             "data": response.json() if response.status_code == 200 else None,
@@ -313,7 +313,7 @@ class TestFilesystemAPI:
                 # Override allowed directories for this test
                 import os
 
-                os.environ["PHOTO_ALLOWED_PHOTO_DIRECTORIES"] = str(test_dir)
+                os.environ["allowed_photo_directories"] = str(test_dir)
                 test_env.setup_test_environment()
 
                 try:

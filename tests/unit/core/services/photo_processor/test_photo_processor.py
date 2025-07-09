@@ -508,7 +508,7 @@ class TestPhotoProcessor:
         """Test that process_directory issues deprecation warning."""
         processor = PhotoProcessor()
 
-        with pytest.warns(None) as warning_list:
+        with pytest.warns() as warning_list:
             results = processor.process_directory(temp_directory, recursive=False)
 
         # Check that deprecation warning was issued
@@ -677,12 +677,11 @@ class TestPhotoProcessorIntegration:
             assert metadata.file_path == jpeg_path
 
             # Test with file outside allowed directory
-            outside_dir = Path(temp_dir) / "outside"
-            outside_dir.mkdir()
-            outside_image = outside_dir / "outside.jpg"
-            img.save(outside_image, "JPEG")
+            with tempfile.TemporaryDirectory() as outside_temp_dir:
+                outside_image = Path(outside_temp_dir) / "outside.jpg"
+                img.save(outside_image, "JPEG")
 
-            with pytest.raises(
-                PhotoProcessingError, match="Security validation failed"
-            ):
-                processor.process_photo(outside_image)
+                with pytest.raises(
+                    PhotoProcessingError, match="File access denied"
+                ):
+                    processor.process_photo(outside_image)

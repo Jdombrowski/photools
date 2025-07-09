@@ -6,7 +6,7 @@ import pytest
 import re
 
 
-@pytest.hookimpl(tryfirst=True)
+@pytest.hookimpl(tryfirst=True)  
 def pytest_runtest_logreport(report):
     """Hook to customize test result output - format with newlines and grey paths."""
     if hasattr(report, 'nodeid') and report.nodeid and "::" in report.nodeid:
@@ -27,6 +27,9 @@ def pytest_runtest_logreport(report):
                 class_part = remaining_parts[0]
                 method_part = "::".join(remaining_parts[1:])
                 report.nodeid = f"{grey_file_path}::\n    {class_part}::\n        {method_part}"
+
+
+# Removed the makereport hook as it was interfering with error messages
 
 
 @pytest.hookimpl(hookwrapper=True)

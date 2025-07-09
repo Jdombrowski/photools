@@ -165,8 +165,8 @@ class PhotoProcessor:
 
     def extract_exif_datetime(self, exif_data: dict[str, Any]) -> datetime | None:
         """Extract and parse datetime from EXIF data."""
-        # Try multiple EXIF datetime fields
-        datetime_tags = ["DateTime", "DateTimeOriginal", "DateTimeDigitized"]
+        # Try multiple EXIF datetime fields in priority order
+        datetime_tags = ["DateTimeOriginal", "DateTime", "DateTimeDigitized"]
 
         for tag in datetime_tags:
             if tag in exif_data and exif_data[tag]:
@@ -350,9 +350,12 @@ class PhotoProcessor:
             for better security, progress tracking, and error handling.
 
         """
-        logger.warning(
+        import warnings
+        warnings.warn(
             "PhotoProcessor.process_directory is deprecated. "
-            "Use SecureDirectoryScanner for better security and features."
+            "Use SecureDirectoryScanner for better security and features.",
+            DeprecationWarning,
+            stacklevel=2
         )
 
         # Basic security validation
