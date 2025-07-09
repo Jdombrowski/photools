@@ -350,9 +350,14 @@ class TestSecureDirectoryScanner:
 
     def test_unknown_scan_strategy(self, scanner, temp_directory):
         """Test handling of unknown scan strategy."""
-        # Create mock strategy that doesn't exist
+        # Create a mock enum value that doesn't exist in the current implementation
+        from unittest.mock import MagicMock
         options = ScanOptions()
-        options.strategy = "unknown_strategy"
+        
+        # Create a mock strategy that isn't handled by the scanner
+        mock_strategy = MagicMock()
+        mock_strategy.value = "unknown_strategy"
+        options.strategy = mock_strategy
 
         with pytest.raises(ValueError, match="Unknown scan strategy"):
             scanner.scan_directory(temp_directory, options)

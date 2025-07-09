@@ -20,7 +20,9 @@ DEFAULT_EMBEDDING_MODEL = sentence-transformers/all-MiniLM-L6-v2
 DEFAULT_VISION_MODEL = microsoft/resnet-50
 
 # Development settings
-TEST_COMMAND = pytest -v --cov=src --cov-report=html --cov-report=term
+TEST_COMMAND = pytest --tb=short --cov=src --cov-report=html --cov-report=term
+TEST_COMMAND_QUICK = pytest --tb=line -q --disable-warnings
+TEST_COMMAND_VERBOSE = pytest -v --tb=long --cov=src --cov-report=html --cov-report=term
 LINT_COMMAND = ruff check src tests
 FORMAT_COMMAND = black src tests && isort src tests
 
@@ -269,17 +271,33 @@ shell: ## Open interactive Python shell with project context
 	@poetry run python -c "from src.config.settings import get_settings; print('🐍 Python shell ready with project context')"
 
 ##@ Testing and Quality
-test: ## Run full test suite
+test: ## Run full test suite with concise output
 	@echo "🧪 Running tests..."
 	@poetry run $(TEST_COMMAND)
 
+test-quick: ## Run tests with minimal output (quick feedback)
+	@echo "🧪 Running quick tests..."
+	@poetry run $(TEST_COMMAND_QUICK)
+
+test-verbose: ## Run tests with detailed output (for debugging)
+	@echo "🧪 Running verbose tests..."
+	@poetry run $(TEST_COMMAND_VERBOSE)
+
+test-failed: ## Run only failed tests from last run
+	@echo "🧪 Running failed tests..."
+	@poetry run pytest --lf --tb=short -q
+
+test-summary: ## Run tests with failure summary only
+	@echo "🧪 Running tests with summary..."
+	@poetry run pytest --tb=no -q --disable-warnings || poetry run pytest --lf --tb=short -v
+
 test-unit: ## Run unit tests only
 	@echo "🧪 Running unit tests..."
-	@poetry run pytest tests/unit/ -v
+	@poetry run pytest tests/unit/ --tb=short -q
 
 test-integration: ## Run integration tests only
 	@echo "🧪 Running integration tests..."
-	@poetry run pytest tests/integration/ -v
+	@poetry run pytest tests/integration/ --tb=short -q
 
 test-service: ## Run tests for specific service directory (usage: make test-service SERVICE=storage)
 	@if [ -z "$(SERVICE)" ]; then \

@@ -361,7 +361,7 @@ def run_api_integration_tests():
     print("=" * 60)
 
     tests = TestFilesystemAPI()
-    overall_reporter = TestReporter()
+    overall_reporter = ReportGenerator()
 
     # Test with real photos
     try:

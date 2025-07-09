@@ -137,11 +137,11 @@ class SecureDirectoryScanner:
             ScanResult with file system information
 
         """
+        scan_id = f"fast_scan_{datetime.now().isoformat()}"
+        progress = ScanProgress(start_time=datetime.now())
+        
         try:
             self.validate_scan_request(directory_path, options)
-
-            scan_id = f"fast_scan_{datetime.now().isoformat()}"
-            progress = ScanProgress(start_time=datetime.now())
             self._active_scans[scan_id] = progress
 
             # Get photo files with security filtering
@@ -225,11 +225,11 @@ class SecureDirectoryScanner:
             ScanResult with complete photo metadata
 
         """
+        scan_id = f"full_scan_{datetime.now().isoformat()}"
+        progress = ScanProgress(start_time=datetime.now())
+        
         try:
             self.validate_scan_request(directory_path, options)
-
-            scan_id = f"full_scan_{datetime.now().isoformat()}"
-            progress = ScanProgress(start_time=datetime.now())
             self._active_scans[scan_id] = progress
 
             # Get photo files

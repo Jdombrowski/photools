@@ -145,3 +145,33 @@ max-public-methods = 20
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
+
+[tool.pytest.ini_options]
+# Concise output by default for better scanning
+addopts = [
+    "--tb=short",           # Short traceback format
+    "--strict-markers",     # Strict marker validation
+    "--disable-warnings",   # Hide warnings unless running verbose
+    "-ra",                  # Show extra test summary info for all except passed
+    "--color=yes",          # Force color output
+]
+
+# Test discovery
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Markers for categorizing tests
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "slow: Slow tests",
+    "requires_db: Tests requiring database",
+    "requires_redis: Tests requiring Redis",
+]
+
+# Console output options
+console_output_style = "progress"  # progress, classic, or count
+log_cli = false
+log_cli_level = "INFO"
