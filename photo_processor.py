@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from celery import Task
 from PIL import Image
@@ -23,9 +23,8 @@ class CallbackTask(Task):
 
 
 @celery_app.task(base=CallbackTask, bind=True)
-def process_single_photo(self, file_path: str) -> Dict[str, Any]:
+def process_single_photo(self, file_path: str) -> dict[str, Any]:
     """Process a single photo file and extract metadata"""
-
     try:
         # Validate file exists and is accessible
         if not os.path.exists(file_path):
@@ -62,9 +61,8 @@ def process_single_photo(self, file_path: str) -> Dict[str, Any]:
 
 
 @celery_app.task(base=CallbackTask)
-def process_batch_photos(file_paths: list) -> Dict[str, Any]:
+def process_batch_photos(file_paths: list) -> dict[str, Any]:
     """Process multiple photos in batch"""
-
     results = {"total": len(file_paths), "successful": 0, "failed": 0, "results": []}
 
     for file_path in file_paths:
@@ -87,9 +85,8 @@ def process_batch_photos(file_paths: list) -> Dict[str, Any]:
 
 
 @celery_app.task(base=CallbackTask)
-def scan_directory(directory_path: str, recursive: bool = True) -> Dict[str, Any]:
+def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any]:
     """Scan a directory for photo files"""
-
     photo_extensions = {
         ".jpg",
         ".jpeg",
@@ -157,9 +154,8 @@ def generate_file_hash(file_path: str) -> str:
     return hash_sha256.hexdigest()
 
 
-def extract_image_metadata(file_path: str) -> Dict[str, Any]:
+def extract_image_metadata(file_path: str) -> dict[str, Any]:
     """Extract basic image metadata using PIL"""
-
     try:
         with Image.open(file_path) as img:
             # Basic image info

@@ -385,8 +385,7 @@ async def trigger_bulk_preview_generation(
     """Trigger background bulk preview generation with smart queueing"""
     from sqlalchemy import select
 
-    from src.core.services.preview_queue_service import (PreviewPriority,
-                                                         preview_queue)
+    from src.core.services.preview_queue_service import PreviewPriority, preview_queue
     from src.infrastructure.database.models import Photo
 
     try:

@@ -49,13 +49,20 @@ line-length = 88
 line-length = 88
 target-version = "py312"
 
+[tool.ruff.format]
+# Enable ruff's formatter as a black replacement
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
 [tool.ruff.lint]
 # Comprehensive rule selection for maximum coverage
 select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings  
     "F",      # pyflakes
-    "I",      # isort
+    "I",      # isort (import sorting)
     "B",      # flake8-bugbear
     "UP",     # pyupgrade
     "C4",     # flake8-comprehensions
@@ -91,6 +98,13 @@ ignore = [
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10  # Basic complexity threshold (pylint handles detailed analysis)
+
+[tool.ruff.lint.isort]
+# Configure ruff's isort to match project structure
+known-first-party = ["src"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+split-on-trailing-comma = true
+force-single-line = false
 
 [tool.pylint.main]
 # Focus on complexity and design analysis

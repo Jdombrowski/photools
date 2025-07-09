@@ -175,8 +175,7 @@ class TestAssertions:
     @staticmethod
     def assert_security_violation_blocked(func, *args, **kwargs):
         """Assert that a function raises a security violation."""
-        from src.core.services.file_system_service import \
-            FileSystemSecurityError
+        from src.core.services.file_system_service import FileSystemSecurityError
 
         try:
             result = func(*args, **kwargs)

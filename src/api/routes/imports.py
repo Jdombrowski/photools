@@ -19,10 +19,12 @@ from src.config.settings import get_settings
 from src.core.models.scan_result import ScanStrategy
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import SecureFileSystemService
-from src.core.services.photo_import_service import (ImportOptions,
-                                                    ImportPriority,
-                                                    ImportStatus,
-                                                    PhotoImportService)
+from src.core.services.photo_import_service import (
+    ImportOptions,
+    ImportPriority,
+    ImportStatus,
+    PhotoImportService,
+)
 from src.core.services.photo_upload_service import PhotoUploadService
 from src.core.storage.local import LocalStorageBackend
 

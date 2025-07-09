@@ -24,7 +24,8 @@ TEST_COMMAND = pytest --tb=short --cov=src --cov-report=html --cov-report=term
 TEST_COMMAND_QUICK = pytest --tb=line -q --disable-warnings
 TEST_COMMAND_VERBOSE = pytest -v --tb=long --cov=src --cov-report=html --cov-report=term
 LINT_COMMAND = ruff check src tests
-FORMAT_COMMAND = black src tests && isort src tests
+FORMAT_COMMAND = black src tests
+RUFF_FORMAT_COMMAND = ruff check src tests --fix
 
 ##@ Help
 help: ## Display this help message
@@ -329,7 +330,7 @@ lint: lint-fast ## Run fast linting (alias for lint-fast)
 
 lint-fast: ## Run fast linting with Ruff (development workflow)
 	@echo "🚀 Running fast linting with Ruff..."
-	@poetry run ruff check src tests --fix
+	@poetry run $(RUFF_FORMAT_COMMAND)
 
 lint-complexity: ## Run complexity analysis with Pylint (core modules only)
 	@echo "🔍 Running complexity analysis with Pylint..."
@@ -350,15 +351,27 @@ lint-service: ## Run linting on specific service (usage: make lint-service SERVI
 	@poetry run ruff check src/core/services/$(SERVICE)/ --fix
 	@poetry run pylint src/core/services/$(SERVICE)/ --reports=y --score=y
 
-format: ## Format code with black and isort
-	@echo "🎨 Formatting code..."
+format: ## Format code with black only (imports handled by ruff)
+	@echo "🎨 Formatting code with black..."
 	@poetry run $(FORMAT_COMMAND)
+
+format-imports: ## Fix imports with ruff (called by lint-fast)
+	@echo "🔧 Fixing imports with ruff..."
+	@poetry run $(RUFF_FORMAT_COMMAND)
+
+format-all: format format-imports ## Run both black and ruff formatting
 
 type-check: ## Run type checking with mypy
 	@echo "🔍 Type checking..."
 	@poetry run mypy src/
 
-quality: lint-full type-check ## Run all code quality checks (full analysis)
+quality: format-all lint-full type-check ## Run all code quality checks (full analysis)
+
+quality-ci: ## Run quality checks for CI (no formatting, check only)
+	@echo "🔍 Running CI quality checks..."
+	@poetry run ruff check src tests --no-fix
+	@poetry run ruff format src tests --check
+	@poetry run mypy src/
 
 coverage: ## Generate coverage report
 	@echo "📊 Generating coverage report..."

@@ -1,10 +1,15 @@
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from ...models.scan_result import (ScanOptions, ScanProgress, ScanResult,
-                                   ScanStatus, ScanStrategy)
+from ...models.scan_result import (
+    ScanOptions,
+    ScanProgress,
+    ScanResult,
+    ScanStatus,
+    ScanStrategy,
+)
 from ..file_system_service import SecureFileSystemService, SecurityConstraints
 from ..photo_processor import PhotoProcessingError, PhotoProcessor
 

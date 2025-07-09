@@ -4,11 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from src.core.services.file_system_service import (AccessLevel,
-                                                   FileSystemEntry,
-                                                   FileSystemSecurityError,
-                                                   SecureFileSystemService,
-                                                   SecurityConstraints)
+from src.core.services.file_system_service import (
+    AccessLevel,
+    FileSystemEntry,
+    FileSystemSecurityError,
+    SecureFileSystemService,
+    SecurityConstraints,
+)
 
 
 class TestSecurityConstraints:

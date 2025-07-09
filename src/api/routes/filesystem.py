@@ -4,14 +4,14 @@ from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 
-from ...config.settings import (get_photo_directories, get_photo_extensions,
-                                get_settings)
+from ...config.settings import get_photo_directories, get_photo_extensions, get_settings
 from ...core.models.scan_result import ScanStrategy
-from ...core.services.directory_scanner import (ScanOptions,
-                                                SecureDirectoryScanner)
-from ...core.services.file_system_service import (FileSystemSecurityError,
-                                                  SecureFileSystemService,
-                                                  SecurityConstraints)
+from ...core.services.directory_scanner import ScanOptions, SecureDirectoryScanner
+from ...core.services.file_system_service import (
+    FileSystemSecurityError,
+    SecureFileSystemService,
+    SecurityConstraints,
+)
 from ...core.services.photo_processor import PhotoProcessor
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,9 @@ def get_file_system_service() -> SecureFileSystemService:
 
     # Log API security configuration
     logger.info(
-        f"API FileSystem service configured with {len(allowed_directories)} allowed directories, max_size={constraints.max_file_size_mb}MB, max_depth={constraints.max_depth}"
+        f"API FileSystem service configured with {len(allowed_directories)} "
+        f"allowed directories, max_size={constraints.max_file_size_mb}MB, "
+        f"max_depth={constraints.max_depth}"
     )
 
     return service
@@ -62,7 +64,15 @@ def get_file_system_service() -> SecureFileSystemService:
 def get_directory_scanner(
     file_system_service: SecureFileSystemService = Depends(get_file_system_service),
 ) -> SecureDirectoryScanner:
-    """Get configured directory scanner."""
+    """Get configured directory scanner.
+
+    Args:
+        file_system_service: Secure file system service dependency
+
+    Returns:
+        Configured directory scanner
+
+    """
     photo_processor = PhotoProcessor(file_system_service=file_system_service)
     return SecureDirectoryScanner(
         file_system_service=file_system_service, photo_processor=photo_processor
@@ -82,7 +92,9 @@ async def list_allowed_directories() -> list[str]:
         return [str(d) for d in directories]
     except Exception as e:
         logger.error(f"Error getting allowed directories: {e}")
-        raise HTTPException(status_code=500, detail="Failed to get allowed directories")
+        raise HTTPException(
+            status_code=500, detail="Failed to get allowed directories"
+        ) from e
 
 
 @router.get("/directories/{directory_path:path}/info")
@@ -94,6 +106,7 @@ async def get_directory_info(
 
     Args:
         directory_path: Path to directory
+        file_system_service: Secure file system service dependency
 
     Returns:
         Directory information and statistics
@@ -128,12 +141,12 @@ async def get_directory_info(
 
     except FileSystemSecurityError as e:
         logger.warning(f"Security error accessing directory {directory_path}: {e}")
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Error getting directory info for {directory_path}: {e}")
         raise HTTPException(
             status_code=500, detail="Failed to get directory information"
-        )
+        ) from e
 
 
 @router.get("/directories/{directory_path:path}/files")
@@ -151,6 +164,7 @@ async def list_directory_files(
         directory_path: Path to directory
         recursive: Whether to scan recursively
         max_depth: Maximum recursion depth
+        file_system_service: Secure file system service dependency
 
     Returns:
         List of accessible files and directories
@@ -195,10 +209,12 @@ async def list_directory_files(
 
     except FileSystemSecurityError as e:
         logger.warning(f"Security error listing directory {directory_path}: {e}")
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Error listing directory {directory_path}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to list directory contents")
+        raise HTTPException(
+            status_code=500, detail="Failed to list directory contents"
+        ) from e
 
 
 @router.get("/directories/{directory_path:path}/photos")
@@ -212,6 +228,7 @@ async def list_photo_files(
     Args:
         directory_path: Path to directory
         recursive: Whether to scan recursively
+        file_system_service: Secure file system service dependency
 
     Returns:
         List of accessible photo files
@@ -257,10 +274,10 @@ async def list_photo_files(
 
     except FileSystemSecurityError as e:
         logger.warning(f"Security error listing photos in {directory_path}: {e}")
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Error listing photos in {directory_path}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to list photo files")
+        raise HTTPException(status_code=500, detail="Failed to list photo files") from e
 
 
 @router.post("/scan/estimate")
@@ -274,6 +291,7 @@ async def estimate_scan(
     Args:
         directory_path: Path to directory to scan
         recursive: Whether scan would be recursive
+        directory_scanner: Directory scanner service dependency
 
     Returns:
         Scan size estimates and timing information
@@ -286,10 +304,10 @@ async def estimate_scan(
 
     except FileSystemSecurityError as e:
         logger.warning(f"Security error estimating scan for {directory_path}: {e}")
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Error estimating scan for {directory_path}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to estimate scan")
+        raise HTTPException(status_code=500, detail="Failed to estimate scan") from e
 
 
 @router.post("/scan/start")
@@ -310,10 +328,12 @@ async def start_directory_scan(
 
     Args:
         directory_path: Path to directory to scan
+        background_tasks: FastAPI background tasks
         strategy: Scanning strategy (fast or full metadata)
         recursive: Whether to scan recursively
         max_files: Maximum number of files to scan
         batch_size: Batch size for processing
+        directory_scanner: Directory scanner service dependency
 
     Returns:
         Scan result information

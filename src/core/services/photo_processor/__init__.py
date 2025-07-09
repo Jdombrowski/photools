@@ -9,8 +9,11 @@ from typing import Any, Dict, List, Optional
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS
 
-from ..file_system_service import (AccessLevel, FileSystemSecurityError,
-                                   SecureFileSystemService)
+from ..file_system_service import (
+    AccessLevel,
+    FileSystemSecurityError,
+    SecureFileSystemService,
+)
 
 logger = logging.getLogger(__name__)
 

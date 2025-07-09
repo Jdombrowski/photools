@@ -176,8 +176,7 @@ def generate_preview_task(
     from pathlib import Path
 
     from src.core.services.photo_upload_service import PhotoUploadService
-    from src.core.services.preview_generator import (PreviewGenerator,
-                                                     PreviewSize)
+    from src.core.services.preview_generator import PreviewGenerator, PreviewSize
 
     # Set task priority metadata for monitoring
     self.update_state(

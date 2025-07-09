@@ -5,8 +5,7 @@ from pathlib import Path
 
 import aiofiles
 
-from .base import (StorageBackend, StorageConfig, StorageOperationResult,
-                   StorageResult)
+from .base import StorageBackend, StorageConfig, StorageOperationResult, StorageResult
 
 
 class LocalStorageBackend(StorageBackend):
