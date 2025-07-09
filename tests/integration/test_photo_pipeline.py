@@ -10,14 +10,12 @@ from pathlib import Path
 import pytest
 
 from src.core.models.scan_result import ScanOptions, ScanStrategy
-from tests.integration.utils.test_helpers import (
-    FileSystemBuilder,
-    ReportGenerator,
-    ServiceTestBuilder,
-    TestAssertions,
-    isolated_test_environment,
-    temporary_test_directory,
-)
+from tests.integration.utils.test_helpers import (FileSystemBuilder,
+                                                  ReportGenerator,
+                                                  ServiceTestBuilder,
+                                                  TestAssertions,
+                                                  isolated_test_environment,
+                                                  temporary_test_directory)
 
 
 class TestPhotoProcessingPipeline:

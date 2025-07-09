@@ -702,7 +702,7 @@ class SecureFileSystemService:
             )
         ]
 
-    logger.info(
+        logger.info(
             f"Found {len(photo_files)} accessible photo files in {directory_path}"
         )
         return photo_files

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # Import route modules
-from src.api.routes import filesystem, health, photos
+from src.api.routes import filesystem, health, imports, photos
 
 
 @asynccontextmanager
@@ -22,7 +22,10 @@ async def lifespan(app: FastAPI):
 # Create FastAPI app with lifespan
 app = FastAPI(
     title="Photools API",
-    description="Media cataloging suite for managing and executing AI model routing within a photo metadata database",
+    description=(
+        "Media cataloging suite for managing and executing AI model routing "
+        "within a photo metadata database"
+    ),
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -43,6 +46,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(photos.router, prefix="/api/v1")
 app.include_router(filesystem.router, prefix="/api/v1")
+app.include_router(imports.router, prefix="/api/v1/import", tags=["imports"])
 
 
 @app.get("/")

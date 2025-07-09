@@ -1,4 +1,4 @@
-## INSTALL
+# INSTALL
 
 This installation process is written to be self-healing, and accessible from both top-down and bottom-up mentalities
 If you are missing something, the setup scripts will notify you: removing any possibility of confusion, while keeping all agency in the hands of the operator.
@@ -10,7 +10,7 @@ Actionable solutions = zero latency setup
 
 Make sure every single element has been tested from a fully fresh install
 
-### External Dependencies (`make install` -> will output all of this to the terminal)
+## External Dependencies (`make install` -> will output all of this to the terminal)
 
 1. Poetry
 Package manager for python - chosen for long term complexity and agnostic lock files

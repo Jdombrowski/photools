@@ -3,6 +3,8 @@ from pathlib import Path
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from src.core.services.file_system_service import SecurityConstraints
+
 
 class PhotoDirectorySettings(BaseSettings):
     """Settings for photo directory access and security."""
@@ -108,16 +110,30 @@ class PhotoDirectorySettings(BaseSettings):
     def get_validated_directories(self) -> list[str]:
         """Get validated list of directories that exist."""
         valid_dirs = []
+
         for dir_path in self.allowed_photo_directories:
             path = Path(dir_path).expanduser().resolve()
             if path.exists() and path.is_dir():
                 valid_dirs.append(str(path))
+            elif path.exists() and not path.is_dir():
+                # If the path exists but is not a directory, log a warning
+                print(f"Warning: Path is not a directory: {dir_path}")
             else:
                 # In development, we may have directories that don't exist yet
                 # Include them anyway but log a warning
                 print(f"Warning: Directory does not exist: {dir_path}")
                 valid_dirs.append(str(path))
         return valid_dirs or [str(Path.home() / "Pictures")]
+
+    def get_security_constraints(self) -> SecurityConstraints:
+        return SecurityConstraints(
+            allowed_extensions=self.photo_extensions,
+            max_file_size_mb=self.max_file_size_mb,
+            max_depth=self.max_directory_depth,
+            follow_symlinks=self.follow_symlinks,
+            skip_hidden_files=self.skip_hidden_files,
+            skip_hidden_directories=self.skip_hidden_directories,
+        )
 
     model_config = SettingsConfigDict(
         env_prefix="PHOTO_",

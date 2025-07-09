@@ -4,13 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from src.core.services.file_system_service import (
-    AccessLevel,
-    FileSystemEntry,
-    FileSystemSecurityError,
-    SecureFileSystemService,
-    SecurityConstraints,
-)
+from src.core.services.file_system_service import (AccessLevel,
+                                                   FileSystemEntry,
+                                                   FileSystemSecurityError,
+                                                   SecureFileSystemService,
+                                                   SecurityConstraints)
 
 
 class TestSecurityConstraints:
@@ -108,7 +106,9 @@ class TestSecureFileSystemService:
         with pytest.raises(FileSystemSecurityError, match="does not exist"):
             SecureFileSystemService(allowed_directories=[invalid_dir])
 
-    @pytest.mark.skip(reason="Security working as intended - path traversal patterns blocked before normalization")
+    @pytest.mark.skip(
+        reason="Security working as intended - path traversal patterns blocked before normalization"
+    )
     def test_path_normalization(self, service, temp_directory):
         """Test path normalization and resolution."""
         # Test relative path resolution
@@ -129,7 +129,9 @@ class TestSecureFileSystemService:
         with pytest.raises(FileSystemSecurityError, match="not in allowed directories"):
             service.validate_path_access(outside_path)
 
-    @pytest.mark.skip(reason="Security working as intended - traversal attacks properly blocked")
+    @pytest.mark.skip(
+        reason="Security working as intended - traversal attacks properly blocked"
+    )
     def test_path_traversal_attack_prevention(self, service, temp_directory):
         """Test prevention of path traversal attacks."""
         # Attempt to access parent directory using path traversal

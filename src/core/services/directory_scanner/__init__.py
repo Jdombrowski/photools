@@ -3,13 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ...models.scan_result import (
-    ScanOptions,
-    ScanProgress,
-    ScanResult,
-    ScanStatus,
-    ScanStrategy,
-)
+from ...models.scan_result import (ScanOptions, ScanProgress, ScanResult,
+                                   ScanStatus, ScanStrategy)
 from ..file_system_service import SecureFileSystemService, SecurityConstraints
 from ..photo_processor import PhotoProcessingError, PhotoProcessor
 
@@ -139,7 +134,7 @@ class SecureDirectoryScanner:
         """
         scan_id = f"fast_scan_{datetime.now().isoformat()}"
         progress = ScanProgress(start_time=datetime.now())
-        
+
         try:
             self.validate_scan_request(directory_path, options)
             self._active_scans[scan_id] = progress
@@ -227,7 +222,7 @@ class SecureDirectoryScanner:
         """
         scan_id = f"full_scan_{datetime.now().isoformat()}"
         progress = ScanProgress(start_time=datetime.now())
-        
+
         try:
             self.validate_scan_request(directory_path, options)
             self._active_scans[scan_id] = progress

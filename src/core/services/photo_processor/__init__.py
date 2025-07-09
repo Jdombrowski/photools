@@ -9,11 +9,8 @@ from typing import Any, Dict, List, Optional
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS
 
-from ..file_system_service import (
-    AccessLevel,
-    FileSystemSecurityError,
-    SecureFileSystemService,
-)
+from ..file_system_service import (AccessLevel, FileSystemSecurityError,
+                                   SecureFileSystemService)
 
 logger = logging.getLogger(__name__)
 
@@ -351,11 +348,12 @@ class PhotoProcessor:
 
         """
         import warnings
+
         warnings.warn(
             "PhotoProcessor.process_directory is deprecated. "
             "Use SecureDirectoryScanner for better security and features.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         # Basic security validation

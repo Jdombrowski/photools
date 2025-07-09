@@ -5,20 +5,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.core.models.scan_result import (
-    ScanOptions,
-    ScanProgress,
-    ScanResult,
-    ScanStatus,
-    ScanStrategy,
-)
+from src.core.models.scan_result import (ScanOptions, ScanProgress, ScanResult,
+                                         ScanStatus, ScanStrategy)
 from src.core.services.directory_scanner import SecureDirectoryScanner
-from src.core.services.file_system_service import (
-    AccessLevel,
-    FileSystemEntry,
-    SecureFileSystemService,
-    SecurityConstraints,
-)
+from src.core.services.file_system_service import (AccessLevel,
+                                                   FileSystemEntry,
+                                                   SecureFileSystemService,
+                                                   SecurityConstraints)
 from src.core.services.photo_processor import PhotoMetadata, PhotoProcessor
 
 
@@ -277,7 +270,8 @@ class TestSecureDirectoryScanner:
         # Configure photo processor to raise errors for some files
         def mock_process_with_errors(path):
             if "photo_1" in str(path):
-                from src.core.services.photo_processor import PhotoProcessingError
+                from src.core.services.photo_processor import \
+                    PhotoProcessingError
 
                 raise PhotoProcessingError("Mock processing error")
 
@@ -352,8 +346,9 @@ class TestSecureDirectoryScanner:
         """Test handling of unknown scan strategy."""
         # Create a mock enum value that doesn't exist in the current implementation
         from unittest.mock import MagicMock
+
         options = ScanOptions()
-        
+
         # Create a mock strategy that isn't handled by the scanner
         mock_strategy = MagicMock()
         mock_strategy.value = "unknown_strategy"
