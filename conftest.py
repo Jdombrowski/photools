@@ -8,16 +8,25 @@ import re
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_logreport(report):
-    """Hook to customize test result output - grey out file paths."""
-    if hasattr(report, 'nodeid') and report.nodeid:
-        # Apply grey color to file paths in nodeid (everything before ::)
-        if "::" in report.nodeid:
-            parts = report.nodeid.split("::", 1)
-            if len(parts) == 2:
-                file_path, test_path = parts
-                # Grey out the file path
-                grey_file_path = f"\033[90m{file_path}\033[0m"
-                report.nodeid = f"{grey_file_path}::{test_path}"
+    """Hook to customize test result output - format with newlines and grey paths."""
+    if hasattr(report, 'nodeid') and report.nodeid and "::" in report.nodeid:
+        parts = report.nodeid.split("::")
+        if len(parts) >= 2:
+            file_path = parts[0]
+            remaining_parts = parts[1:]
+            
+            # Grey out the file path
+            grey_file_path = f"\033[90m{file_path}\033[0m"
+            
+            # Format with newlines and indentation
+            if len(remaining_parts) == 1:
+                # Just method name
+                report.nodeid = f"{grey_file_path}::\n    {remaining_parts[0]}"
+            elif len(remaining_parts) >= 2:
+                # Class and method
+                class_part = remaining_parts[0]
+                method_part = "::".join(remaining_parts[1:])
+                report.nodeid = f"{grey_file_path}::\n    {class_part}::\n        {method_part}"
 
 
 @pytest.hookimpl(hookwrapper=True)
