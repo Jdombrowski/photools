@@ -116,7 +116,7 @@ class SecureDirectoryScanner:
                 "recursive": recursive,
                 "largest_file_size": max((e.size for e in photo_files), default=0),
                 "file_extensions": list(
-                    set(e.path.suffix.lower() for e in photo_files)
+                    {e.path.suffix.lower() for e in photo_files}
                 ),
             }
 

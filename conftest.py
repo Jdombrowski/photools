@@ -1,5 +1,4 @@
-"""Global pytest configuration and custom output formatting.
-"""
+"""Global pytest configuration and custom output formatting."""
 
 
 import pytest
@@ -34,7 +33,7 @@ def pytest_runtest_logreport(report):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """Hook to grey out file paths in the summary section."""
-    outcome = yield
+    yield
 
     # Modify the summary lines that were already written
     if hasattr(terminalreporter, '_tw'):

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class CallbackTask(Task):
-    """Custom task class that can handle callbacks"""
+    """Custom task class that can handle callbacks."""
 
     def on_success(self, retval, task_id, args, kwargs):
         logger.info(f"AI Task {task_id} succeeded")
@@ -22,7 +22,7 @@ class CallbackTask(Task):
 
 @celery_app.task(base=CallbackTask, bind=True)
 def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
-    """Generate AI embeddings for a photo (placeholder for now)"""
+    """Generate AI embeddings for a photo (placeholder for now)."""
     try:
         # This is a placeholder - in the future this will:
         # 1. Load the image
@@ -61,7 +61,7 @@ def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
 
 @celery_app.task(base=CallbackTask, bind=True)
 def extract_ai_features(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
-    """Extract AI features like objects, faces, scenes (placeholder)"""
+    """Extract AI features like objects, faces, scenes (placeholder)."""
     try:
         file_path = photo_metadata.get("file_path")
 
@@ -103,7 +103,7 @@ def extract_ai_features(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
 def batch_process_ai_features(
     photo_metadata_list: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Process AI features for multiple photos in batch"""
+    """Process AI features for multiple photos in batch."""
     results = {
         "total": len(photo_metadata_list),
         "embeddings_queued": 0,
@@ -143,7 +143,7 @@ def batch_process_ai_features(
 
 @celery_app.task(base=CallbackTask)
 def update_search_index(photo_data: dict[str, Any]) -> dict[str, Any]:
-    """Update search index with processed photo data (placeholder)"""
+    """Update search index with processed photo data (placeholder)."""
     try:
         # This would typically:
         # 1. Update PostgreSQL with metadata

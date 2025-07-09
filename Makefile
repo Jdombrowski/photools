@@ -330,7 +330,7 @@ lint: lint-fast ## Run fast linting (alias for lint-fast)
 
 lint-fast: ## Run fast linting with Ruff (development workflow)
 	@echo "🚀 Running fast linting with Ruff..."
-	@poetry run $(RUFF_FORMAT_COMMAND)
+	@poetry run ruff check src tests --fix --unsafe-fixes
 
 lint-complexity: ## Run complexity analysis with Pylint (core modules only)
 	@echo "🔍 Running complexity analysis with Pylint..."
@@ -372,6 +372,13 @@ quality-ci: ## Run quality checks for CI (no formatting, check only)
 	@poetry run ruff check src tests --no-fix
 	@poetry run ruff format src tests --check
 	@poetry run mypy src/
+
+fix-auto: ## Auto-fix as many linting issues as possible
+	@echo "🔧 Auto-fixing linting issues..."
+	@poetry run ruff format .
+	@poetry run ruff check . --fix --unsafe-fixes
+	@poetry run $(FORMAT_COMMAND)
+	@echo "✅ Auto-fix complete"
 
 coverage: ## Generate coverage report
 	@echo "📊 Generating coverage report..."

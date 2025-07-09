@@ -144,7 +144,6 @@ class TestPhotoProcessor:
         img = Image.new("RGB", (100, 100), color="red")
 
         # Add some basic EXIF data
-        exif_dict = {"0th": {}, "Exif": {}, "GPS": {}, "1st": {}, "thumbnail": None}
 
         jpeg_path = temp_directory / "test_photo.jpg"
         img.save(jpeg_path, "JPEG", quality=85)

@@ -1,4 +1,4 @@
-"""Add V2 progressive workflow fields
+"""Add V2 progressive workflow fields.
 
 Revision ID: 9f53850aeeaa
 Revises: 2e1f6f978680

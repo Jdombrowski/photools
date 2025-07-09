@@ -319,7 +319,7 @@ class TestSecureDirectoryScanner:
             progress_callback=progress_callback,
         )
 
-        result = scanner.scan_directory_fast(temp_directory, options)
+        scanner.scan_directory_fast(temp_directory, options)
 
         assert len(progress_updates) == len(sample_photos)
         assert progress_updates[-1]["percent"] == 100.0
@@ -370,7 +370,7 @@ class TestSecureDirectoryScanner:
 
         # Start a scan (this will add to active scans temporarily)
         options = ScanOptions(strategy=ScanStrategy.FAST_METADATA_ONLY)
-        result = scanner.scan_directory_fast(temp_directory, options)
+        scanner.scan_directory_fast(temp_directory, options)
 
         # After completion, should be removed from active scans
         assert len(scanner.list_active_scans()) == 0

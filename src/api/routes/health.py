@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/health")
 async def health_check():
-    """Basic health check endpoint"""
+    """Basic health check endpoint."""
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
@@ -20,7 +20,7 @@ async def health_check():
 
 @router.get("/health/detailed")
 async def detailed_health_check():
-    """Detailed health check with system information"""
+    """Detailed health check with system information."""
     try:
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage("/")

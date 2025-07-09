@@ -51,7 +51,7 @@ async def list_photos(
     camera_make: str | None = None,
     db: AsyncSession = Depends(get_db_session),
 ):
-    """List photos with pagination and optional search/filtering"""
+    """List photos with pagination and optional search/filtering."""
     from sqlalchemy import and_, func, or_, select
     from sqlalchemy.orm import joinedload
 
@@ -154,7 +154,7 @@ async def list_photos(
 async def upload_photo(
     file: UploadFile = File(...), db: AsyncSession = Depends(get_db_session)
 ):
-    """Upload a single photo for processing"""
+    """Upload a single photo for processing."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="No filename provided")
 
@@ -183,7 +183,7 @@ async def upload_photo(
 async def batch_upload_photos(
     files: list[UploadFile] = File(...), db: AsyncSession = Depends(get_db_session)
 ):
-    """Upload multiple photos for batch processing"""
+    """Upload multiple photos for batch processing."""
     if len(files) > 100:  # Reasonable limit
         raise HTTPException(
             status_code=400, detail="Too many files. Maximum 100 files per batch."
@@ -215,7 +215,7 @@ async def batch_upload_photos(
 
 @router.get("/photos/{photo_id}")
 async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
-    """Get photo details by ID"""
+    """Get photo details by ID."""
     from sqlalchemy import select
 
     from src.infrastructure.database.models import Photo, PhotoMetadata
@@ -268,7 +268,7 @@ async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
 
 @router.delete("/photos/{photo_id}")
 async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
-    """Delete a photo by ID (TODO: Phase 2/3 - implement soft-delete with compaction)"""
+    """Delete a photo by ID (TODO: Phase 2/3 - implement soft-delete with compaction)."""
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -287,7 +287,7 @@ async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)
 
 @router.get("/photos/{photo_id}/file")
 async def get_photo_file(photo_id: str, db: AsyncSession = Depends(get_db_session)):
-    """Serve the actual photo file content"""
+    """Serve the actual photo file content."""
     from fastapi import Response
     from sqlalchemy import select
 
@@ -324,7 +324,7 @@ async def get_photo_preview(
     format: str = "jpg",
     db: AsyncSession = Depends(get_db_session),
 ):
-    """Get a preview/thumbnail of the photo"""
+    """Get a preview/thumbnail of the photo."""
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -340,7 +340,7 @@ async def get_photo_preview(
 async def get_photo_preview_info(
     photo_id: str, db: AsyncSession = Depends(get_db_session)
 ):
-    """Get information about available previews for a photo"""
+    """Get information about available previews for a photo."""
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -355,7 +355,7 @@ async def get_photo_preview_info(
 async def generate_photo_previews(
     photo_id: str, db: AsyncSession = Depends(get_db_session)
 ):
-    """Generate all preview sizes for a photo"""
+    """Generate all preview sizes for a photo."""
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -364,13 +364,13 @@ async def generate_photo_previews(
 
 @router.get("/storage/info")
 async def get_storage_info():
-    """Get storage backend information and statistics"""
+    """Get storage backend information and statistics."""
     return upload_service.get_storage_info()
 
 
 @router.get("/storage/preview-stats")
 async def get_preview_storage_stats(db: AsyncSession = Depends(get_db_session)):
-    """Get preview storage statistics"""
+    """Get preview storage statistics."""
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -382,7 +382,7 @@ async def trigger_bulk_preview_generation(
     batch_size: int = 10,
     db: AsyncSession = Depends(get_db_session),
 ):
-    """Trigger background bulk preview generation with smart queueing"""
+    """Trigger background bulk preview generation with smart queueing."""
     from sqlalchemy import select
 
     from src.core.services.preview_queue_service import PreviewPriority, preview_queue
@@ -436,7 +436,7 @@ async def trigger_bulk_preview_generation(
 
 @router.get("/admin/queue-stats")
 async def get_queue_statistics():
-    """Get current preview generation queue statistics"""
+    """Get current preview generation queue statistics."""
     from src.core.services.preview_queue_service import preview_queue
 
     try:
@@ -457,7 +457,7 @@ async def get_queue_statistics():
 
 @router.get("/admin/task-status/{task_id}")
 async def get_task_status(task_id: str):
-    """Get status of a background task"""
+    """Get status of a background task."""
     from src.workers.celery_app import celery_app
 
     try:
@@ -479,7 +479,7 @@ async def get_task_status(task_id: str):
 
 @router.post("/photos/scan-directory")
 async def scan_directory(directory_path: str):
-    """Scan a directory for photos to import"""
+    """Scan a directory for photos to import."""
     if not os.path.exists(directory_path):
         raise HTTPException(
             status_code=400, detail=f"Directory does not exist: {directory_path}"

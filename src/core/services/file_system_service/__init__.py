@@ -154,7 +154,7 @@ class SecureFileSystemService:
                 )
 
     def _normalize_path(self, path: Path) -> Path:
-        """Normalize and resolve path with extensive security validation.
+        r"""Normalize and resolve path with extensive security validation.
 
         This method prevents:
         - Path traversal attacks (../, .\\, etc.)

@@ -1,4 +1,4 @@
-"""Photools background workers module
+"""Photools background workers module.
 
 This module contains Celery workers for:
 - Photo processing and metadata extraction

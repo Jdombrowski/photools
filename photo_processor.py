@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class CallbackTask(Task):
-    """Custom task class that can handle callbacks"""
+    """Custom task class that can handle callbacks."""
 
     def on_success(self, retval, task_id, args, kwargs):
         logger.info(f"Task {task_id} succeeded with result: {retval}")
@@ -24,7 +24,7 @@ class CallbackTask(Task):
 
 @celery_app.task(base=CallbackTask, bind=True)
 def process_single_photo(self, file_path: str) -> dict[str, Any]:
-    """Process a single photo file and extract metadata"""
+    """Process a single photo file and extract metadata."""
     try:
         # Validate file exists and is accessible
         if not os.path.exists(file_path):
@@ -62,7 +62,7 @@ def process_single_photo(self, file_path: str) -> dict[str, Any]:
 
 @celery_app.task(base=CallbackTask)
 def process_batch_photos(file_paths: list) -> dict[str, Any]:
-    """Process multiple photos in batch"""
+    """Process multiple photos in batch."""
     results = {"total": len(file_paths), "successful": 0, "failed": 0, "results": []}
 
     for file_path in file_paths:
@@ -86,7 +86,7 @@ def process_batch_photos(file_paths: list) -> dict[str, Any]:
 
 @celery_app.task(base=CallbackTask)
 def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any]:
-    """Scan a directory for photo files"""
+    """Scan a directory for photo files."""
     photo_extensions = {
         ".jpg",
         ".jpeg",
@@ -143,7 +143,7 @@ def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any
 
 
 def generate_file_hash(file_path: str) -> str:
-    """Generate SHA-256 hash of file for deduplication"""
+    """Generate SHA-256 hash of file for deduplication."""
     hash_sha256 = hashlib.sha256()
 
     with open(file_path, "rb") as f:
@@ -155,7 +155,7 @@ def generate_file_hash(file_path: str) -> str:
 
 
 def extract_image_metadata(file_path: str) -> dict[str, Any]:
-    """Extract basic image metadata using PIL"""
+    """Extract basic image metadata using PIL."""
     try:
         with Image.open(file_path) as img:
             # Basic image info

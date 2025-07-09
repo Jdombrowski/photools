@@ -51,7 +51,7 @@ class TestPhotoProcessingPipeline:
             test_photos_dir = test_env.paths.test_photos_dir
 
             try:
-                dir_info = file_service.get_file_info(test_photos_dir)
+                file_service.get_file_info(test_photos_dir)
                 TestAssertions.assert_photos_discovered(
                     file_service,
                     test_photos_dir,
