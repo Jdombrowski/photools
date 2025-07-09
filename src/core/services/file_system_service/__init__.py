@@ -22,13 +22,13 @@ class SecurityConstraints:
     """Security constraints for file system access."""
 
     max_file_size_mb: int = 500  # Maximum file size in MB
-    allowed_extensions: set[str] = None
+    allowed_extensions: Optional[set[str]] = None
     max_depth: int = 10  # Maximum directory traversal depth
     follow_symlinks: bool = False
     skip_hidden_files: bool = True
     skip_hidden_directories: bool = True
     max_path_length: int = 4096  # Maximum path length
-    allowed_drives: set[str] = None  # Windows: allowed drive letters
+    allowed_drives: Optional[set[str]] = None  # Windows: allowed drive letters
     block_executable_extensions: bool = True  # Block potentially dangerous files
     strict_extension_validation: bool = True  # Only allow explicitly listed extensions
     enable_symlink_escape_detection: bool = True  # Check for symlink escapes
@@ -702,7 +702,7 @@ class SecureFileSystemService:
             )
         ]
 
-        logger.info(
+    logger.info(
             f"Found {len(photo_files)} accessible photo files in {directory_path}"
         )
         return photo_files
