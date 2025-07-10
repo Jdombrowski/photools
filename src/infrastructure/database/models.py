@@ -376,4 +376,7 @@ class ProcessingAction(Base):
     photo = relationship("Photo")
 
     def __repr__(self):
-        return f"<ProcessingAction(photo_id={self.photo_id}, {self.stage_from}->{self.stage_to}, type={self.action_type})>"
+        return (
+            f"<ProcessingAction(photo_id={self.photo_id}, "
+            f"{self.stage_from}->{self.stage_to}, type={self.action_type})>"
+        )

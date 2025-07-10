@@ -249,7 +249,10 @@ class TestFilesystemAPI:
                     reporter.add_result(
                         "Configuration Endpoint",
                         config["success"],
-                        f"Dirs: {config.get('directories_count', 0)}, Exts: {config.get('extensions_count', 0)}",
+                        (
+                            f"Dirs: {config.get('directories_count', 0)}, "
+                            f"Exts: {config.get('extensions_count', 0)}"
+                        ),
                     )
 
                     # Test allowed directories
@@ -293,7 +296,10 @@ class TestFilesystemAPI:
                     reporter.add_result(
                         "Security Violations",
                         security["success"],
-                        f"Blocked {security['blocked_count']}/{security['total_attempts']} attacks",
+                        (
+                            f"Blocked {security['blocked_count']}/"
+                            f"{security['total_attempts']} attacks"
+                        ),
                     )
 
             finally:

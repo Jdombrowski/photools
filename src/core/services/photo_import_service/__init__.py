@@ -16,12 +16,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from src.core.models.scan_result import ScanResult, ScanStrategy
 from src.core.services.directory_scanner import SecureDirectoryScanner
-
-# from src.core.services.file_system_service import SecureFileSystemService
+from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_upload_service import PhotoUploadService
 from src.core.storage.base import StorageBackend
 
@@ -166,7 +165,6 @@ class PhotoImportService:
         photo_upload_service: PhotoUploadService,
         storage_backend: StorageBackend,
     ):
-        """Initialize PhotoImportService with required dependencies."""
         self.directory_scanner = directory_scanner
         self.photo_upload_service = photo_upload_service
         self.storage_backend = storage_backend

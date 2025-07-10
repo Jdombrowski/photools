@@ -203,7 +203,8 @@ class TestAssertions:
 
         if abs(actual_count - expected_count) > tolerance:
             raise AssertionError(
-                f"Expected {expected_count} ± {tolerance} photos, but found {actual_count}"
+                f"Expected {expected_count} ± {tolerance} photos, "
+                f"but found {actual_count}"
             )
 
     @staticmethod
@@ -228,7 +229,8 @@ class TestAssertions:
 
         if scan_result.success_rate < min_success_rate * 100:
             raise AssertionError(
-                f"Scan success rate too low: {scan_result.success_rate}% < {min_success_rate * 100}%"
+                f"Scan success rate too low: {scan_result.success_rate}% < "
+                f"{min_success_rate * 100}%"
             )
 
 

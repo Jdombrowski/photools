@@ -329,6 +329,8 @@ test-service: ## Run tests for specific service directory (usage: make test-serv
 lint: lint-fast ## Run fast linting (alias for lint-fast)
 
 lint-fast: ## Run fast linting with Ruff (development workflow)
+	@echo "🔌 Running linting with Black"
+	@poetry run black --line-length 88 .
 	@echo "🚀 Running fast linting with Ruff..."
 	@poetry run ruff check src tests --fix --unsafe-fixes
 

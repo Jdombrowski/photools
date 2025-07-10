@@ -133,7 +133,8 @@ def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any
         }
 
         logger.info(
-            f"Directory scan completed: {directory_path} - Found {len(found_photos)} photos"
+            f"Directory scan completed: {directory_path} - "
+            f"Found {len(found_photos)} photos"
         )
         return result
 
@@ -380,7 +381,8 @@ def extract_image_metadata(file_path: str) -> dict[str, Any]:
                     metadata["exif_tags_count"] = len(exif_data)
 
                     # Extract some common EXIF tags
-                    # Note: In production, use ExifRead or similar for comprehensive EXIF parsing
+                    # Note: In production, use ExifRead or similar for
+                    # comprehensive EXIF parsing
                     try:
                         if 306 in exif_data:  # DateTime
                             metadata["datetime"] = str(exif_data[306])

@@ -109,7 +109,10 @@ class TestSecureFileSystemService:
             SecureFileSystemService(allowed_directories=[invalid_dir])
 
     @pytest.mark.skip(
-        reason="Security working as intended - path traversal patterns blocked before normalization"
+        reason=(
+            "Security working as intended - path traversal patterns "
+            "blocked before normalization"
+        )
     )
     def test_path_normalization(self, service, temp_directory):
         """Test path normalization and resolution."""

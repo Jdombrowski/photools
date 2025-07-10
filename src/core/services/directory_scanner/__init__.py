@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class SecureDirectoryScanner:
-    """Secure directory scanner with readonly access and comprehensive metadata extraction.
+    """Secure directory scanner with readonly access and metadata extraction.
 
     Features:
     - Security-first design with path validation

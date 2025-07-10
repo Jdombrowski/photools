@@ -28,9 +28,6 @@ def pytest_runtest_logreport(report):
                 )
 
 
-# Removed the makereport hook as it was interfering with error messages
-
-
 @pytest.hookimpl(hookwrapper=True)
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """Hook to grey out file paths in the summary section."""

@@ -2,9 +2,10 @@ import hashlib
 import logging
 import mimetypes
 import os
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS

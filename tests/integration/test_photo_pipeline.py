@@ -73,7 +73,10 @@ class TestPhotoProcessingPipeline:
                     reporter.add_result(
                         "Scan Estimation",
                         True,
-                        f"Estimated {expected_files} files, {estimate.get('total_size_mb', 0):.1f}MB",
+                        (
+                            f"Estimated {expected_files} files, "
+                            f"{estimate.get('total_size_mb', 0):.1f}MB"
+                        ),
                     )
                 else:
                     reporter.add_result("Scan Estimation", False, "No files estimated")
@@ -93,7 +96,10 @@ class TestPhotoProcessingPipeline:
                 reporter.add_result(
                     "Fast Scan",
                     True,
-                    f"Processed {fast_result.successful_files}/{fast_result.total_files} files",
+                    (
+                        f"Processed {fast_result.successful_files}/"
+                        f"{fast_result.total_files} files"
+                    ),
                 )
             except Exception as e:
                 reporter.add_result("Fast Scan", False, str(e))

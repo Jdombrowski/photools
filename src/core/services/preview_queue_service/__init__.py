@@ -1,8 +1,9 @@
 import logging
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

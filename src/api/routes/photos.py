@@ -271,7 +271,7 @@ async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
 @router.delete("/photos/{photo_id}")
 async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
     """Delete a photo by ID.
-    
+
     TODO: Phase 2/3 - implement soft-delete with compaction.
     """
     from src.core.services.preview_service import PreviewService

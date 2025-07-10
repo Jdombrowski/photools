@@ -83,12 +83,20 @@ ignore = [
     "D102",   # Missing docstring in public method (pylint handles better)
     "D103",   # Missing docstring in public function (pylint handles better)
     "D104",   # Missing docstring in public package (pylint handles better)
+    "D105",   # Missing docstring in magic method (__repr__, etc)
+    "D107",   # Missing docstring in __init__ method
+    "D401",   # First line should end with a period (pylint handles better)
+    "D417",   # Missing argument descriptions (too verbose for simple functions)
     "C901",   # Complex function (pylint handles with better metrics)
     "S101",   # Use of assert (acceptable in tests)
+    "S104",   # Binding to all interfaces (acceptable for API servers)
+    "S110",   # try-except-pass (acceptable for non-critical operations)
+    "S112",   # try-except-continue (acceptable for non-critical operations)
     "TID252", # Relative imports (acceptable in our architecture)
     "D203",   # One blank line before class (conflicts with D211)
     "D213",   # Multi-line docstring second line (conflicts with D212)
-]
+    "E501",   # Line too long (handled by black)
+    ]
 
 # Per-file ignores for appropriate contexts
 [tool.ruff.lint.per-file-ignores]
