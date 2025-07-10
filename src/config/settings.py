@@ -197,7 +197,10 @@ class APISettings(BaseSettings):
     title: str = Field(default="Photools API", description="API title")
 
     description: str = Field(
-        default="Media cataloging suite for managing and executing AI model routing within a photo metadata database",
+        default=(
+            "Media cataloging suite for managing and executing AI model routing "
+            "within a photo metadata database"
+        ),
         description="API description",
     )
 

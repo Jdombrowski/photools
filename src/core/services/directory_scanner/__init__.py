@@ -115,9 +115,7 @@ class SecureDirectoryScanner:
                 "estimated_duration_minutes": round(estimated_duration_seconds / 60, 1),
                 "recursive": recursive,
                 "largest_file_size": max((e.size for e in photo_files), default=0),
-                "file_extensions": list(
-                    {e.path.suffix.lower() for e in photo_files}
-                ),
+                "file_extensions": list({e.path.suffix.lower() for e in photo_files}),
             }
 
         except Exception as e:

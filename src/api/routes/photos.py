@@ -176,7 +176,7 @@ async def upload_photo(
         return result
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}") from e
 
 
 @router.post("/photos/batch-upload")
@@ -210,7 +210,9 @@ async def batch_upload_photos(
         return result
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch upload failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Batch upload failed: {str(e)}"
+        ) from e
 
 
 @router.get("/photos/{photo_id}")
@@ -268,7 +270,10 @@ async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
 
 @router.delete("/photos/{photo_id}")
 async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
-    """Delete a photo by ID (TODO: Phase 2/3 - implement soft-delete with compaction)."""
+    """Delete a photo by ID.
+    
+    TODO: Phase 2/3 - implement soft-delete with compaction.
+    """
     from src.core.services.preview_service import PreviewService
 
     preview_service = PreviewService(db)
@@ -405,7 +410,8 @@ async def trigger_bulk_preview_generation(
                 photo_id=str(photo.id),
                 storage_path=str(photo.file_path),
                 filename=str(photo.filename),
-                priority=PreviewPriority.NORMAL,  # Use normal priority for bulk operations
+                # Use normal priority for bulk operations
+                priority=PreviewPriority.NORMAL,
             )
 
             if queue_result["status"] in ["queued", "existing"]:
@@ -431,7 +437,7 @@ async def trigger_bulk_preview_generation(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to start bulk preview generation: {str(e)}"
-        )
+        ) from e
 
 
 @router.get("/admin/queue-stats")
@@ -452,7 +458,7 @@ async def get_queue_statistics():
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to get queue statistics: {str(e)}"
-        )
+        ) from e
 
 
 @router.get("/admin/task-status/{task_id}")
@@ -474,7 +480,7 @@ async def get_task_status(task_id: str):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to get task status: {str(e)}"
-        )
+        ) from e
 
 
 @router.post("/photos/scan-directory")

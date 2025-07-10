@@ -200,7 +200,7 @@ async def import_directory(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to start directory import: {str(e)}"
-        )
+        ) from e
 
 
 @router.post("/file", response_model=ImportResultResponse)
@@ -264,7 +264,9 @@ async def import_file(
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to import file: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to import file: {str(e)}"
+        ) from e
 
 
 @router.get("/{import_id}/progress", response_model=ImportProgressResponse)

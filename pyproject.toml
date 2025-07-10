@@ -96,6 +96,7 @@ ignore = [
 "scripts/*" = ["D", "S101"]  # Relaxed for utility scripts
 "src/infrastructure/*" = ["D100", "D101"]  # Infrastructure can have relaxed docs
 "src/api/main.py" = ["S104"]  # Allow binding to all interfaces in main
+"src/api/routes/*" = ["B008"]  # Allow FastAPI Depends() and Query() in function signatures
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10  # Basic complexity threshold (pylint handles detailed analysis)

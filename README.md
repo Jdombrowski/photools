@@ -30,7 +30,7 @@ photools/
 ├── Makefile                     # Main development workflow automation
 ├── README.md                   # Project documentation with make commands
 ├── docker-compose.yml          # Multi-service development environment
-├── docker-compose.prod.yml     # Production configuration
+├── docker-compose.prod.yml     # Production configurationz
 ├── .env.example               # Environment variables template
 ├── .gitignore
 ├── pyproject.toml             # Python dependencies and project config

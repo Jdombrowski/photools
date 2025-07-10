@@ -385,7 +385,7 @@ class PhotoImportService:
         for i, photo_info in enumerate(scan_result.files):
             try:
                 progress.current_file = photo_info.get("file_path", "unknown")
-                progress.current_stage = f"importing {i+1}/{len(scan_result.files)}"
+                progress.current_stage = f"importing {i + 1}/{len(scan_result.files)}"
                 self._update_progress(progress, options)
 
                 file_path = Path(photo_info["file_path"])

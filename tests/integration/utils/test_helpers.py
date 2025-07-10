@@ -188,7 +188,7 @@ class TestAssertions:
         except Exception as e:
             raise AssertionError(
                 f"Expected FileSystemSecurityError, but got {type(e).__name__}: {e}"
-            )
+            ) from e
 
     @staticmethod
     def assert_photos_discovered(
@@ -249,9 +249,9 @@ class ReportGenerator:
         total = len(self.results)
         passed = sum(1 for r in self.results if r["passed"])
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Test Summary: {passed}/{total} tests passed")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         for result in self.results:
             status = "✅" if result["passed"] else "❌"
@@ -259,7 +259,7 @@ class ReportGenerator:
             if result["details"]:
                 print(f"   {result['details']}")
 
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         return passed == total
 

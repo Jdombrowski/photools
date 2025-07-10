@@ -358,13 +358,15 @@ async def start_directory_scan(
 
     except FileSystemSecurityError as e:
         logger.warning(f"Security error starting scan for {directory_path}: {e}")
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e)) from e
     except ValueError as e:
         logger.warning(f"Invalid scan parameters for {directory_path}: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Error starting scan for {directory_path}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to start directory scan")
+        raise HTTPException(
+            status_code=500, detail="Failed to start directory scan"
+        ) from e
 
 
 @router.get("/scan/{scan_id}/status")
@@ -409,7 +411,7 @@ async def get_scan_status(
 
     except Exception as e:
         logger.error(f"Error getting scan status for {scan_id}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to get scan status")
+        raise HTTPException(status_code=500, detail="Failed to get scan status") from e
 
 
 @router.get("/scans/active")
@@ -442,7 +444,9 @@ async def list_active_scans(
 
     except Exception as e:
         logger.error(f"Error listing active scans: {e}")
-        raise HTTPException(status_code=500, detail="Failed to list active scans")
+        raise HTTPException(
+            status_code=500, detail="Failed to list active scans"
+        ) from e
 
 
 @router.delete("/scan/{scan_id}")
@@ -475,7 +479,7 @@ async def cancel_scan(
 
     except Exception as e:
         logger.error(f"Error cancelling scan {scan_id}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to cancel scan")
+        raise HTTPException(status_code=500, detail="Failed to cancel scan") from e
 
 
 @router.get("/config")
@@ -509,4 +513,4 @@ async def get_filesystem_config() -> dict[str, Any]:
         logger.error(f"Error getting filesystem config: {e}")
         raise HTTPException(
             status_code=500, detail="Failed to get filesystem configuration"
-        )
+        ) from e

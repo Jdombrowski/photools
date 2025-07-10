@@ -300,9 +300,9 @@ class TestFilesystemAPI:
                 test_env.cleanup_test_environment()
 
         success = reporter.print_summary()
-        assert (
-            success
-        ), f"API test failed with {reporter.get_success_rate():.1f}% success rate"
+        assert success, (
+            f"API test failed with {reporter.get_success_rate():.1f}% success rate"
+        )
 
     @pytest.mark.skip(
         reason="TODO: re-enable when revisiting API - security working too well"

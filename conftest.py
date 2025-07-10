@@ -1,13 +1,12 @@
 """Global pytest configuration and custom output formatting."""
 
-
 import pytest
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_logreport(report):
     """Hook to customize test result output - format with newlines and grey paths."""
-    if hasattr(report, 'nodeid') and report.nodeid and "::" in report.nodeid:
+    if hasattr(report, "nodeid") and report.nodeid and "::" in report.nodeid:
         parts = report.nodeid.split("::")
         if len(parts) >= 2:
             file_path = parts[0]
@@ -24,7 +23,9 @@ def pytest_runtest_logreport(report):
                 # Class and method
                 class_part = remaining_parts[0]
                 method_part = "::".join(remaining_parts[1:])
-                report.nodeid = f"{grey_file_path}::\n    {class_part}::\n        {method_part}"
+                report.nodeid = (
+                    f"{grey_file_path}::\n    {class_part}::\n        {method_part}"
+                )
 
 
 # Removed the makereport hook as it was interfering with error messages
@@ -36,7 +37,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     yield
 
     # Modify the summary lines that were already written
-    if hasattr(terminalreporter, '_tw'):
+    if hasattr(terminalreporter, "_tw"):
         # This runs after the summary is written, so we can't easily modify it
         # The nodeid modification above should handle most cases
         pass

@@ -132,7 +132,7 @@ class SecureFileSystemService:
             f"SecureFileSystemService initialized with {len(self.allowed_directories)} allowed directories"
         )
         for i, directory in enumerate(self.allowed_directories):
-            logger.info(f"  Allowed directory {i+1}: {directory}")
+            logger.info(f"  Allowed directory {i + 1}: {directory}")
         logger.info(
             f"Security constraints: max_file_size={self.constraints.max_file_size_mb}MB, max_depth={self.constraints.max_depth}, follow_symlinks={self.constraints.follow_symlinks}"
         )
