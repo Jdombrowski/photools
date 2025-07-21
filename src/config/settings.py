@@ -171,11 +171,11 @@ class CelerySettings(BaseSettings):
     """Celery task queue settings."""
 
     broker_url: str = Field(
-        default="redis://localhost:6379/0", description="Celery broker URL"
+        default="redis://localhost:6378/0", description="Celery broker URL"
     )
 
     result_backend: str = Field(
-        default="redis://localhost:6379/1", description="Celery result backend URL"
+        default="redis://localhost:6378/1", description="Celery result backend URL"
     )
 
     task_serializer: str = Field(default="json", description="Celery task serializer")

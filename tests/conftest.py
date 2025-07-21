@@ -47,7 +47,7 @@ def test_env_vars():
         "ENVIRONMENT": "testing",
         "DEBUG": "true",
         "DATABASE_URL": "sqlite:///:memory:",
-        "REDIS_URL": "redis://localhost:6379/15",  # Use test DB
+        "REDIS_URL": "redis://localhost:6378/15",  # Use test DB
         "PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR": "/tmp/test_photos,/tmp/test_uploads",
     }
 

@@ -228,6 +228,11 @@ env: ## Activate Poetry virtual environment
 	@poetry env activate
 	@echo "✅ Virtual environment activated"
 
+start: dev ## Start development servers
+	@echo "🚀 Starting development servers..."
+	@echo "   Alias 'make dev' for full development environment"
+	@echo "   Use 'make docker-dev' for Docker development"
+
 dev: ## Start development servers with hot reload
 	@echo "🚀 Starting development environment..."
 	@echo "📋 Checking dependencies..."
@@ -249,7 +254,7 @@ dev: ## Start development servers with hot reload
 	@echo "   🌐 API: http://localhost:8000"
 	@echo "   📊 API Docs: http://localhost:8000/docs"
 	@echo "   🐘 PostgreSQL: localhost:5432"
-	@echo "   🔴 Redis: localhost:6379"
+	@echo "   🔴 Redis: localhost:6378"
 
 dev-full: ## Start full development environment with all services
 	@echo "🚀 Starting full development environment..."
@@ -474,7 +479,7 @@ debug: ## Show debug information
 	@echo "   PROJECT_NAME: ${PROJECT_NAME:-photools}"
 	@echo "   API_PORT: ${API_PORT:-8000}"
 	@echo "   POSTGRES_PORT: ${POSTGRES_PORT:-5432}"
-	@echo "   REDIS_PORT: ${REDIS_PORT:-6379}"
+	@echo "   REDIS_PORT: ${REDIS_PORT:-6378}"
 	@echo ""
 	@echo "📊 Poetry Status:"
 	@poetry --version || echo "Poetry not installed locally"
@@ -542,7 +547,7 @@ docker-build: docker-check ## Build development Docker images
 # 	@docker compose up -d postgres redis chromadb
 # 	@echo "✅ Infrastructure services started"
 # 	@echo "   📊 PostgreSQL: localhost:5432"
-# 	@echo "   📊 Redis: localhost:6379" 
+# 	@echo "   📊 Redis: localhost:6378" 
 # 	@echo "   📊 ChromaDB: localhost:8900"
 
 docker-dev: docker-check ## Start full development environment
