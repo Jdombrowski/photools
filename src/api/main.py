@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # Import route modules
-from src.api.routes import filesystem, health, imports, photos
+from src.api.routes import collections, filesystem, health, imports, photos
 
 
 @asynccontextmanager
@@ -45,6 +45,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Include routers
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(photos.router, prefix="/api/v1")
+app.include_router(collections.router, prefix="/api/v1", tags=["collections"])
 app.include_router(filesystem.router, prefix="/api/v1")
 app.include_router(imports.router, prefix="/api/v1/import", tags=["imports"])
 

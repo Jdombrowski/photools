@@ -1,12 +1,14 @@
 import logging
 import os
 from datetime import datetime
+from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.services.photo_upload_service import PhotoUploadService
+from src.core.services.photo_query_builder import build_photo_query
 from src.infrastructure.database import get_db_session
 
 router = APIRouter()
@@ -14,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize upload service
 upload_service = PhotoUploadService()
+
+# Constants
+MAX_PHOTOS_PER_REQUEST = 200  # Hard limit for safety
 
 
 # Pydantic models for request/response
@@ -42,6 +47,53 @@ class PhotoResponse(BaseModel):
     updated_at: datetime
 
 
+class WorkflowStage:
+    """Workflow-based rating system mapping."""
+    REJECT = 0          # Delete/Reject - Doesn't meet basic standards
+    REVIEW_NEEDED = 1   # Review Needed - Uncertain, needs second look
+    ARCHIVE = 2         # Archive - Decent but not worth editing time  
+    EDIT_QUEUE = 3      # Edit Queue - Meets goals, ready for enhancement
+    PORTFOLIO = 4       # Portfolio - Finished, exceptional work
+    SHOWCASE = 5        # Showcase - Exceptional, competition/exhibition worthy
+    
+    STAGE_DESCRIPTIONS = {
+        0: "Reject/Delete - Doesn't meet basic standards",
+        1: "Review Needed - Uncertain, needs second look", 
+        2: "Archive - Decent but not worth editing time",
+        3: "Edit Queue - Meets goals, ready for enhancement",
+        4: "Portfolio - Finished, exceptional work",
+        5: "Showcase - Exceptional, competition/exhibition worthy"
+    }
+    
+    STAGE_NAMES = {
+        0: "Reject",
+        1: "Review",
+        2: "Archive", 
+        3: "Edit Queue",
+        4: "Portfolio",
+        5: "Showcase"
+    }
+    
+    @classmethod
+    def is_valid(cls, rating: int) -> bool:
+        """Check if rating is valid workflow stage."""
+        return rating in cls.STAGE_DESCRIPTIONS
+    
+    @classmethod
+    def get_description(cls, rating: int) -> str:
+        """Get description for workflow stage."""
+        return cls.STAGE_DESCRIPTIONS.get(rating, "Unknown stage")
+    
+    @classmethod
+    def get_name(cls, rating: int) -> str:
+        """Get short name for workflow stage."""
+        return cls.STAGE_NAMES.get(rating, "Unknown")
+
+
+class PhotoRatingRequest(BaseModel):
+    rating: int  # Workflow stage (0-5)
+
+
 @router.get("/photos")
 async def list_photos(
     limit: int = 50,
@@ -49,60 +101,51 @@ async def list_photos(
     search: str | None = None,
     processing_stage: str | None = None,
     camera_make: str | None = None,
+    rating: Optional[int] = None,
+    rating_min: Optional[int] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    aperture_min: Optional[float] = None,
+    aperture_max: Optional[float] = None,
+    iso_min: Optional[int] = None,
+    iso_max: Optional[int] = None,
+    has_gps: Optional[bool] = None,
+    show_all: bool = False,
+    debug: bool = False,
     db: AsyncSession = Depends(get_db_session),
 ):
-    """List photos with pagination and optional search/filtering."""
-    from sqlalchemy import and_, func, or_, select
-    from sqlalchemy.orm import joinedload
-
-    from src.infrastructure.database.models import Photo, PhotoMetadata
-
-    # Build base query
-    query = select(Photo).options(joinedload(Photo.photo_metadata))
-
-    # Add filters
-    filters = []
-    if search:
-        # Search in filename or camera make/model
-        filters.append(
-            or_(
-                Photo.filename.ilike(f"%{search}%"),
-                Photo.photo_metadata.has(
-                    PhotoMetadata.camera_make.ilike(f"%{search}%")
-                ),
-                Photo.photo_metadata.has(
-                    PhotoMetadata.camera_model.ilike(f"%{search}%")
-                ),
-            )
+    """List photos with pagination and optional search/filtering.
+    
+    By default, only shows recent photos (last 30 days) unless specific filters are applied
+    or show_all=true is used.
+    """
+    try:
+        # Build query using the query builder pattern
+        query_builder = (
+            build_photo_query(db)
+            .debug_mode(debug)
+            .with_search(search)
+            .with_processing_stage(processing_stage)
+            .with_camera_make(camera_make)
+            .with_rating(rating, rating_min)
+            .with_date_range(date_from, date_to)
+            .with_camera_settings(aperture_min, aperture_max, iso_min, iso_max)
+            .with_gps(has_gps)
+            .with_whitelist_defaults(show_all)
+            .with_pagination(limit, offset, MAX_PHOTOS_PER_REQUEST)
         )
-
-    if processing_stage:
-        filters.append(Photo.processing_stage == processing_stage)
-
-    if camera_make:
-        filters.append(
-            Photo.photo_metadata.has(
-                PhotoMetadata.camera_make.ilike(f"%{camera_make}%")
-            )
-        )
-
-    if filters:
-        query = query.where(and_(*filters))
-
-    # Get total count
-    count_query = select(func.count(Photo.id))
-    if filters:
-        count_query = count_query.where(and_(*filters))
-
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
-
-    # Apply pagination and ordering
-    query = query.order_by(Photo.created_at.desc()).offset(offset).limit(limit)
-
-    # Execute query
-    result = await db.execute(query)
-    photos = result.scalars().all()
+        
+        # Execute query
+        photos = await query_builder.execute()
+        
+        # Get total count (simplified for now - could be optimized)
+        total = len(photos) + offset if photos else 0
+        
+        if debug:
+            logger.info(f"Query executed with filters: {query_builder.get_applied_filters()}")
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Format response
     photos_data = []
@@ -266,6 +309,68 @@ async def get_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)):
         }
 
     return response
+
+
+@router.put("/photos/{photo_id}/rating")
+async def set_photo_rating(
+    photo_id: str,
+    rating_request: PhotoRatingRequest,
+    db: AsyncSession = Depends(get_db_session)
+):
+    """Set or update a photo's workflow stage rating (0-5)."""
+    from sqlalchemy import select, update
+    from src.infrastructure.database.models import Photo
+    
+    # Validate rating using workflow stage system
+    if not WorkflowStage.is_valid(rating_request.rating):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Rating must be between 0-5. Available stages: {list(WorkflowStage.STAGE_NAMES.values())}"
+        )
+    
+    # Check if photo exists
+    stmt = select(Photo).where(Photo.id == photo_id)
+    result = await db.execute(stmt)
+    photo = result.scalar_one_or_none()
+    
+    if not photo:
+        raise HTTPException(status_code=404, detail="Photo not found")
+    
+    # Update rating with workflow stage
+    update_stmt = (
+        update(Photo)
+        .where(Photo.id == photo_id)
+        .values(
+            user_rating=rating_request.rating,
+            rating_updated_at=datetime.utcnow()
+        )
+    )
+    
+    await db.execute(update_stmt)
+    await db.commit()
+    
+    return {
+        "photo_id": photo_id,
+        "rating": rating_request.rating,
+        "workflow_stage": WorkflowStage.get_name(rating_request.rating),
+        "description": WorkflowStage.get_description(rating_request.rating),
+        "updated_at": datetime.utcnow()
+    }
+
+
+@router.get("/photos/workflow-stages")
+async def get_workflow_stages():
+    """Get available workflow stage ratings and their descriptions."""
+    return {
+        "stages": [
+            {
+                "value": stage,
+                "name": WorkflowStage.get_name(stage),
+                "description": WorkflowStage.get_description(stage)
+            }
+            for stage in sorted(WorkflowStage.STAGE_DESCRIPTIONS.keys())
+        ]
+    }
 
 
 @router.delete("/photos/{photo_id}")

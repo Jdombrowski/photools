@@ -63,6 +63,10 @@ class Photo(Base):
     processing_stage = Column(String, default="incoming")  # ProcessingStage enum values
     priority_level = Column(Integer, default=0)  # 0=normal, 1=good, 2=excellent
     needs_attention = Column(Boolean, default=True, index=True)
+    
+    # Rating system
+    user_rating = Column(Integer)  # 1-5 star rating
+    rating_updated_at = Column(DateTime)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -82,6 +86,9 @@ class Photo(Base):
     )
     scan_entries = relationship(
         "ScanPhotoEntry", back_populates="photo", cascade="all, delete-orphan"
+    )
+    collection_memberships = relationship(
+        "CollectionPhoto", back_populates="photo", cascade="all, delete-orphan"
     )
 
     def __repr__(self):
@@ -380,3 +387,48 @@ class ProcessingAction(Base):
             f"<ProcessingAction(photo_id={self.photo_id}, "
             f"{self.stage_from}->{self.stage_to}, type={self.action_type})>"
         )
+
+
+class Collection(Base):
+    """User-created collections of photos."""
+
+    __tablename__ = "collections"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
+    name = Column(String, nullable=False, index=True)
+    description = Column(Text)
+    photo_count = Column(Integer, default=0)
+    cover_photo_id = Column(String, ForeignKey("photos.id"))
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    photos = relationship(
+        "CollectionPhoto", back_populates="collection", cascade="all, delete-orphan"
+    )
+    cover_photo = relationship("Photo", foreign_keys=[cover_photo_id])
+
+    def __repr__(self):
+        return f"<Collection(id={self.id}, name={self.name}, photo_count={self.photo_count})>"
+
+
+class CollectionPhoto(Base):
+    """Junction table for photos in collections."""
+
+    __tablename__ = "collection_photos"
+
+    collection_id = Column(
+        String, ForeignKey("collections.id", ondelete="CASCADE"), primary_key=True
+    )
+    photo_id = Column(
+        String, ForeignKey("photos.id", ondelete="CASCADE"), primary_key=True
+    )
+    added_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    collection = relationship("Collection", back_populates="photos")
+    photo = relationship("Photo", back_populates="collection_memberships")
+
+    def __repr__(self):
+        return f"<CollectionPhoto(collection_id={self.collection_id}, photo_id={self.photo_id})>"
