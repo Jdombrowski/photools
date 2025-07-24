@@ -7,12 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA09A8A92E3209C4001DB984 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA09A8A82E3209C4001DB984 /* Theme.swift */; };
+		CA09A8AB2E320AB6001DB984 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA09A8AA2E320AB6001DB984 /* SidebarView.swift */; };
+		CA09A8B32E3210BE001DB984 /* PerfectlyNineties-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8B12E3210BE001DB984 /* PerfectlyNineties-RegularItalic.otf */; };
+		CA09A8B42E3210BE001DB984 /* PerfectlyNineties-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8B02E3210BE001DB984 /* PerfectlyNineties-Regular.otf */; };
+		CA09A8B52E3210BE001DB984 /* GladoliaDEMO-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8AE2E3210BE001DB984 /* GladoliaDEMO-Regular.otf */; };
+		CA09A8B62E3210BE001DB984 /* acumin-pro-condensed-ult-black.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8AC2E3210BE001DB984 /* acumin-pro-condensed-ult-black.otf */; };
+		CA09A8B72E3210BE001DB984 /* IntegralCF-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8AF2E3210BE001DB984 /* IntegralCF-ExtraBold.otf */; };
+		CA09A8B82E3210BE001DB984 /* Astroz Trial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8AD2E3210BE001DB984 /* Astroz Trial.ttf */; };
+		CA09A8B92E3210BE001DB984 /* Quivert.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA09A8B22E3210BE001DB984 /* Quivert.otf */; };
 		CA64AEAD2E32050D00FA266C /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAA2E32050D00FA266C /* LibraryStore.swift */; };
 		CA64AEAE2E32050D00FA266C /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAB2E32050D00FA266C /* Photo.swift */; };
 		CA64AEB62E32051800FA266C /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB02E32051800FA266C /* ImportView.swift */; };
 		CA64AEB72E32051800FA266C /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAF2E32051800FA266C /* CollectionsView.swift */; };
 		CA64AEB82E32051800FA266C /* PhotoThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */; };
-		CA64AEB92E32051800FA266C /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB42E32051800FA266C /* SidebarView.swift */; };
 		CA64AEBA2E32051800FA266C /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB12E32051800FA266C /* LibraryView.swift */; };
 		CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB22E32051800FA266C /* PhotoDetailView.swift */; };
 		CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEBC2E32056100FA266C /* ContentView.swift */; };
@@ -36,6 +44,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA09A8A82E3209C4001DB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		CA09A8AA2E320AB6001DB984 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		CA09A8AC2E3210BE001DB984 /* acumin-pro-condensed-ult-black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "acumin-pro-condensed-ult-black.otf"; sourceTree = "<group>"; };
+		CA09A8AD2E3210BE001DB984 /* Astroz Trial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Astroz Trial.ttf"; sourceTree = "<group>"; };
+		CA09A8AE2E3210BE001DB984 /* GladoliaDEMO-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GladoliaDEMO-Regular.otf"; sourceTree = "<group>"; };
+		CA09A8AF2E3210BE001DB984 /* IntegralCF-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IntegralCF-ExtraBold.otf"; sourceTree = "<group>"; };
+		CA09A8B02E3210BE001DB984 /* PerfectlyNineties-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PerfectlyNineties-Regular.otf"; sourceTree = "<group>"; };
+		CA09A8B12E3210BE001DB984 /* PerfectlyNineties-RegularItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PerfectlyNineties-RegularItalic.otf"; sourceTree = "<group>"; };
+		CA09A8B22E3210BE001DB984 /* Quivert.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Quivert.otf; sourceTree = "<group>"; };
 		CA64AE7E2E32041000FA266C /* PhoTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA64AE8C2E32041200FA266C /* PhoToolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhoToolsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA64AE962E32041200FA266C /* PhoToolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhoToolsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,13 +63,25 @@
 		CA64AEB12E32051800FA266C /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		CA64AEB22E32051800FA266C /* PhotoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailView.swift; sourceTree = "<group>"; };
 		CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoThumbnailView.swift; sourceTree = "<group>"; };
-		CA64AEB42E32051800FA266C /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		CA64AEBC2E32056100FA266C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CA09A8BB2E321158001DB984 /* Exceptions for "PhoTools" folder in "PhoTools" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CA64AE7D2E32041000FA266C /* PhoTools */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CA64AE802E32041000FA266C /* PhoTools */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CA09A8BB2E321158001DB984 /* Exceptions for "PhoTools" folder in "PhoTools" target */,
+			);
 			path = PhoTools;
 			sourceTree = "<group>";
 		};
@@ -93,6 +122,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA09A8BD2E3211C7001DB984 /* Custom Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				CA09A8B22E3210BE001DB984 /* Quivert.otf */,
+				CA09A8AC2E3210BE001DB984 /* acumin-pro-condensed-ult-black.otf */,
+				CA09A8AD2E3210BE001DB984 /* Astroz Trial.ttf */,
+				CA09A8AE2E3210BE001DB984 /* GladoliaDEMO-Regular.otf */,
+				CA09A8AF2E3210BE001DB984 /* IntegralCF-ExtraBold.otf */,
+				CA09A8B02E3210BE001DB984 /* PerfectlyNineties-Regular.otf */,
+				CA09A8B12E3210BE001DB984 /* PerfectlyNineties-RegularItalic.otf */,
+			);
+			path = "Custom Fonts";
+			sourceTree = "<group>";
+		};
 		CA64AE752E32041000FA266C = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +145,8 @@
 				CA64AE7F2E32041000FA266C /* Products */,
 				CA64AEAC2E32050D00FA266C /* Models */,
 				CA64AEBC2E32056100FA266C /* ContentView.swift */,
+				CA09A8A82E3209C4001DB984 /* Theme.swift */,
+				CA09A8BD2E3211C7001DB984 /* Custom Fonts */,
 			);
 			sourceTree = "<group>";
 		};
@@ -133,7 +178,7 @@
 				CA64AEB12E32051800FA266C /* LibraryView.swift */,
 				CA64AEB22E32051800FA266C /* PhotoDetailView.swift */,
 				CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */,
-				CA64AEB42E32051800FA266C /* SidebarView.swift */,
+				CA09A8AA2E320AB6001DB984 /* SidebarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -258,6 +303,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA09A8B32E3210BE001DB984 /* PerfectlyNineties-RegularItalic.otf in Resources */,
+				CA09A8B42E3210BE001DB984 /* PerfectlyNineties-Regular.otf in Resources */,
+				CA09A8B52E3210BE001DB984 /* GladoliaDEMO-Regular.otf in Resources */,
+				CA09A8B62E3210BE001DB984 /* acumin-pro-condensed-ult-black.otf in Resources */,
+				CA09A8B72E3210BE001DB984 /* IntegralCF-ExtraBold.otf in Resources */,
+				CA09A8B82E3210BE001DB984 /* Astroz Trial.ttf in Resources */,
+				CA09A8B92E3210BE001DB984 /* Quivert.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +337,8 @@
 				CA64AEB62E32051800FA266C /* ImportView.swift in Sources */,
 				CA64AEB72E32051800FA266C /* CollectionsView.swift in Sources */,
 				CA64AEB82E32051800FA266C /* PhotoThumbnailView.swift in Sources */,
-				CA64AEB92E32051800FA266C /* SidebarView.swift in Sources */,
+				CA09A8A92E3209C4001DB984 /* Theme.swift in Sources */,
+				CA09A8AB2E320AB6001DB984 /* SidebarView.swift in Sources */,
 				CA64AEBA2E32051800FA266C /* LibraryView.swift in Sources */,
 				CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */,
 				CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */,
@@ -457,6 +510,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhoTools/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -484,6 +538,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhoTools/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

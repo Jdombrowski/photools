@@ -33,7 +33,7 @@ struct ImportView: View {
                             .foregroundColor(selectedFolder == nil ? .secondary : .primary)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
-                            .background(Color(NSColor.controlBackgroundColor))
+                            .background(PhoToolsTheme.cardBackground)
                             .cornerRadius(6)
                         
                         Button("Choose Folder") {
@@ -54,7 +54,7 @@ struct ImportView: View {
                         Toggle("Generate previews", isOn: .constant(true))
                     }
                     .padding()
-                    .background(Color(NSColor.controlBackgroundColor))
+                    .background(PhoToolsTheme.cardBackground)
                     .cornerRadius(8)
                 }
             }

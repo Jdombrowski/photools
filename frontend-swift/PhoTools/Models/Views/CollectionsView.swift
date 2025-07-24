@@ -5,15 +5,15 @@ struct CollectionsView: View {
         VStack {
             Image(systemName: "folder")
                 .font(.system(size: 48))
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.mutedText)
             
             Text("Collections")
-                .font(.title)
-                .fontWeight(.semibold)
+                .font(PhoToolsTheme.titleFont)
+                .foregroundColor(PhoToolsTheme.primaryText)
             
             Text("Photo collections will be implemented here")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.secondaryText)
                 .multilineTextAlignment(.center)
         }
         .navigationTitle("Collections")
@@ -25,15 +25,15 @@ struct SearchView: View {
         VStack {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.mutedText)
             
             Text("Advanced Search")
-                .font(.title)
-                .fontWeight(.semibold)
+                .font(PhoToolsTheme.titleFont)
+                .foregroundColor(PhoToolsTheme.primaryText)
             
             Text("Advanced search functionality will be implemented here")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.secondaryText)
                 .multilineTextAlignment(.center)
         }
         .navigationTitle("Search")

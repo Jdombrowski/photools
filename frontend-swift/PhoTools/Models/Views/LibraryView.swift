@@ -17,13 +17,14 @@ struct LibraryView: View {
                 // Search bar
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PhoToolsTheme.mutedText)
                     TextField("Search photos...", text: $libraryStore.searchQuery)
                         .textFieldStyle(.plain)
+                        .foregroundColor(PhoToolsTheme.primaryText)
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(PhoToolsTheme.cardBackground)
                 .cornerRadius(6)
                 .frame(maxWidth: 300)
                 
@@ -38,7 +39,7 @@ struct LibraryView: View {
                     Image(systemName: "square.grid.2x2")
                         .font(.caption)
                 }
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.mutedText)
                 
                 // View options
                 Button(action: { libraryStore.selectAllPhotos() }) {
@@ -58,7 +59,7 @@ struct LibraryView: View {
                 }
             }
             .padding()
-            .background(Color(NSColor.windowBackgroundColor))
+            .background(PhoToolsTheme.backgroundColor)
             
             Divider()
             
@@ -67,6 +68,7 @@ struct LibraryView: View {
                 VStack {
                     Spacer()
                     ProgressView("Loading photos...")
+                        .foregroundColor(PhoToolsTheme.primaryText)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     Spacer()
                 }
@@ -75,14 +77,14 @@ struct LibraryView: View {
                     Spacer()
                     Image(systemName: "photo.on.rectangle")
                         .font(.system(size: 48))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PhoToolsTheme.mutedText)
                     Text("No photos found")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
+                        .font(PhoToolsTheme.headlineFont)
+                        .foregroundColor(PhoToolsTheme.secondaryText)
                     if !libraryStore.searchQuery.isEmpty {
                         Text("Try adjusting your search terms")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .font(PhoToolsTheme.captionFont)
+                            .foregroundColor(PhoToolsTheme.mutedText)
                     }
                     Spacer()
                 }

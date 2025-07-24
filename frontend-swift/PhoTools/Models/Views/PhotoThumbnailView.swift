@@ -11,14 +11,14 @@ struct PhotoThumbnailView: View {
             ZStack {
                 // Placeholder background
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(PhoToolsTheme.cardBackground)
                     .aspectRatio(1, contentMode: .fit)
                 
                 // Mock thumbnail - in real app this would be AsyncImage loading from API
                 RoundedRectangle(cornerRadius: 8)
                     .fill(
                         LinearGradient(
-                            colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                            colors: [PhoToolsTheme.mutedText.opacity(0.3), PhoToolsTheme.mutedText.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -28,10 +28,10 @@ struct PhotoThumbnailView: View {
                         VStack {
                             Image(systemName: "photo")
                                 .font(.title)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(PhoToolsTheme.primaryText.opacity(0.8))
                             Text(photo.filename)
                                 .font(.caption2)
-                                .foregroundColor(.white.opacity(0.9))
+                                .foregroundColor(PhoToolsTheme.primaryText.opacity(0.9))
                                 .multilineTextAlignment(.center)
                         }
                         .padding(8)
@@ -40,8 +40,8 @@ struct PhotoThumbnailView: View {
                 // Selection overlay
                 if isSelected {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.accentColor, lineWidth: 3)
-                        .background(Color.accentColor.opacity(0.1))
+                        .stroke(PhoToolsTheme.accentColor, lineWidth: 2)
+                        .background(PhoToolsTheme.accentColor.opacity(0.1))
                         .cornerRadius(8)
                 }
                 
@@ -66,8 +66,8 @@ struct PhotoThumbnailView: View {
                                 .font(.caption2)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 2)
-                                .background(.black.opacity(0.7))
-                                .foregroundColor(.white)
+                                .background(PhoToolsTheme.backgroundColor.opacity(0.8))
+                                .foregroundColor(PhoToolsTheme.primaryText)
                                 .cornerRadius(4)
                                 .padding(6)
                         }
@@ -81,6 +81,7 @@ struct PhotoThumbnailView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(photo.filename)
                     .font(.caption)
+                    .foregroundColor(PhoToolsTheme.primaryText)
                     .lineLimit(1)
                     .truncationMode(.middle)
                 
@@ -88,7 +89,7 @@ struct PhotoThumbnailView: View {
                     if let metadata = photo.metadata {
                         Text(metadata.cameraInfo)
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(PhoToolsTheme.secondaryText)
                             .lineLimit(1)
                     }
                     
@@ -96,7 +97,7 @@ struct PhotoThumbnailView: View {
                     
                     Text(photo.displaySize)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(PhoToolsTheme.secondaryText)
                 }
             }
             .frame(width: size)
@@ -113,12 +114,12 @@ struct RatingBadge: View {
             ForEach(0..<rating, id: \.self) { _ in
                 Image(systemName: "star.fill")
                     .font(.caption2)
-                    .foregroundColor(.yellow)
+                    .foregroundColor(PhoToolsTheme.accentColor)
             }
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
-        .background(.black.opacity(0.7))
+        .background(PhoToolsTheme.backgroundColor.opacity(0.8))
         .cornerRadius(4)
     }
 }

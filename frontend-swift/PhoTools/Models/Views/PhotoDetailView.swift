@@ -14,7 +14,7 @@ struct PhotoDetailView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
-                                colors: [.blue.opacity(0.4), .purple.opacity(0.4)],
+                                colors: [PhoToolsTheme.mutedText.opacity(0.4), PhoToolsTheme.mutedText.opacity(0.2)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -24,14 +24,14 @@ struct PhotoDetailView: View {
                             VStack {
                                 Image(systemName: "photo.fill")
                                     .font(.system(size: 48))
-                                    .foregroundColor(.white.opacity(0.8))
+                                    .foregroundColor(PhoToolsTheme.primaryText.opacity(0.8))
                                 Text(photo.filename)
                                     .font(.title2)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(PhoToolsTheme.primaryText)
                                     .fontWeight(.medium)
                             }
                         }
-                        .background(Color.black.opacity(0.1))
+                        .background(PhoToolsTheme.cardBackground)
                         .cornerRadius(12)
                         .padding()
                     
@@ -43,7 +43,8 @@ struct PhotoDetailView: View {
                     // Photo info
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Photo Details")
-                            .font(.headline)
+                            .font(PhoToolsTheme.headlineFont)
+                            .foregroundColor(PhoToolsTheme.primaryText)
                         
                         InfoRow(label: "Filename", value: photo.filename)
                         InfoRow(label: "Size", value: photo.displaySize)
@@ -58,11 +59,13 @@ struct PhotoDetailView: View {
                     if let metadata = photo.metadata {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Camera Info")
-                                .font(.headline)
+                                .font(PhoToolsTheme.headlineFont)
+                                .foregroundColor(PhoToolsTheme.primaryText)
                             
                             InfoRow(label: "Camera", value: metadata.cameraInfo)
                             if let lens = metadata.lensModel {
                                 InfoRow(label: "Lens", value: lens)
+                                    .font(PhoToolsTheme.captionFont)
                             }
                             if !metadata.exposureInfo.isEmpty {
                                 InfoRow(label: "Settings", value: metadata.exposureInfo)
@@ -78,7 +81,8 @@ struct PhotoDetailView: View {
                     // Rating section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Workflow Rating")
-                            .font(.headline)
+                            .font(PhoToolsTheme.headlineFont)
+                            .foregroundColor(PhoToolsTheme.primaryText)
                         
                         HStack {
                             ForEach(0...5, id: \.self) { rating in
@@ -87,7 +91,7 @@ struct PhotoDetailView: View {
                                 }) {
                                     Image(systemName: rating == 0 ? "xmark.circle" : "star.fill")
                                         .foregroundColor(
-                                            photo.userRating == rating ? .yellow : .gray.opacity(0.3)
+                                            photo.userRating == rating ? PhoToolsTheme.accentColor : PhoToolsTheme.mutedText.opacity(0.3)
                                         )
                                         .font(.title2)
                                 }
@@ -96,17 +100,18 @@ struct PhotoDetailView: View {
                         }
                         
                         Text("Current: \(photo.workflowStage)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .font(PhoToolsTheme.captionFont)
+                            .foregroundColor(PhoToolsTheme.secondaryText)
                     }
                     
                     Spacer()
                 }
                 .frame(width: 280)
                 .padding()
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(PhoToolsTheme.sidebarBackground)
             }
             .navigationTitle(photo.filename)
+            .font(PhoToolsTheme.bodyFont)
 //            .navigationBarTitleDisplayMode(.inline)
 //            .toolbar {
 //                ToolbarItem(placement: .navigationBarTrailing) {
@@ -127,9 +132,10 @@ struct InfoRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .foregroundColor(.secondary)
+                .foregroundColor(PhoToolsTheme.secondaryText)
                 .frame(width: 80, alignment: .leading)
             Text(value)
+                .foregroundColor(PhoToolsTheme.primaryText)
                 .fontWeight(.medium)
             Spacer()
         }
