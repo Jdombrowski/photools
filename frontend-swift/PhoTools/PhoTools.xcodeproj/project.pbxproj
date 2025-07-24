@@ -1,0 +1,611 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CA64AEAD2E32050D00FA266C /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAA2E32050D00FA266C /* LibraryStore.swift */; };
+		CA64AEAE2E32050D00FA266C /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAB2E32050D00FA266C /* Photo.swift */; };
+		CA64AEB62E32051800FA266C /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB02E32051800FA266C /* ImportView.swift */; };
+		CA64AEB72E32051800FA266C /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEAF2E32051800FA266C /* CollectionsView.swift */; };
+		CA64AEB82E32051800FA266C /* PhotoThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */; };
+		CA64AEB92E32051800FA266C /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB42E32051800FA266C /* SidebarView.swift */; };
+		CA64AEBA2E32051800FA266C /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB12E32051800FA266C /* LibraryView.swift */; };
+		CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB22E32051800FA266C /* PhotoDetailView.swift */; };
+		CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEBC2E32056100FA266C /* ContentView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CA64AE8D2E32041200FA266C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA64AE762E32041000FA266C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA64AE7D2E32041000FA266C;
+			remoteInfo = PhoTools;
+		};
+		CA64AE972E32041200FA266C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA64AE762E32041000FA266C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA64AE7D2E32041000FA266C;
+			remoteInfo = PhoTools;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CA64AE7E2E32041000FA266C /* PhoTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA64AE8C2E32041200FA266C /* PhoToolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhoToolsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA64AE962E32041200FA266C /* PhoToolsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhoToolsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA64AEAA2E32050D00FA266C /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
+		CA64AEAB2E32050D00FA266C /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		CA64AEAF2E32051800FA266C /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
+		CA64AEB02E32051800FA266C /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		CA64AEB12E32051800FA266C /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		CA64AEB22E32051800FA266C /* PhotoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailView.swift; sourceTree = "<group>"; };
+		CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoThumbnailView.swift; sourceTree = "<group>"; };
+		CA64AEB42E32051800FA266C /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		CA64AEBC2E32056100FA266C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CA64AE802E32041000FA266C /* PhoTools */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PhoTools;
+			sourceTree = "<group>";
+		};
+		CA64AE8F2E32041200FA266C /* PhoToolsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PhoToolsTests;
+			sourceTree = "<group>";
+		};
+		CA64AE992E32041200FA266C /* PhoToolsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PhoToolsUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CA64AE7B2E32041000FA266C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE892E32041200FA266C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE932E32041200FA266C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CA64AE752E32041000FA266C = {
+			isa = PBXGroup;
+			children = (
+				CA64AE802E32041000FA266C /* PhoTools */,
+				CA64AE8F2E32041200FA266C /* PhoToolsTests */,
+				CA64AE992E32041200FA266C /* PhoToolsUITests */,
+				CA64AE7F2E32041000FA266C /* Products */,
+				CA64AEAC2E32050D00FA266C /* Models */,
+				CA64AEBC2E32056100FA266C /* ContentView.swift */,
+			);
+			sourceTree = "<group>";
+		};
+		CA64AE7F2E32041000FA266C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA64AE7E2E32041000FA266C /* PhoTools.app */,
+				CA64AE8C2E32041200FA266C /* PhoToolsTests.xctest */,
+				CA64AE962E32041200FA266C /* PhoToolsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CA64AEAC2E32050D00FA266C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CA64AEB52E32051800FA266C /* Views */,
+				CA64AEAA2E32050D00FA266C /* LibraryStore.swift */,
+				CA64AEAB2E32050D00FA266C /* Photo.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		CA64AEB52E32051800FA266C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CA64AEAF2E32051800FA266C /* CollectionsView.swift */,
+				CA64AEB02E32051800FA266C /* ImportView.swift */,
+				CA64AEB12E32051800FA266C /* LibraryView.swift */,
+				CA64AEB22E32051800FA266C /* PhotoDetailView.swift */,
+				CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */,
+				CA64AEB42E32051800FA266C /* SidebarView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CA64AE7D2E32041000FA266C /* PhoTools */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA64AEA02E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoTools" */;
+			buildPhases = (
+				CA64AE7A2E32041000FA266C /* Sources */,
+				CA64AE7B2E32041000FA266C /* Frameworks */,
+				CA64AE7C2E32041000FA266C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CA64AE802E32041000FA266C /* PhoTools */,
+			);
+			name = PhoTools;
+			packageProductDependencies = (
+			);
+			productName = PhoTools;
+			productReference = CA64AE7E2E32041000FA266C /* PhoTools.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CA64AE8B2E32041200FA266C /* PhoToolsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA64AEA32E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoToolsTests" */;
+			buildPhases = (
+				CA64AE882E32041200FA266C /* Sources */,
+				CA64AE892E32041200FA266C /* Frameworks */,
+				CA64AE8A2E32041200FA266C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA64AE8E2E32041200FA266C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CA64AE8F2E32041200FA266C /* PhoToolsTests */,
+			);
+			name = PhoToolsTests;
+			packageProductDependencies = (
+			);
+			productName = PhoToolsTests;
+			productReference = CA64AE8C2E32041200FA266C /* PhoToolsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CA64AE952E32041200FA266C /* PhoToolsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA64AEA62E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoToolsUITests" */;
+			buildPhases = (
+				CA64AE922E32041200FA266C /* Sources */,
+				CA64AE932E32041200FA266C /* Frameworks */,
+				CA64AE942E32041200FA266C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA64AE982E32041200FA266C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CA64AE992E32041200FA266C /* PhoToolsUITests */,
+			);
+			name = PhoToolsUITests;
+			packageProductDependencies = (
+			);
+			productName = PhoToolsUITests;
+			productReference = CA64AE962E32041200FA266C /* PhoToolsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CA64AE762E32041000FA266C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					CA64AE7D2E32041000FA266C = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					CA64AE8B2E32041200FA266C = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = CA64AE7D2E32041000FA266C;
+					};
+					CA64AE952E32041200FA266C = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = CA64AE7D2E32041000FA266C;
+					};
+				};
+			};
+			buildConfigurationList = CA64AE792E32041000FA266C /* Build configuration list for PBXProject "PhoTools" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CA64AE752E32041000FA266C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CA64AE7F2E32041000FA266C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CA64AE7D2E32041000FA266C /* PhoTools */,
+				CA64AE8B2E32041200FA266C /* PhoToolsTests */,
+				CA64AE952E32041200FA266C /* PhoToolsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CA64AE7C2E32041000FA266C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE8A2E32041200FA266C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE942E32041200FA266C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CA64AE7A2E32041000FA266C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA64AEB62E32051800FA266C /* ImportView.swift in Sources */,
+				CA64AEB72E32051800FA266C /* CollectionsView.swift in Sources */,
+				CA64AEB82E32051800FA266C /* PhotoThumbnailView.swift in Sources */,
+				CA64AEB92E32051800FA266C /* SidebarView.swift in Sources */,
+				CA64AEBA2E32051800FA266C /* LibraryView.swift in Sources */,
+				CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */,
+				CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */,
+				CA64AEAD2E32050D00FA266C /* LibraryStore.swift in Sources */,
+				CA64AEAE2E32050D00FA266C /* Photo.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE882E32041200FA266C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA64AE922E32041200FA266C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CA64AE8E2E32041200FA266C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA64AE7D2E32041000FA266C /* PhoTools */;
+			targetProxy = CA64AE8D2E32041200FA266C /* PBXContainerItemProxy */;
+		};
+		CA64AE982E32041200FA266C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA64AE7D2E32041000FA266C /* PhoTools */;
+			targetProxy = CA64AE972E32041200FA266C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CA64AE9E2E32041200FA266C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CA64AE9F2E32041200FA266C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		CA64AEA12E32041200FA266C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PhoTools/PhoTools.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoTools;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CA64AEA22E32041200FA266C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PhoTools/PhoTools.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoTools;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CA64AEA42E32041200FA266C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoToolsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PhoTools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PhoTools";
+			};
+			name = Debug;
+		};
+		CA64AEA52E32041200FA266C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoToolsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PhoTools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PhoTools";
+			};
+			name = Release;
+		};
+		CA64AEA72E32041200FA266C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoToolsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = PhoTools;
+			};
+			name = Debug;
+		};
+		CA64AEA82E32041200FA266C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7T8FL7WTNL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.PhoToolsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = PhoTools;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CA64AE792E32041000FA266C /* Build configuration list for PBXProject "PhoTools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA64AE9E2E32041200FA266C /* Debug */,
+				CA64AE9F2E32041200FA266C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA64AEA02E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoTools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA64AEA12E32041200FA266C /* Debug */,
+				CA64AEA22E32041200FA266C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA64AEA32E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoToolsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA64AEA42E32041200FA266C /* Debug */,
+				CA64AEA52E32041200FA266C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA64AEA62E32041200FA266C /* Build configuration list for PBXNativeTarget "PhoToolsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA64AEA72E32041200FA266C /* Debug */,
+				CA64AEA82E32041200FA266C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CA64AE762E32041000FA266C /* Project object */;
+}

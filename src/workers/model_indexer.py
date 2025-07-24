@@ -29,8 +29,8 @@ def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
         # 2. Run it through a vision transformer model
         # 3. Generate embeddings
         # 4. Store embeddings in vector database
-
         file_path = photo_metadata.get("file_path")
+        
 
         # Mock embedding generation
         mock_embedding = [0.1] * 512  # Typical embedding size
