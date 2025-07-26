@@ -4,6 +4,7 @@ struct PhotoThumbnailView: View {
     let photo: Photo
     let size: CGFloat
     let isSelected: Bool
+    let thumbnailURL: URL? // Pass URL directly instead of requiring LibraryStore
     
     var body: some View {
         VStack(spacing: 4) {
@@ -14,28 +15,48 @@ struct PhotoThumbnailView: View {
                     .fill(PhoToolsTheme.cardBackground)
                     .aspectRatio(1, contentMode: .fit)
                 
-                // Mock thumbnail - in real app this would be AsyncImage loading from API
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        LinearGradient(
-                            colors: [PhoToolsTheme.mutedText.opacity(0.3), PhoToolsTheme.mutedText.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .aspectRatio(1, contentMode: .fit)
-                    .overlay {
-                        VStack {
-                            Image(systemName: "photo")
-                                .font(.title)
-                                .foregroundColor(PhoToolsTheme.primaryText.opacity(0.8))
-                            Text(photo.filename)
-                                .font(.caption2)
-                                .foregroundColor(PhoToolsTheme.primaryText.opacity(0.9))
-                                .multilineTextAlignment(.center)
-                        }
-                        .padding(8)
+                // Real thumbnail from backend API
+                if let thumbnailURL = thumbnailURL {
+                    AsyncImage(url: thumbnailURL) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .clipped()
+                    } placeholder: {
+                        // Loading placeholder
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(PhoToolsTheme.cardBackground)
+                            .overlay {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: PhoToolsTheme.primaryText))
+                            }
                     }
+                    .cornerRadius(8)
+                    .aspectRatio(1, contentMode: .fit)
+                } else {
+                    // Fallback for mock data or when backend is unavailable
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(
+                            LinearGradient(
+                                colors: [PhoToolsTheme.mutedText.opacity(0.3), PhoToolsTheme.mutedText.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .aspectRatio(1, contentMode: .fit)
+                        .overlay {
+                            VStack {
+                                Image(systemName: "photo")
+                                    .font(.title)
+                                    .foregroundColor(PhoToolsTheme.primaryText.opacity(0.8))
+                                Text(photo.filename)
+                                    .font(.caption2)
+                                    .foregroundColor(PhoToolsTheme.primaryText.opacity(0.9))
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(8)
+                        }
+                }
                 
                 // Selection overlay
                 if isSelected {
@@ -130,7 +151,8 @@ struct RatingBadge: View {
             PhotoThumbnailView(
                 photo: photo,
                 size: 200,
-                isSelected: photo.id == "1"
+                isSelected: photo.id == "1",
+                thumbnailURL: nil // Will show fallback
             )
         }
     }

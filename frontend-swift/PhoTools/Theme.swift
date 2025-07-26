@@ -31,8 +31,8 @@ struct PhoToolsTheme {
 //    static let headlineFont = Font.system(.headline, design: .rounded, weight: .semibold)
     static let headlineFont = Font.custom("PerfectlyNineties-Semibold", size: 18)
     static let bodyFont = Font.custom("SysfontRegular", size: 14)
-//    static let captionFont = Font.system(.caption, design: .default, weight: .medium)
-    static let captionFont = Font.custom("SysfontRegular", size: 12)
+    static let captionFont = Font.system(.caption, design: .default, weight: .medium)
+//    static let captionFont = Font.custom("SysfontRegular", size: 12)
 
     // MARK: - Styling Helpers
     

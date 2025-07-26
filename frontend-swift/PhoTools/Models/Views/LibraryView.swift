@@ -12,6 +12,26 @@ struct LibraryView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            // Connection status bar
+            if let errorMessage = libraryStore.errorMessage {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle")
+                        .foregroundColor(.orange)
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundColor(PhoToolsTheme.secondaryText)
+                    Spacer()
+                    Button("Retry") {
+                        libraryStore.loadPhotos(refresh: true)
+                    }
+                    .font(.caption)
+                    .foregroundColor(PhoToolsTheme.accentColor)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 6)
+                .background(PhoToolsTheme.cardBackground)
+            }
+            
             // Toolbar
             HStack {
                 // Search bar
@@ -21,6 +41,9 @@ struct LibraryView: View {
                     TextField("Search photos...", text: $libraryStore.searchQuery)
                         .textFieldStyle(.plain)
                         .foregroundColor(PhoToolsTheme.primaryText)
+                        .onSubmit {
+                            libraryStore.performSearch()
+                        }
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -96,7 +119,8 @@ struct LibraryView: View {
                             PhotoThumbnailView(
                                 photo: photo,
                                 size: gridSize,
-                                isSelected: libraryStore.selectedPhotos.contains(photo.id)
+                                isSelected: libraryStore.selectedPhotos.contains(photo.id),
+                                thumbnailURL: libraryStore.thumbnailURL(for: photo.id, size: Int(gridSize))
                             )
                             .onTapGesture {
                                 if NSEvent.modifierFlags.contains(.command) {

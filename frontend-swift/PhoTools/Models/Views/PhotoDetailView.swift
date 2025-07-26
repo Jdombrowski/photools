@@ -46,7 +46,7 @@ struct PhotoDetailView: View {
                             .font(PhoToolsTheme.headlineFont)
                             .foregroundColor(PhoToolsTheme.primaryText)
                         
-                        InfoRow(label: "Filename", value: photo.filename)
+                        InfoRow(label: "Filename", value: photo.filename)   
                         InfoRow(label: "Size", value: photo.displaySize)
                         InfoRow(label: "Dimensions", value: "\(photo.width ?? 0) × \(photo.height ?? 0)")
                         InfoRow(label: "Format", value: photo.mimeType.uppercased())

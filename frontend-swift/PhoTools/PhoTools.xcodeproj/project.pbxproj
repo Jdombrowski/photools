@@ -24,6 +24,7 @@
 		CA64AEBA2E32051800FA266C /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB12E32051800FA266C /* LibraryView.swift */; };
 		CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEB22E32051800FA266C /* PhotoDetailView.swift */; };
 		CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA64AEBC2E32056100FA266C /* ContentView.swift */; };
+		CAB7CE5E2E35446F00837A61 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB7CE5D2E35446F00837A61 /* APIService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		CA64AEB22E32051800FA266C /* PhotoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailView.swift; sourceTree = "<group>"; };
 		CA64AEB32E32051800FA266C /* PhotoThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoThumbnailView.swift; sourceTree = "<group>"; };
 		CA64AEBC2E32056100FA266C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CAB7CE5D2E35446F00837A61 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -146,6 +148,7 @@
 				CA64AEAC2E32050D00FA266C /* Models */,
 				CA64AEBC2E32056100FA266C /* ContentView.swift */,
 				CA09A8A82E3209C4001DB984 /* Theme.swift */,
+				CAB7CE5D2E35446F00837A61 /* APIService.swift */,
 				CA09A8BD2E3211C7001DB984 /* Custom Fonts */,
 			);
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 				CA64AEBB2E32051800FA266C /* PhotoDetailView.swift in Sources */,
 				CA64AEBD2E32056100FA266C /* ContentView.swift in Sources */,
 				CA64AEAD2E32050D00FA266C /* LibraryStore.swift in Sources */,
+				CAB7CE5E2E35446F00837A61 /* APIService.swift in Sources */,
 				CA64AEAE2E32050D00FA266C /* Photo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
