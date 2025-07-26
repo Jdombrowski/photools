@@ -64,7 +64,7 @@ class PhotoMetadata:
         }
 
 
-class PhotoProcessor:
+class PhotoProcessorService:
     """Core photo processing service with security-first design.
 
     Design principles:
@@ -354,7 +354,7 @@ class PhotoProcessor:
         import warnings
 
         warnings.warn(
-            "PhotoProcessor.process_directory is deprecated. "
+            "PhotoProcessorService.process_directory is deprecated. "
             "Use SecureDirectoryScanner for better security and features.",
             DeprecationWarning,
             stacklevel=2,
@@ -404,7 +404,7 @@ class PhotoProcessingError(Exception):
 # Quick validation function for development
 def validate_processor():
     """Quick smoke test for development."""
-    processor = PhotoProcessor()
+    processor = PhotoProcessorService()
 
     # Test with a sample image (you'll need to create this)
     sample_path = Path("test_photo.jpg")

@@ -12,7 +12,7 @@ from ...core.services.file_system_service import (
     SecureFileSystemService,
     SecurityConstraints,
 )
-from ...core.services.photo_processor import PhotoProcessor
+from ...core.services.photo_processor_service import PhotoProcessorService
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ def get_directory_scanner(
         Configured directory scanner
 
     """
-    photo_processor = PhotoProcessor(file_system_service=file_system_service)
+    photo_processor = PhotoProcessorService(file_system_service=file_system_service)
     return SecureDirectoryScanner(
         file_system_service=file_system_service, photo_processor=photo_processor
     )

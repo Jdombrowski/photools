@@ -8,7 +8,7 @@ from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.settings import get_settings
-from src.core.services.photo_processor import PhotoProcessor
+from src.core.services.photo_processor_service import PhotoProcessorService
 from src.core.storage import LocalStorageBackend, StorageBackend, StorageConfig
 from src.infrastructure.database.models import Photo, PhotoMetadata
 
@@ -18,7 +18,7 @@ class PhotoUploadService:
 
     def __init__(self, storage_backend: StorageBackend | None = None):
         self.settings = get_settings()
-        self.photo_processor = PhotoProcessor()
+        self.photo_processor = PhotoProcessorService()
 
         # Use provided storage backend or create default local storage
         if storage_backend:
@@ -222,7 +222,7 @@ class PhotoUploadService:
                 tmp_file.write(file_content)
                 tmp_file.flush()
 
-                # Use existing PhotoProcessor
+                # Use existing PhotoProcessorService
                 result = await self.photo_processor.process_photo_async(tmp_file.name)
 
                 # Clean up temp file
@@ -335,7 +335,9 @@ class PhotoUploadService:
     def get_storage_info(self) -> dict:
         """Get information about the current storage backend."""
         if hasattr(self.storage, "get_storage_stats"):
-            return self.storage.get_storage_stats()
+            return (
+                self.storage.get_storage_stats()
+            )  # TODO: Implement this method in storage backends
         else:
             return {
                 "backend_type": type(self.storage).__name__,

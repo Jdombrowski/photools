@@ -15,18 +15,14 @@ from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from src.config.settings import get_settings
 from src.core.models.scan_result import ScanStrategy
-from src.core.services.directory_scanner import SecureDirectoryScanner
-from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_import_service import (
     ImportOptions,
     ImportPriority,
     ImportStatus,
     PhotoImportService,
 )
-from src.core.services.photo_upload_service import PhotoUploadService
-from src.core.storage.local import LocalStorageBackend
+from src.core.services.service_factory import get_service_factory
 
 router = APIRouter()
 
@@ -108,34 +104,9 @@ class ImportStatusResponse(BaseModel):
 
 # Dependency injection
 def get_import_service() -> PhotoImportService:
-    """Get configured PhotoImportService instance."""
-    settings = get_settings()
-
-    if not settings.photos:
-        raise HTTPException(
-            status_code=500, detail="Photo directories configuration is not set"
-        )
-
-    # Create file system service
-    file_system_service = SecureFileSystemService(
-        allowed_directories=settings.photos.get_validated_directories(),
-        constraints=settings.photos.get_security_constraints(),
-    )
-
-    # Create directory scanner
-    directory_scanner = SecureDirectoryScanner(file_system_service=file_system_service)
-
-    # Create upload service
-    storage_backend = LocalStorageBackend()
-    photo_upload_service = PhotoUploadService(
-        storage_backend=storage_backend, file_system_service=file_system_service
-    )
-
-    return PhotoImportService(
-        directory_scanner=directory_scanner,
-        photo_upload_service=photo_upload_service,
-        storage_backend=storage_backend,
-    )
+    """Get configured PhotoImportService instance using service factory."""
+    service_factory = get_service_factory()
+    return service_factory.get_photo_import_service()
 
 
 # API Endpoints

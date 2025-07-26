@@ -6,6 +6,37 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.core.services.file_system_service import SecurityConstraints
 
 
+def _validate_directories(
+    directories: list[str], fallback_path: Path | None = None
+) -> list[str]:
+    """Utility function to validate directory existence and accessibility.
+
+    Args:
+        directories: List of directory paths to validate
+        fallback_path: Optional fallback path if no valid directories found
+
+    Returns:
+        List of valid directory paths as strings
+
+    """
+    valid_dirs = []
+
+    for dir_path in directories:
+        path = Path(dir_path).expanduser().resolve()
+        if path.exists() and path.is_dir():
+            valid_dirs.append(str(path))
+        elif path.exists() and not path.is_dir():
+            print(f"Warning: Path is not a directory, skipping: {dir_path}")
+        else:
+            print(f"Warning: Directory does not exist, skipping: {dir_path}")
+
+    # Use fallback if no valid directories found
+    if not valid_dirs and fallback_path:
+        valid_dirs.append(str(fallback_path))
+
+    return valid_dirs
+
+
 class PhotoDirectorySettings(BaseSettings):
     """Settings for photo directory access and security."""
 
@@ -73,6 +104,16 @@ class PhotoDirectorySettings(BaseSettings):
         default=50, description="Number of files to process in each batch"
     )
 
+    storage_base_path: str = Field(
+        default="./uploads", description="Base path for local storage"
+    )
+
+    organize_by_date: bool = Field(default=True, description="Organize files by date")
+
+    date_format: str = Field(
+        default="%Y/%m/%d", description="Date format for organization"
+    )
+
     # Additional security settings
     strict_path_validation: bool = Field(
         default=True, description="Enable strict path validation and security checks"
@@ -109,21 +150,25 @@ class PhotoDirectorySettings(BaseSettings):
 
     def get_validated_directories(self) -> list[str]:
         """Get validated list of directories that exist."""
-        valid_dirs = []
+        return _validate_directories(
+            self.allowed_photo_directories, fallback_path=self.get_upload_path()
+        )
 
-        for dir_path in self.allowed_photo_directories:
-            path = Path(dir_path).expanduser().resolve()
-            if path.exists() and path.is_dir():
-                valid_dirs.append(str(path))
-            elif path.exists() and not path.is_dir():
-                # If the path exists but is not a directory, log a warning
-                print(f"Warning: Path is not a directory: {dir_path}")
-            else:
-                # In development, we may have directories that don't exist yet
-                # Include them anyway but log a warning
-                print(f"Warning: Directory does not exist: {dir_path}")
-                valid_dirs.append(str(path))
-        return valid_dirs or [str(Path.home() / "Pictures")]
+    def get_storage_config(self):
+        """Get storage configuration for LocalStorageBackend."""
+        from src.core.storage.base import StorageConfig
+
+        return StorageConfig(
+            base_path=self.storage_base_path,
+            organize_by_date=self.organize_by_date,
+            date_format=self.date_format,
+        )
+
+    def get_upload_path(self) -> Path:
+        """Get the resolved upload path, creating it if necessary."""
+        upload_path = Path(self.storage_base_path).resolve()
+        upload_path.mkdir(parents=True, exist_ok=True)
+        return upload_path
 
     def get_security_constraints(self) -> SecurityConstraints:
         return SecurityConstraints(
@@ -161,7 +206,6 @@ class DatabaseSettings(BaseSettings):
     )
 
     model_config = {
-        "env_prefix": "DATABASE_",
         "case_sensitive": False,
         "extra": "ignore",
     }

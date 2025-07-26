@@ -11,7 +11,7 @@ from ...models.scan_result import (
     ScanStrategy,
 )
 from ..file_system_service import SecureFileSystemService, SecurityConstraints
-from ..photo_processor import PhotoProcessingError, PhotoProcessor
+from ..photo_processor_service import PhotoProcessingError, PhotoProcessorService
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +25,13 @@ class SecureDirectoryScanner:
     - Configurable scanning strategies
     - Batch processing for performance
     - Error handling and recovery
-    - Integration with existing PhotoProcessor
+    - Integration with existing PhotoProcessorService
     """
 
     def __init__(
         self,
         file_system_service: SecureFileSystemService,
-        photo_processor: PhotoProcessor | None = None,
+        photo_processor: PhotoProcessorService | None = None,
         security_constraints: SecurityConstraints | None = None,
     ):
         """Initialize secure directory scanner.
@@ -43,7 +43,7 @@ class SecureDirectoryScanner:
 
         """
         self.file_system_service = file_system_service
-        self.photo_processor = photo_processor or PhotoProcessor()
+        self.photo_processor = photo_processor or PhotoProcessorService()
         self.security_constraints = security_constraints or SecurityConstraints()
 
         # Track active scans
@@ -250,7 +250,7 @@ class SecureDirectoryScanner:
                     options.progress_callback(progress)
 
                 try:
-                    # Extract full metadata using PhotoProcessor
+                    # Extract full metadata using PhotoProcessorService
                     metadata = self.photo_processor.process_photo(entry.path)
 
                     file_result = {

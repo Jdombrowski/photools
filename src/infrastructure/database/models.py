@@ -63,7 +63,7 @@ class Photo(Base):
     processing_stage = Column(String, default="incoming")  # ProcessingStage enum values
     priority_level = Column(Integer, default=0)  # 0=normal, 1=good, 2=excellent
     needs_attention = Column(Boolean, default=True, index=True)
-    
+
     # Rating system
     user_rating = Column(Integer)  # 1-5 star rating
     rating_updated_at = Column(DateTime)
