@@ -209,3 +209,11 @@ CLAUDE.md
 # Testing Data
 data/
 .env.test
+Custom Fonts/
+frontend-swift/PhoTools/fonts/
+docs/CLAUDE-architecture-guidelines.md
+docs/CLAUDE-architecture-tradeoffs.md
+docs/frontend-design.md
+docs/frontend-implementation-plan.md
+docs/frontend-native-implementation-plan.md
+docs/frontend-ui-design.md

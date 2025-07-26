@@ -11,7 +11,6 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
     healthcheck:
       test:
         [
@@ -44,7 +43,7 @@ services:
       dockerfile: ${DOCKERFILE:-Dockerfile}
     container_name: ${PROJECT_NAME:-photools}-api
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "${API_PORT:-8090}:8090"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
       - REDIS_URL=redis://redis:6378/0
@@ -53,7 +52,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - DEBUG=${DEBUG:-true}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
-      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/data/test_photos,/app/uploads
+      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/uploads,/tmp
     volumes:
       - .:/app
       - ${UPLOAD_DIR:-./uploads}:/app/uploads
@@ -63,7 +62,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8090 --reload
 
   # Celery Worker
   worker:
@@ -78,7 +77,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6378/1
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
-      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/data/test_photos,/app/uploads
+      - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/uploads,/tmp
     volumes:
       - .:/app
       - ${UPLOAD_DIR:-./uploads}:/app/uploads

@@ -11,6 +11,7 @@ readme = "README.md"
 pytest-cov = "^6.2.1"
 pylint = "^3.0.0"
 pre-commit = "^4.2.0"
+black = "^25.1.0"
 
 [tool.pyright]
 venvPath = "."

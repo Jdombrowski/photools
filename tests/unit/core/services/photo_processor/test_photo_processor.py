@@ -13,10 +13,10 @@ from src.core.services.file_system_service import (
     FileSystemSecurityError,
     SecureFileSystemService,
 )
-from src.core.services.photo_processor import (
+from src.core.services.photo_processor_service import (
     PhotoMetadata,
     PhotoProcessingError,
-    PhotoProcessor,
+    PhotoProcessorService,
 )
 
 
@@ -129,7 +129,7 @@ class TestPhotoMetadata:
 
 
 class TestPhotoProcessor:
-    """Test PhotoProcessor functionality."""
+    """Test PhotoProcessorService functionality."""
 
     @pytest.fixture
     def temp_directory(self):
@@ -179,7 +179,7 @@ class TestPhotoProcessor:
 
     def test_processor_initialization_default(self):
         """Test processor initialization with defaults."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         assert processor.use_exiftool is False
         assert processor.file_system_service is None
@@ -189,7 +189,7 @@ class TestPhotoProcessor:
         self, mock_file_system_service
     ):
         """Test processor initialization with file system service."""
-        processor = PhotoProcessor(
+        processor = PhotoProcessorService(
             file_system_service=mock_file_system_service, max_file_size_mb=100
         )
 
@@ -198,7 +198,7 @@ class TestPhotoProcessor:
 
     def test_is_supported_format(self):
         """Test file format support detection."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Supported formats
         assert processor.is_supported_format(Path("photo.jpg")) is True
@@ -221,7 +221,7 @@ class TestPhotoProcessor:
         self, mock_file_system_service
     ):
         """Test file access validation with file system service."""
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
         test_path = Path("/test/photo.jpg")
 
         # Should not raise exception for valid access
@@ -242,7 +242,7 @@ class TestPhotoProcessor:
         )
         mock_file_system_service.get_file_info.return_value = file_info
 
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
 
         with pytest.raises(PhotoProcessingError, match="File access denied"):
             processor.validate_file_access(Path("/test/photo.jpg"))
@@ -253,21 +253,21 @@ class TestPhotoProcessor:
             "Security violation"
         )
 
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
 
         with pytest.raises(PhotoProcessingError, match="Security validation failed"):
             processor.validate_file_access(Path("/test/photo.jpg"))
 
     def test_validate_file_access_without_file_system_service(self, sample_jpeg):
         """Test file access validation without file system service."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Should not raise exception for existing file
         processor.validate_file_access(sample_jpeg)
 
     def test_validate_file_access_nonexistent_file(self):
         """Test validation of nonexistent file."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
         nonexistent = Path("/nonexistent/photo.jpg")
 
         with pytest.raises(PhotoProcessingError, match="File not found"):
@@ -276,7 +276,7 @@ class TestPhotoProcessor:
     def test_validate_file_access_large_file(self, temp_directory):
         """Test validation of file exceeding size limit."""
         # Create processor with small size limit
-        processor = PhotoProcessor(max_file_size_mb=1)  # 1MB limit
+        processor = PhotoProcessorService(max_file_size_mb=1)  # 1MB limit
 
         # Create file larger than limit
         large_file = temp_directory / "large.jpg"
@@ -287,7 +287,7 @@ class TestPhotoProcessor:
 
     def test_calculate_file_hash(self, sample_jpeg):
         """Test file hash calculation."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         hash1 = processor.calculate_file_hash(sample_jpeg)
         hash2 = processor.calculate_file_hash(sample_jpeg)
@@ -299,7 +299,7 @@ class TestPhotoProcessor:
 
     def test_calculate_file_hash_different_files(self, sample_jpeg, sample_png):
         """Test that different files produce different hashes."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         hash_jpeg = processor.calculate_file_hash(sample_jpeg)
         hash_png = processor.calculate_file_hash(sample_png)
@@ -308,7 +308,7 @@ class TestPhotoProcessor:
 
     def test_calculate_file_hash_permission_error(self, temp_directory):
         """Test hash calculation with permission error."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Create file and remove read permission
         test_file = temp_directory / "no_permission.jpg"
@@ -326,7 +326,7 @@ class TestPhotoProcessor:
 
     def test_extract_exif_datetime(self):
         """Test EXIF datetime extraction."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Test with valid datetime
         exif_data = {"DateTimeOriginal": "2023:01:15 14:30:25"}
@@ -337,7 +337,7 @@ class TestPhotoProcessor:
 
     def test_extract_exif_datetime_multiple_tags(self):
         """Test EXIF datetime extraction with multiple datetime tags."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Test priority: DateTimeOriginal > DateTime > DateTimeDigitized
         exif_data = {
@@ -352,7 +352,7 @@ class TestPhotoProcessor:
 
     def test_extract_exif_datetime_invalid_format(self):
         """Test EXIF datetime extraction with invalid format."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         exif_data = {"DateTime": "invalid_date_format"}
         result = processor.extract_exif_datetime(exif_data)
@@ -361,7 +361,7 @@ class TestPhotoProcessor:
 
     def test_extract_exif_datetime_missing(self):
         """Test EXIF datetime extraction when no datetime tags present."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         exif_data = {"ISO": 200, "FNumber": 2.8}
         result = processor.extract_exif_datetime(exif_data)
@@ -370,7 +370,7 @@ class TestPhotoProcessor:
 
     def test_extract_gps_coordinates(self):
         """Test GPS coordinate extraction from EXIF."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Mock GPS data (NYC coordinates)
         gps_info = {
@@ -393,7 +393,7 @@ class TestPhotoProcessor:
 
     def test_extract_gps_coordinates_missing(self):
         """Test GPS coordinate extraction when GPS data missing."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         exif_data = {"ISO": 200}
         result = processor.extract_gps_coordinates(exif_data)
@@ -402,7 +402,7 @@ class TestPhotoProcessor:
 
     def test_extract_gps_coordinates_incomplete(self):
         """Test GPS coordinate extraction with incomplete data."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Missing longitude reference
         gps_info = {
@@ -418,7 +418,7 @@ class TestPhotoProcessor:
 
     def test_convert_gps_coordinate(self):
         """Test GPS coordinate conversion from DMS to decimal."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Test conversion: 40°42'46.08" = 40.7128°
         dms = (40, 42, 46.08)
@@ -429,7 +429,7 @@ class TestPhotoProcessor:
 
     def test_extract_metadata_pil(self, sample_jpeg):
         """Test metadata extraction using PIL."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         metadata = processor.extract_metadata_pil(sample_jpeg)
 
@@ -442,7 +442,7 @@ class TestPhotoProcessor:
 
     def test_extract_metadata_pil_png(self, sample_png):
         """Test metadata extraction from PNG file."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         metadata = processor.extract_metadata_pil(sample_png)
 
@@ -452,7 +452,7 @@ class TestPhotoProcessor:
 
     def test_extract_metadata_pil_invalid_image(self, temp_directory):
         """Test metadata extraction from invalid image file."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         # Create file with invalid image data
         invalid_image = temp_directory / "invalid.jpg"
@@ -463,7 +463,7 @@ class TestPhotoProcessor:
 
     def test_process_photo_success(self, sample_jpeg):
         """Test successful photo processing."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         metadata = processor.process_photo(sample_jpeg)
 
@@ -476,7 +476,7 @@ class TestPhotoProcessor:
         self, sample_jpeg, mock_file_system_service
     ):
         """Test photo processing with file system service validation."""
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
 
         metadata = processor.process_photo(sample_jpeg)
 
@@ -486,7 +486,7 @@ class TestPhotoProcessor:
 
     def test_process_photo_unsupported_format(self, temp_directory):
         """Test processing unsupported file format."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         txt_file = temp_directory / "document.txt"
         txt_file.write_text("This is a text file")
@@ -496,7 +496,7 @@ class TestPhotoProcessor:
 
     def test_process_photo_nonexistent_file(self):
         """Test processing nonexistent file."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         nonexistent = Path("/nonexistent/photo.jpg")
 
@@ -505,7 +505,7 @@ class TestPhotoProcessor:
 
     def test_process_directory_deprecated_warning(self, temp_directory, sample_jpeg):
         """Test that process_directory issues deprecation warning."""
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
 
         with pytest.warns() as warning_list:
             results = processor.process_directory(temp_directory, recursive=False)
@@ -524,7 +524,7 @@ class TestPhotoProcessor:
         self, temp_directory, sample_jpeg, mock_file_system_service
     ):
         """Test directory processing with file system service."""
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
 
         results = processor.process_directory(temp_directory, recursive=False)
 
@@ -540,7 +540,7 @@ class TestPhotoProcessor:
             FileSystemSecurityError("Access denied")
         )
 
-        processor = PhotoProcessor(file_system_service=mock_file_system_service)
+        processor = PhotoProcessorService(file_system_service=mock_file_system_service)
 
         with pytest.raises(PhotoProcessingError, match="Directory access denied"):
             processor.process_directory(temp_directory)
@@ -553,7 +553,7 @@ class TestPhotoProcessor:
         txt_file = temp_directory / "readme.txt"
         txt_file.write_text("Documentation")
 
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
         results = processor.process_directory(temp_directory, recursive=False)
 
         # Should only process image files
@@ -569,7 +569,7 @@ class TestPhotoProcessor:
         invalid_image = temp_directory / "invalid.jpg"
         invalid_image.write_text("Not an image")
 
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
         results = processor.process_directory(temp_directory, recursive=False)
 
         # Should process valid image and skip invalid one
@@ -586,7 +586,7 @@ class TestPhotoProcessor:
         sub_image = subdir / "sub_photo.jpg"
         sub_image.write_bytes(sample_jpeg.read_bytes())
 
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
         results = processor.process_directory(temp_directory, recursive=True)
 
         # Should find both images
@@ -603,7 +603,7 @@ class TestPhotoProcessor:
         sub_image = subdir / "sub_photo.jpg"
         sub_image.write_bytes(sample_jpeg.read_bytes())
 
-        processor = PhotoProcessor()
+        processor = PhotoProcessorService()
         results = processor.process_directory(temp_directory, recursive=False)
 
         # Should only find image in root directory
@@ -627,7 +627,7 @@ class TestPhotoProcessingError:
 
 @pytest.mark.integration
 class TestPhotoProcessorIntegration:
-    """Integration tests for PhotoProcessor."""
+    """Integration tests for PhotoProcessorService."""
 
     def test_real_image_processing(self):
         """Test processing a real image file."""
@@ -641,7 +641,7 @@ class TestPhotoProcessorIntegration:
             jpeg_path = temp_path / "test_real.jpg"
             img.save(jpeg_path, "JPEG", quality=90)
 
-            processor = PhotoProcessor()
+            processor = PhotoProcessorService()
             metadata = processor.process_photo(jpeg_path)
 
             assert metadata.file_path == jpeg_path
@@ -651,7 +651,7 @@ class TestPhotoProcessorIntegration:
             assert len(metadata.file_hash) == 64
 
     def test_integration_with_file_system_service(self):
-        """Test integration between PhotoProcessor and SecureFileSystemService."""
+        """Test integration between PhotoProcessorService and SecureFileSystemService."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
 
@@ -669,7 +669,7 @@ class TestPhotoProcessorIntegration:
             )
 
             # Create processor with file system service
-            processor = PhotoProcessor(file_system_service=file_system_service)
+            processor = PhotoProcessorService(file_system_service=file_system_service)
 
             # Should successfully process
             metadata = processor.process_photo(jpeg_path)

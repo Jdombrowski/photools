@@ -18,7 +18,7 @@ Using a **hybrid module-aligned** approach that prioritizes cohesion based on co
 **Examples:**
 
 ```
-src/core/services/photo_processor_test.py     # Tests only PhotoProcessor
+src/core/services/photo_processor_test.py     # Tests only PhotoProcessorService
 src/api/routes/filesystem_test.py             # Tests only filesystem routes
 ```
 
@@ -68,7 +68,7 @@ When writing a test, ask:
 
 ## Naming Conventions
 
-- **Co-located**: `component_test.py` (no "test_" prefix, clear it's a test by location)
+- **Co-located**: `component_test.py` (no "test\_" prefix, clear it's a test by location)
 - **Module integration**: `test_feature_name.py` (descriptive of what's being tested)
 - **Shared tests**: `test_feature_name.py` (prefixed for discovery)
 

@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     POETRY_NO_INTERACTION=1 \
-    POETRY_VENV_IN_PROJECT=1 \
+    POETRY_VENV_IN_PROJECT=false \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 # Install system dependencies
@@ -46,7 +46,7 @@ COPY . .
 RUN mkdir -p uploads models logs
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8090
 
 # Default command
-CMD ["poetry", "run", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["poetry", "run", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8090", "--reload"]

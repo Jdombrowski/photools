@@ -242,17 +242,17 @@ dev: ## Start development servers with hot reload
 	@echo "⏳ Waiting for services to be ready..."
 	@sleep 5
 	@echo "🌐 Starting FastAPI server..."
-	@poetry run uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000 &
-	@echo "⚡ Checking if Celery is available..."
-	@if poetry run python -c "import celery" 2>/dev/null; then \
-		echo "🎯 Starting Celery worker..."; \
-		poetry run celery -A src.workers.celery_app worker --loglevel=info --concurrency=2 & \
-	else \
-		echo "⚠️  Celery not installed yet. Install with: poetry add celery[redis]"; \
-	fi
+	@poetry run uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8090 &
+# 	@echo "⚡ Checking if Celery is available..."
+# 	@if poetry run python -c "import celery" 2>/dev/null; then \
+# 		echo "🎯 Starting Celery worker..."; \
+# 		poetry run celery -A src.workers.celery_app worker --loglevel=info --concurrency=2 & \
+# 	else \
+# 		echo "⚠️  Celery not installed yet. Install with: poetry add celery[redis]"; \
+# 	fi
 	@echo "✅ Development servers starting:"
-	@echo "   🌐 API: http://localhost:8000"
-	@echo "   📊 API Docs: http://localhost:8000/docs"
+	@echo "   🌐 API: http://localhost:8090"
+	@echo "   📊 API Docs: http://localhost:8090/docs"
 	@echo "   🐘 PostgreSQL: localhost:5432"
 	@echo "   🔴 Redis: localhost:6378"
 
@@ -335,7 +335,7 @@ lint: lint-fast ## Run fast linting (alias for lint-fast)
 
 lint-fast: ## Run fast linting with Ruff (development workflow)
 	@echo "🔌 Running linting with Black"
-	@poetry run black --line-length 88 .
+	@python -m black --line-length 88 .
 	@echo "🚀 Running fast linting with Ruff..."
 	@poetry run ruff check src tests --fix --unsafe-fixes
 
@@ -360,7 +360,7 @@ lint-service: ## Run linting on specific service (usage: make lint-service SERVI
 
 format: ## Format code with black only (imports handled by ruff)
 	@echo "🎨 Formatting code with black..."
-	@poetry run $(FORMAT_COMMAND)
+	@python -m black src tests
 
 format-imports: ## Fix imports with ruff (called by lint-fast)
 	@echo "🔧 Fixing imports with ruff..."
@@ -384,7 +384,7 @@ fix-auto: ## Auto-fix as many linting issues as possible
 	@echo "🔧 Auto-fixing linting issues..."
 	@poetry run ruff format .
 	@poetry run ruff check . --fix --unsafe-fixes
-	@poetry run $(FORMAT_COMMAND)
+	@python -m black src tests
 	@echo "✅ Auto-fix complete"
 
 coverage: ## Generate coverage report
@@ -669,20 +669,7 @@ test-api-verbose: ## Test API endpoints with full response output
 	@echo "✅ Verbose API testing complete"
 
 test-api-snapshot: ## Generate API response snapshots for change tracking
-	@echo "📸 Generating API response snapshots..."
-	@mkdir -p tests/snapshots/api
-	@echo "📊 Capturing health endpoint..."
-	@curl -s http://localhost:8000/api/v1/health > tests/snapshots/api/health.json
-	@echo "📊 Capturing photo listing..."
-	@curl -s "http://localhost:8000/api/v1/photos?limit=10" > tests/snapshots/api/photos_list.json
-	@echo "📊 Capturing storage info..."
-	@curl -s http://localhost:8000/api/v1/storage/info > tests/snapshots/api/storage_info.json
-	@echo "📊 Capturing preview stats..."
-	@curl -s http://localhost:8000/api/v1/storage/preview-stats > tests/snapshots/api/preview_stats.json
-	@echo "📊 Capturing API root..."
-	@curl -s http://localhost:8000/api > tests/snapshots/api/api_root.json
-	@echo "✅ API snapshots saved to tests/snapshots/api/"
-	@echo "   📁 Use 'make test-api-diff' to compare changes"
+	@./scripts/api-snapshot.sh
 
 test-api-diff: ## Compare current API responses with snapshots
 	@echo "🔍 API Change Detection..."
