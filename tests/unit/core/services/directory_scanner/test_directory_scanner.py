@@ -19,7 +19,10 @@ from src.core.services.file_system_service import (
     SecureFileSystemService,
     SecurityConstraints,
 )
-from src.core.services.photo_processor import PhotoMetadata, PhotoProcessor
+from src.core.services.photo_processor_service import (
+    PhotoMetadata,
+    PhotoProcessorService,
+)
 
 
 class TestScanProgress:
@@ -153,7 +156,7 @@ class TestSecureDirectoryScanner:
     @pytest.fixture
     def mock_photo_processor(self, sample_photos):
         """Create mock photo processor."""
-        processor = MagicMock(spec=PhotoProcessor)
+        processor = MagicMock(spec=PhotoProcessorService)
 
         def mock_process_photo(path):
             return PhotoMetadata(
@@ -277,7 +280,9 @@ class TestSecureDirectoryScanner:
         # Configure photo processor to raise errors for some files
         def mock_process_with_errors(path):
             if "photo_1" in str(path):
-                from src.core.services.photo_processor import PhotoProcessingError
+                from src.core.services.photo_processor_service import (
+                    PhotoProcessingError,
+                )
 
                 raise PhotoProcessingError("Mock processing error")
 
@@ -453,7 +458,9 @@ class TestDirectoryScannerIntegration:
                 allowed_directories=[temp_path], constraints=constraints
             )
 
-            photo_processor = PhotoProcessor(file_system_service=file_system_service)
+            photo_processor = PhotoProcessorService(
+                file_system_service=file_system_service
+            )
             scanner = SecureDirectoryScanner(
                 file_system_service=file_system_service, photo_processor=photo_processor
             )

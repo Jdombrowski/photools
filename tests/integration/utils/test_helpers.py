@@ -15,7 +15,7 @@ from PIL import Image
 
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import SecureFileSystemService
-from src.core.services.photo_processor import PhotoProcessor
+from src.core.services.photo_processor_service import PhotoProcessorService
 from tests.integration.config.test_settings import TestingEnvironment
 
 
@@ -142,12 +142,12 @@ class ServiceTestBuilder:
 
     def build_photo_processor(
         self, file_system_service: SecureFileSystemService | None = None
-    ) -> PhotoProcessor:
+    ) -> PhotoProcessorService:
         """Build a configured photo processor for testing."""
         if file_system_service is None:
             file_system_service = self.build_file_system_service()
 
-        return PhotoProcessor(
+        return PhotoProcessorService(
             file_system_service=file_system_service,
             max_file_size_mb=self.test_env.security.max_file_size_mb,
         )
@@ -155,7 +155,7 @@ class ServiceTestBuilder:
     def build_directory_scanner(
         self,
         file_system_service: SecureFileSystemService | None = None,
-        photo_processor: PhotoProcessor | None = None,
+        photo_processor: PhotoProcessorService | None = None,
     ) -> SecureDirectoryScanner:
         """Build a configured directory scanner for testing."""
         if file_system_service is None:

@@ -131,9 +131,9 @@ class TestPhotoProcessingPipeline:
 
         # Report results
         success = reporter.print_summary()
-        assert success, (
-            f"Pipeline test failed with {reporter.get_success_rate():.1f}% success rate"
-        )
+        assert (
+            success
+        ), f"Pipeline test failed with {reporter.get_success_rate():.1f}% success rate"
 
     def test_pipeline_with_synthetic_photos(self):
         """Test the pipeline using synthetic test photos."""
