@@ -23,8 +23,9 @@ RUN apt-get install -y \
 # Install Poetry
 RUN pip install poetry==1.8.3
 
-# Configure Poetry
-RUN poetry config virtualenvs.create false
+# Configure Poetry to install directly to system Python (no venv)
+RUN poetry config virtualenvs.create false && \
+    poetry config virtualenvs.in-project false
 
 # Set work directory
 WORKDIR /app
