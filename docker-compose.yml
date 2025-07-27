@@ -26,15 +26,30 @@ services:
     image: redis:${REDIS_VERSION:-7-alpine}
     container_name: ${PROJECT_NAME:-photools}-redis
     ports:
-      - "${REDIS_PORT:-6378}:6378"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --port 6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
+
+  # Database initialization
+  db-init:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: ${PROJECT_NAME:-photools}-db-init
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: /app/scripts/init_db.sh
+    volumes:
+      - .:/app
 
   # FastAPI Application
   api:
@@ -43,12 +58,12 @@ services:
       dockerfile: ${DOCKERFILE:-Dockerfile}
     container_name: ${PROJECT_NAME:-photools}-api
     ports:
-      - "${API_PORT:-8090}:8090"
+      - "${API_PORT:-8000}:8000"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
-      - REDIS_URL=redis://redis:6378/0
-      - CELERY_BROKER_URL=redis://redis:6378/0
-      - CELERY_RESULT_BACKEND=redis://redis:6378/1
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - DEBUG=${DEBUG:-true}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
@@ -62,7 +77,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8090 --reload
+      db-init:
+        condition: service_completed_successfully
+    command: poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
 
   # Celery Worker
   worker:
@@ -72,9 +89,9 @@ services:
     container_name: ${PROJECT_NAME:-photools}-worker
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-photo_user}:${POSTGRES_PASSWORD:-photo_password}@postgres:5432/${POSTGRES_DB:-photo_catalog}
-      - REDIS_URL=redis://redis:6378/0
-      - CELERY_BROKER_URL=redis://redis:6378/0
-      - CELERY_RESULT_BACKEND=redis://redis:6378/1
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
       - PHOTO_ALLOWED_PHOTO_DIRECTORIES_STR=/app/uploads,/tmp
@@ -90,21 +107,21 @@ services:
     command: poetry run celery -A src.workers.celery_app worker --loglevel=${CELERY_LOG_LEVEL:-info}
 
   # Celery Flower (Optional - for monitoring)
-  flower:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-    container_name: ${PROJECT_NAME:-photools}-flower
-    ports:
-      - "${FLOWER_PORT:-5555}:5555"
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6378/0
-      - CELERY_RESULT_BACKEND=redis://redis:6378/1
-    depends_on:
-      - redis
-    command: poetry run celery -A src.workers.celery_app flower --port=5555
-    profiles:
-      - monitoring
+#   flower:
+#     build:
+#       context: .
+#       dockerfile: ${DOCKERFILE:-Dockerfile}
+#     container_name: ${PROJECT_NAME:-photools}-flower
+#     ports:
+#       - "${FLOWER_PORT:-5555}:5555"
+#     environment:
+#       - CELERY_BROKER_URL=redis://redis:6379/0
+#       - CELERY_RESULT_BACKEND=redis://redis:6379/1
+#     depends_on:
+#       - redis
+#     command: poetry run celery -A src.workers.celery_app flower --port=5555
+#     profiles:
+#       - monitoring
 
 volumes:
   postgres_data:

@@ -172,21 +172,21 @@ stage1-deps: deps-install-minimal ## Stage 1: Install minimal API foundation dep
 	@echo "🎯 Stage 1 complete: Basic FastAPI server ready"
 	@echo "   You can now: build basic API endpoints, health checks"
 
-# stage2-deps: ## Stage 2: Add file handling dependencies
-# 	@echo "🎯 Stage 2: Adding file handling capabilities..."
-# 	@$(MAKE) deps-add PACKAGE=python-multipart
-# 	@$(MAKE) deps-add PACKAGE=pillow
-# 	@$(MAKE) deps-add PACKAGE=aiofiles
-# 	@$(MAKE) deps-add PACKAGE=pydantic-settings
-# 	@echo "✅ Stage 2 complete: File upload and configuration ready"
+stage2-deps: ## Stage 2: Add file handling dependencies
+	@echo "🎯 Stage 2: Adding file handling capabilities..."
+	@$(MAKE) deps-add PACKAGE=python-multipart
+	@$(MAKE) deps-add PACKAGE=pillow
+	@$(MAKE) deps-add PACKAGE=aiofiles
+	@$(MAKE) deps-add PACKAGE=pydantic-settings
+	@echo "✅ Stage 2 complete: File upload and configuration ready"
 
-# stage3-deps: ## Stage 3: Add database dependencies
-# 	@echo "🎯 Stage 3: Adding database capabilities..."
-# 	@$(MAKE) deps-add PACKAGE=sqlalchemy
-# 	@$(MAKE) deps-add PACKAGE=alembic
-# 	@$(MAKE) deps-add PACKAGE=psycopg2-binary
-# 	@$(MAKE) deps-add PACKAGE=pytest-asyncio GROUP=dev
-# 	@echo "✅ Stage 3 complete: Database integration ready"
+stage3-deps: ## Stage 3: Add database dependencies
+	@echo "🎯 Stage 3: Adding database capabilities..."
+	@$(MAKE) deps-add PACKAGE=sqlalchemy
+	@$(MAKE) deps-add PACKAGE=alembic
+	@$(MAKE) deps-add PACKAGE=psycopg2-binary
+	@$(MAKE) deps-add PACKAGE=pytest-asyncio GROUP=dev
+	@echo "✅ Stage 3 complete: Database integration ready"
 
 # stage4-deps: ## Stage 4: Add AI model dependencies
 # 	@echo "🎯 Stage 4: Adding AI model capabilities..."
@@ -233,7 +233,28 @@ start: dev ## Start development servers
 	@echo "   Alias 'make dev' for full development environment"
 	@echo "   Use 'make docker-dev' for Docker development"
 
-dev: ## Start development servers with hot reload
+##@ Local Development (Recommended)
+dev-local: ## Start local development (infrastructure in Docker, API/Celery local)
+	@echo "🚀 Starting local development environment..."
+	@./scripts/dev-start.sh
+
+dev-init-db: ## Initialize database for local development
+	@echo "🗄️ Initializing local development database..."
+	@./scripts/init-db-local.sh
+
+dev-api: ## Start API server locally (requires infrastructure running)
+	@echo "🌐 Starting local API server..."
+	@./scripts/run-api.sh
+
+dev-worker: ## Start Celery worker locally (requires infrastructure running)
+	@echo "⚙️ Starting local Celery worker..."
+	@./scripts/run-worker.sh
+
+dev-stop: ## Stop local development infrastructure
+	@echo "🛑 Stopping local development infrastructure..."
+	@./scripts/dev-stop.sh
+
+dev: ## Start development servers with hot reload (legacy Docker approach)
 	@echo "🚀 Starting development environment..."
 	@echo "📋 Checking dependencies..."
 	@poetry install
@@ -251,10 +272,10 @@ dev: ## Start development servers with hot reload
 # 		echo "⚠️  Celery not installed yet. Install with: poetry add celery[redis]"; \
 # 	fi
 	@echo "✅ Development servers starting:"
-	@echo "   🌐 API: http://localhost:8090"
-	@echo "   📊 API Docs: http://localhost:8090/docs"
+	@echo "   🌐 API: http://localhost:8000"
+	@echo "   📊 API Docs: http://localhost:8000/docs"
 	@echo "   🐘 PostgreSQL: localhost:5432"
-	@echo "   🔴 Redis: localhost:6378"
+	@echo "   🔴 Redis: localhost:6379"
 
 dev-full: ## Start full development environment with all services
 	@echo "🚀 Starting full development environment..."
@@ -477,9 +498,9 @@ demo: ## Prepare demo environment with sample data
 debug: ## Show debug information
 	@echo "📊 Environment Variables:"
 	@echo "   PROJECT_NAME: ${PROJECT_NAME:-photools}"
-	@echo "   API_PORT: ${API_PORT:-8000}"
+	@echo "   API_PORT: ${API_PORT:-8000 (Docker) / 8090 (Local)}"
 	@echo "   POSTGRES_PORT: ${POSTGRES_PORT:-5432}"
-	@echo "   REDIS_PORT: ${REDIS_PORT:-6378}"
+	@echo "   REDIS_PORT: ${REDIS_PORT:-6379}"
 	@echo ""
 	@echo "📊 Poetry Status:"
 	@poetry --version || echo "Poetry not installed locally"
@@ -691,8 +712,13 @@ api-workflow: ## Complete API testing workflow (snapshot → test → diff)
 
 
 ##@ Quick Development Workflow
-quick-start: setup-env docker-dev ## Quick start: setup env and start services
+quick-start: setup-env dev-local ## Quick start: setup env and start local development
 	@echo "🚀 Quick start complete!"
+	@echo "   Next: make dev-init-db (to initialize database)"
+	@echo "   Then: make dev-api (in one terminal) and make dev-worker (in another)"
+
+quick-start-legacy: setup-env docker-dev ## Legacy quick start: setup env and start Docker services
+	@echo "🚀 Legacy quick start complete!"
 	@echo "   Now run: make dev (for local development)"
 	@echo "   Or run: make docker-dev (for Docker development)"
 
@@ -703,3 +729,26 @@ full-start: setup-env docker-dev-with-monitoring deps-install ## Full start: eve
 	@echo "   🌸 Celery Flower: http://localhost:5555"
 	@echo "   🐘 PgAdmin: http://localhost:8080 (admin@photools.local / admin)"
 	@echo "   📊 Redis Commander: http://localhost:8081"
+
+local-workflow: ## Complete local development workflow (recommended)
+	@echo "🎯 Starting complete local development workflow..."
+	@echo "📋 Step 1: Setting up environment..."
+	@$(MAKE) setup-env
+	@echo "📋 Step 2: Installing dependencies..."
+	@$(MAKE) deps-install
+	@echo "📋 Step 3: Starting infrastructure..."
+	@$(MAKE) dev-local
+	@echo "📋 Step 4: Initializing database..."
+	@$(MAKE) dev-init-db
+	@echo ""
+	@echo "✅ Local development environment ready!"
+	@echo ""
+	@echo "🔧 Next steps (run in separate terminals):"
+	@echo "   Terminal 1: make dev-api"
+	@echo "   Terminal 2: make dev-worker"
+	@echo ""
+	@echo "📊 URLs:"
+	@echo "   🌐 API: http://localhost:8090"
+	@echo "   📖 API Docs: http://localhost:8090/docs"
+	@echo "   🐘 PostgreSQL: localhost:5432"
+	@echo "   🔴 Redis: localhost:6379"
