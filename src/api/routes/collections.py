@@ -53,15 +53,7 @@ async def create_collection(
     await db.commit()
     await db.refresh(new_collection)
 
-    return CollectionResponse(
-        id=new_collection.id,
-        name=new_collection.name,
-        description=new_collection.description,
-        photo_count=new_collection.photo_count,
-        cover_photo_id=new_collection.cover_photo_id,
-        created_at=new_collection.created_at,
-        updated_at=new_collection.updated_at,
-    )
+    return pack_collection(new_collection)
 
 
 @router.get("/collections")
@@ -85,19 +77,18 @@ async def list_collections(
     result = await db.execute(stmt)
     collections = result.scalars().all()
 
-    collections_data = []
-    for collection in collections:
-        collections_data.append(
-            {
-                "id": collection.id,
-                "name": collection.name,
-                "description": collection.description,
-                "photo_count": collection.photo_count,
-                "cover_photo_id": collection.cover_photo_id,
-                "created_at": collection.created_at,
-                "updated_at": collection.updated_at,
-            }
-        )
+    collections_data = [
+        {
+            "id": collection.id,
+            "name": collection.name,
+            "description": collection.description,
+            "photo_count": collection.photo_count,
+            "cover_photo_id": collection.cover_photo_id,
+            "created_at": collection.created_at,
+            "updated_at": collection.updated_at,
+        }
+        for collection in collections
+    ]
 
     return {
         "collections": collections_data,
@@ -120,14 +111,18 @@ async def get_collection(
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
 
+    return pack_collection(collection)
+
+
+def pack_collection(collection):
     return CollectionResponse(
-        id=collection.id,
-        name=collection.name,
-        description=collection.description,
-        photo_count=collection.photo_count,
-        cover_photo_id=collection.cover_photo_id,
-        created_at=collection.created_at,
-        updated_at=collection.updated_at,
+        id=collection["id"],
+        name=collection["name"],
+        description=collection["description"],
+        photo_count=collection["photo_count"],
+        cover_photo_id=collection["cover_photo_id"],
+        created_at=collection["created_at"],
+        updated_at=collection["updated_at"],
     )
 
 
@@ -181,13 +176,13 @@ async def update_collection(
         await db.refresh(collection)
 
     return CollectionResponse(
-        id=collection.id,
-        name=collection.name,
-        description=collection.description,
-        photo_count=collection.photo_count,
-        cover_photo_id=collection.cover_photo_id,
-        created_at=collection.created_at,
-        updated_at=collection.updated_at,
+        id=collection["id"],
+        name=collection["name"],
+        description=collection["description"],
+        photo_count=collection["photo_count"],
+        cover_photo_id=collection["cover_photo_id"],
+        created_at=collection["created_at"],
+        updated_at=collection["updated_at"],
     )
 
 

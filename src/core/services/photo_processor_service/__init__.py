@@ -306,6 +306,10 @@ class PhotoProcessorService:
     async def process_photo_async(self, file_path: str) -> dict[str, Any]:
         """Async wrapper for photo processing that returns a dict result.
 
+        This method avoids using run_in_executor to prevent SQLAlchemy greenlet issues.
+        Since the underlying PIL/metadata operations are CPU-bound but don't require
+        database access, we can run them synchronously in the async context.
+
         Args:
             file_path: Path to photo file as string
 
@@ -313,26 +317,21 @@ class PhotoProcessorService:
             Dict with success status and metadata
 
         """
-        import asyncio
-
-        def _process_sync():
-            try:
-                file_path_obj = Path(file_path)
-                metadata = self.process_photo(file_path_obj)
-                return {"success": True, "metadata": metadata.to_dict()}
-            except PhotoProcessingError as e:
-                logger.error(f"Photo processing failed: {e}")
-                return {"success": False, "error": str(e), "metadata": None}
-            except Exception as e:
-                logger.error(f"Unexpected error in photo processing: {e}")
-                return {
-                    "success": False,
-                    "error": f"Unexpected error: {str(e)}",
-                    "metadata": None,
-                }
-
-        # Run the synchronous processing in a thread pool
-        return await asyncio.get_event_loop().run_in_executor(None, _process_sync)
+        try:
+            file_path_obj = Path(file_path)
+            # Run synchronously in the current async context to avoid greenlet issues
+            metadata = self.process_photo(file_path_obj)
+            return {"success": True, "metadata": metadata.to_dict()}
+        except PhotoProcessingError as e:
+            logger.error(f"Photo processing failed: {e}")
+            return {"success": False, "error": str(e), "metadata": None}
+        except Exception as e:
+            logger.error(f"Unexpected error in photo processing: {e}")
+            return {
+                "success": False,
+                "error": f"Unexpected error: {str(e)}",
+                "metadata": None,
+            }
 
     def process_directory(
         self, directory_path: Path, recursive: bool = True
