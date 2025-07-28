@@ -173,6 +173,7 @@ class PhotoImportService:
     async def import_directory(
         self,
         directory_path: Path,
+        db_session,
         import_options: ImportOptions | None = None,
     ) -> ImportResult:
         """Import all photos from a directory.
@@ -203,7 +204,7 @@ class PhotoImportService:
             progress.current_stage = "scanning directory"
             self._update_progress(progress, options)
 
-            scan_result = await self._scan_directory(directory_path, options)
+            scan_result = self._scan_directory(directory_path, options)
             progress.total_files = scan_result.total_files
             progress.scanned_files = scan_result.processed_files
 
@@ -212,7 +213,7 @@ class PhotoImportService:
             progress.current_stage = "importing photos"
             self._update_progress(progress, options)
 
-            import_result = await self._import_photos(scan_result, options, progress)
+            import_result = await self._import_photos(scan_result, options, progress, db_session)
 
             # Phase 3: Completion
             progress.status = ImportStatus.COMPLETED
@@ -250,6 +251,7 @@ class PhotoImportService:
     async def import_single_photo(
         self,
         file_path: Path,
+        db_session,
         import_options: ImportOptions | None = None,
     ) -> ImportResult:
         """Import a single photo file.
@@ -281,11 +283,71 @@ class PhotoImportService:
 
             # Check for duplicates if enabled
             if options.skip_duplicates:
-                # TODO: Implement duplicate detection
-                pass
+                is_duplicate = await self._check_duplicate(file_path, db_session)
+                if is_duplicate:
+                    progress.skipped_files = 1
+                    progress.status = ImportStatus.COMPLETED
+                    progress.current_stage = "completed - duplicate skipped"
+                    progress.end_time = datetime.now()
+                    self._update_progress(progress, options)
+                    
+                    return ImportResult(
+                        import_id=import_id,
+                        source_directory=str(file_path.parent),
+                        status=ImportStatus.COMPLETED,
+                        total_files=1,
+                        imported_files=0,
+                        skipped_files=1,
+                        failed_files=0,
+                        start_time=progress.start_time,
+                        end_time=progress.end_time,
+                        skipped_photos=[str(file_path)],
+                    )
 
             # Upload photo through existing service
-            await self.photo_upload_service.upload_photo(file_path)
+            upload_result = await self._upload_photo_from_path(file_path, db_session)
+            
+            if upload_result.get("status") == "duplicate":
+                # Storage-level duplicate detected
+                progress.skipped_files = 1
+                progress.status = ImportStatus.COMPLETED
+                progress.current_stage = "completed - storage duplicate skipped"
+                progress.end_time = datetime.now()
+                self._update_progress(progress, options)
+                
+                return ImportResult(
+                    import_id=import_id,
+                    source_directory=str(file_path.parent),
+                    status=ImportStatus.COMPLETED,
+                    total_files=1,
+                    imported_files=0,
+                    skipped_files=1,
+                    failed_files=0,
+                    start_time=progress.start_time,
+                    end_time=progress.end_time,
+                    skipped_photos=[str(file_path)],
+                )
+            elif upload_result.get("status") != "success":
+                # Upload failed
+                progress.failed_files = 1
+                progress.status = ImportStatus.FAILED
+                progress.current_stage = "failed - upload error"
+                progress.end_time = datetime.now()
+                progress.errors.append(f"Upload failed: {upload_result.get('error', 'Unknown error')}")
+                self._update_progress(progress, options)
+                
+                return ImportResult(
+                    import_id=import_id,
+                    source_directory=str(file_path.parent),
+                    status=ImportStatus.FAILED,
+                    total_files=1,
+                    imported_files=0,
+                    skipped_files=0,
+                    failed_files=1,
+                    start_time=progress.start_time,
+                    end_time=progress.end_time,
+                    error_details=[{"file": str(file_path), "error": upload_result.get("error", "Upload failed")}],
+                )
 
             progress.imported_files = 1
             progress.status = ImportStatus.COMPLETED
@@ -350,7 +412,7 @@ class PhotoImportService:
                 return True
         return False
 
-    async def _scan_directory(
+    def _scan_directory(
         self,
         directory_path: Path,
         options: ImportOptions,
@@ -374,6 +436,7 @@ class PhotoImportService:
         scan_result: ScanResult,
         options: ImportOptions,
         progress: ImportProgress,
+        db_session,
     ) -> ImportResult:
         """Import photos from scan result."""
         imported_photos = []
@@ -390,15 +453,32 @@ class PhotoImportService:
 
                 # Check for duplicates if enabled
                 if options.skip_duplicates:
-                    # TODO: Implement proper duplicate detection
-                    # For now, assume no duplicates
-                    pass
+                    is_duplicate = await self._check_duplicate(file_path, db_session)
+                    if is_duplicate:
+                        skipped_photos.append(str(file_path))
+                        progress.skipped_files += 1
+                        continue
 
                 # Upload photo
-                await self.photo_upload_service.upload_photo(file_path)
-
-                imported_photos.append(str(file_path))
-                progress.imported_files += 1
+                upload_result = await self._upload_photo_from_path(file_path, db_session)
+                
+                if upload_result.get("status") == "success":
+                    imported_photos.append(str(file_path))
+                    progress.imported_files += 1
+                elif upload_result.get("status") == "duplicate":
+                    # Storage-level duplicate detected
+                    skipped_photos.append(str(file_path))
+                    progress.skipped_files += 1
+                else:
+                    # Upload failed
+                    error_details.append(
+                        {"file": str(file_path), "error": upload_result.get("error", "Upload failed")}
+                    )
+                    skipped_photos.append(str(file_path))
+                    progress.failed_files += 1
+                    progress.errors.append(
+                        f"Failed to import {file_path}: {upload_result.get('error', 'Upload failed')}"
+                    )
 
             except Exception as e:
                 error_details.append(
@@ -410,10 +490,16 @@ class PhotoImportService:
                     f"Failed to import {photo_info.get('file_path', 'unknown')}: {e}"
                 )
 
+        # Determine overall status based on results
+        if progress.failed_files > 0 and progress.imported_files == 0:
+            overall_status = ImportStatus.FAILED
+        else:
+            overall_status = ImportStatus.COMPLETED
+            
         return ImportResult(
             import_id=progress.import_id,
             source_directory=scan_result.directory,
-            status=ImportStatus.COMPLETED,
+            status=overall_status,
             total_files=scan_result.total_files,
             imported_files=progress.imported_files,
             skipped_files=progress.skipped_files,
@@ -423,6 +509,41 @@ class PhotoImportService:
             imported_photos=imported_photos,
             skipped_photos=skipped_photos,
             error_details=error_details,
+        )
+
+    async def _check_duplicate(self, file_path: Path, db_session) -> bool:
+        """Check if a photo file is a duplicate based on file hash."""
+        import hashlib
+        from sqlalchemy import select
+        from src.infrastructure.database.models import Photo
+        
+        # Calculate file hash
+        file_content = file_path.read_bytes()
+        file_hash = hashlib.sha256(file_content).hexdigest()
+        
+        # Check if hash exists in database
+        stmt = select(Photo).where(Photo.file_hash == file_hash)
+        result = await db_session.execute(stmt)
+        existing_photo = result.scalar_one_or_none()
+        
+        return existing_photo is not None
+
+    async def _upload_photo_from_path(self, file_path: Path, db_session) -> dict:
+        """Upload a photo file by reading it from disk and calling the upload service."""
+        # Read file content
+        file_content = file_path.read_bytes()
+        
+        # Determine content type based on file extension
+        import mimetypes
+        content_type, _ = mimetypes.guess_type(str(file_path))
+        content_type = content_type or "application/octet-stream"
+        
+        # Call the upload service with file content
+        return await self.photo_upload_service.process_upload(
+            file_content=file_content,
+            filename=file_path.name,
+            content_type=content_type,
+            db_session=db_session,
         )
 
     def _update_progress(self, progress: ImportProgress, options: ImportOptions):

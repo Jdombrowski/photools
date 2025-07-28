@@ -62,10 +62,12 @@ class PhotoUploadService:
         storage_result = None
 
         try:
-            # Extract metadata first (before storage)
-            metadata_result = await self._extract_metadata_from_content(
-                file_content, filename
-            )
+            # Skip metadata extraction temporarily to debug database issue
+            metadata_result = None
+            # TODO: Re-enable metadata extraction after fixing greenlet issue
+            # metadata_result = await self._extract_metadata_from_content(
+            #     file_content, filename
+            # )
 
             # Store file using storage backend
             storage_result = await self.storage.store_file(
@@ -95,8 +97,6 @@ class PhotoUploadService:
                     metadata_result,
                 )
 
-                await db_session.commit()
-
                 return {
                     "status": "success",
                     "photo_id": photo_record.id,
@@ -113,7 +113,6 @@ class PhotoUploadService:
                 raise ValueError("storage_path is None")
 
         except Exception as e:
-            await db_session.rollback()
             # Attempt cleanup of stored file if it was saved
             if storage_result and storage_result.storage_path:
                 await self.storage.delete_file(storage_result.storage_path)
@@ -191,11 +190,9 @@ class PhotoUploadService:
 
             # Delete from database
             await db_session.delete(photo)
-            await db_session.commit()
 
             return storage_deleted
         except Exception:
-            await db_session.rollback()
             return False
 
     async def _check_existing_photo(

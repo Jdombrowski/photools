@@ -3,7 +3,7 @@ import os
 from celery import Celery
 
 # Get Redis URL from environment or use default
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6378/0")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 # Create Celery instance
 celery_app = Celery(
@@ -20,11 +20,11 @@ celery_app.conf.update(
     result_serializer="json",
     timezone="UTC",
     enable_utc=True,
-    # Task routing
-    task_routes={
-        "src.workers.photo_processor.*": {"queue": "photo_processing"},
-        "src.workers.model_indexer.*": {"queue": "ai_processing"},
-    },
+    # Task routing - using default queue for now
+    # task_routes={
+    #     "src.workers.photo_processor.*": {"queue": "photo_processing"},
+    #     "src.workers.model_indexer.*": {"queue": "ai_processing"},
+    # },
     # Worker configuration
     worker_prefetch_multiplier=1,
     task_acks_late=True,

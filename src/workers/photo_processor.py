@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from celery import Task
-from PIL import Image
+import PIL.Image
 
 from .celery_app import celery_app
 
@@ -23,7 +23,7 @@ class CallbackTask(Task):
 
 
 @celery_app.task(base=CallbackTask, bind=True)
-def process_single_photo(self, file_path: str) -> dict[str, Any]:
+def process_single_photo(self, file_path: str) -> dict[str, Any] | None:
     """Process a single photo file and extract metadata."""
     try:
         # Validate file exists and is accessible
@@ -53,7 +53,7 @@ def process_single_photo(self, file_path: str) -> dict[str, Any]:
         }
 
         logger.info(f"Successfully processed photo: {file_path}")
-        return result
+        return result 
 
     except Exception as e:
         logger.error(f"Error processing photo {file_path}: {str(e)}")
@@ -162,7 +162,7 @@ def generate_preview_task(
     storage_path: str,
     filename: str,
     priority: str = "normal",
-    requested_sizes: list = None,
+    requested_sizes: list = [],
 ) -> dict[str, Any]:
     """Generate preview(s) for a photo with priority-aware execution.
 
@@ -304,7 +304,7 @@ def bulk_generate_previews_task(batch_size: int = 10) -> dict[str, Any]:
     from src.infrastructure.database.models import Photo
 
     settings = get_settings()
-    engine = create_engine(settings.database.url)
+    engine = create_engine(settings.database.database_url)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     try:
@@ -330,7 +330,7 @@ def bulk_generate_previews_task(batch_size: int = 10) -> dict[str, Any]:
             for photo in photos:
                 try:
                     # Check if photo already has previews
-                    existing_previews = preview_generator.get_preview_info(photo.id)
+                    existing_previews = preview_generator.get_preview_info(str(photo.id))
 
                     # Skip if all preview sizes exist
                     if len(existing_previews) >= 4:  # All 4 sizes
@@ -363,7 +363,7 @@ def bulk_generate_previews_task(batch_size: int = 10) -> dict[str, Any]:
 def extract_image_metadata(file_path: str) -> dict[str, Any]:
     """Extract basic image metadata using PIL."""
     try:
-        with Image.open(file_path) as img:
+        with PIL.Image.open(file_path) as img:
             # Basic image info
             metadata = {
                 "format": img.format,
@@ -374,8 +374,8 @@ def extract_image_metadata(file_path: str) -> dict[str, Any]:
             }
 
             # Try to get EXIF data
-            if hasattr(img, "_getexif") and img._getexif() is not None:
-                exif_data = img._getexif()
+            if hasattr(img, "_getexif") and img._exif is not None:
+                exif_data = img._exif
                 if exif_data:
                     metadata["exif_available"] = True
                     metadata["exif_tags_count"] = len(exif_data)

@@ -52,7 +52,23 @@ class LocalStorageBackend(StorageBackend):
             # Extract date from metadata if available
             date_taken = None
             if metadata and metadata.get("date_taken"):
-                date_taken = metadata["date_taken"]
+                # Parse the date string to datetime object
+                date_str = metadata["date_taken"]
+                if isinstance(date_str, str):
+                    try:
+                        from datetime import datetime
+                        # Handle various date formats that might come from metadata
+                        if 'T' in date_str:
+                            # ISO format: 2023-07-27T12:34:56 or 2023-07-27T12:34:56+00:00
+                            date_taken = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                        else:
+                            # Try other common formats
+                            date_taken = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                    except (ValueError, TypeError) as e:
+                        # If date parsing fails, use current time
+                        date_taken = None
+                elif hasattr(date_str, 'year'):  # Already a datetime object
+                    date_taken = date_str
 
             # Generate storage path
             relative_path = self.generate_storage_path(filename, file_hash, date_taken)

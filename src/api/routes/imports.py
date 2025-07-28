@@ -14,8 +14,10 @@ from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.models.scan_result import ScanStrategy
+from src.infrastructure.database import get_db_session
 from src.core.services.photo_import_service import (
     ImportOptions,
     ImportPriority,
@@ -115,6 +117,7 @@ async def import_directory(
     request: ImportDirectoryRequest,
     background_tasks: BackgroundTasks,
     import_service: PhotoImportService = Depends(get_import_service),
+    db: AsyncSession = Depends(get_db_session),
 ):
     """Start importing all photos from a directory.
 
@@ -159,7 +162,7 @@ async def import_directory(
 
         # Start import as background task
         import_result = await import_service.import_directory(
-            directory_path=directory_path, import_options=import_options
+            directory_path=directory_path, db_session=db, import_options=import_options
         )
 
         return ImportStatusResponse(
@@ -178,6 +181,7 @@ async def import_directory(
 async def import_file(
     request: ImportFileRequest,
     import_service: PhotoImportService = Depends(get_import_service),
+    db: AsyncSession = Depends(get_db_session),
 ):
     """Import a single photo file.
 
@@ -214,7 +218,7 @@ async def import_file(
 
         # Import file
         import_result = await import_service.import_single_photo(
-            file_path=file_path, import_options=import_options
+            file_path=file_path, db_session=db, import_options=import_options
         )
 
         return ImportResultResponse(

@@ -197,11 +197,11 @@ class DatabaseSettings(BaseSettings):
         description="Database connection URL",
     )
 
-    database_pool_size: int = Field(
+    pool_size: int = Field(
         default=10, description="Database connection pool size"
     )
 
-    database_max_overflow: int = Field(
+    max_overflow: int = Field(
         default=20, description="Maximum database connection pool overflow"
     )
 
@@ -252,7 +252,7 @@ class APISettings(BaseSettings):
 
     host: str = Field(default="0.0.0.0", description="API host")
 
-    port: int = Field(default=8000, description="API port")
+    port: int = Field(default=8090, description="API port")
 
     debug: bool = Field(default=False, description="Enable debug mode")
 
@@ -264,7 +264,7 @@ class APISettings(BaseSettings):
     )
 
     cors_origins: list[str] = Field(
-        default_factory=lambda: ["http://localhost:3000", "http://localhost:8000"],
+        default_factory=lambda: ["http://localhost:3000", "http://localhost:8090"],
         description="CORS allowed origins",
     )
 

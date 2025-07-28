@@ -591,20 +591,54 @@ async def get_task_status(task_id: str):
 @router.post("/photos/scan-directory")
 async def scan_directory(directory_path: str):
     """Scan a directory for photos to import."""
-    if not os.path.exists(directory_path):
+    from pathlib import Path
+    from src.core.services.service_factory import get_service_factory
+    from src.core.models.scan_result import ScanOptions, ScanStrategy
+    
+    path = Path(directory_path)
+    
+    if not path.exists():
         raise HTTPException(
             status_code=400, detail=f"Directory does not exist: {directory_path}"
         )
 
-    if not os.path.isdir(directory_path):
+    if not path.is_dir():
         raise HTTPException(
             status_code=400, detail=f"Path is not a directory: {directory_path}"
         )
 
-    # For now, just return mock scan results
-    return {
-        "message": f"Directory scan initiated: {directory_path}",
-        "status": "scanning",
-        "estimated_files": "calculating...",
-        "scan_id": f"scan_{datetime.utcnow().timestamp()}",
-    }
+    try:
+        # Get directory scanner from service factory
+        service_factory = get_service_factory()
+        directory_scanner = service_factory.get_directory_scanner()
+        
+        # First do a fast scan to get estimate
+        scan_options = ScanOptions(
+            strategy=ScanStrategy.FAST_METADATA_ONLY,
+            recursive=True,
+            max_files=None,
+            batch_size=50,
+        )
+        
+        # Perform the scan
+        scan_result = directory_scanner.scan_directory(path, scan_options)
+        
+        return {
+            "scan_id": scan_result.scan_id,
+            "directory": scan_result.directory,
+            "status": scan_result.status.value,
+            "strategy": scan_result.strategy.value,
+            "total_files": scan_result.total_files,
+            "processed_files": scan_result.processed_files,
+            "successful_files": scan_result.successful_files,
+            "failed_files": scan_result.failed_files,
+            "start_time": scan_result.start_time.isoformat() if scan_result.start_time else None,
+            "end_time": scan_result.end_time.isoformat() if scan_result.end_time else None,
+            "files": scan_result.files[:10],  # Return first 10 files as preview
+            "errors": scan_result.errors,
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Directory scan failed: {str(e)}"
+        ) from e
