@@ -1,13 +1,13 @@
 import hashlib
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from celery import Task
 from PIL import Image
 
-from .celery_app import celery_app
+from src.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def process_single_photo(self, file_path: str) -> dict[str, Any]:
             "file_size": file_size,
             "created_at": datetime.fromtimestamp(file_stats.st_ctime).isoformat(),
             "modified_at": datetime.fromtimestamp(file_stats.st_mtime).isoformat(),
-            "processed_at": datetime.utcnow().isoformat(),
+            "processed_at": datetime.now(timezone.utc).isoformat(),
             "metadata": image_metadata,
             "status": "completed",
         }
@@ -128,7 +128,7 @@ def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any
             "recursive": recursive,
             "total_photos": len(found_photos),
             "photos": found_photos,
-            "scanned_at": datetime.utcnow().isoformat(),
+            "scanned_at": datetime.now(timezone.utc).isoformat(),
             "status": "completed",
         }
 
@@ -168,8 +168,8 @@ def extract_image_metadata(file_path: str) -> dict[str, Any]:
             }
 
             # Try to get EXIF data
-            if hasattr(img, "_getexif") and img._getexif() is not None:
-                exif_data = img._getexif()
+            if hasattr(img, "getexif") and img.getexif() is not None:
+                exif_data = img.getexif()
                 if exif_data:
                     metadata["exif_available"] = True
                     metadata["exif_tags_count"] = len(exif_data)
