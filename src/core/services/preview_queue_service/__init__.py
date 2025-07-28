@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,11 @@ class PreviewRequest:
     filename: str
     priority: PreviewPriority
     requested_sizes: list[str] | None = None
-    created_at: datetime = None
+    created_at: datetime | None = None
 
     def __post_init__(self):
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(UTC)
 
 
 class PreviewQueueService:
@@ -249,7 +249,7 @@ class PreviewQueueService:
             "task_id": task_id,
             "priority": priority.value,
             "requested_sizes": requested_sizes,
-            "started_at": datetime.utcnow(),
+            "started_at": datetime.now(UTC),
         }
 
     def _estimate_queue_position(self, priority: PreviewPriority) -> int:

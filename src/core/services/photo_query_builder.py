@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import and_, or_, select
@@ -160,7 +160,7 @@ class PhotoQueryBuilder:
         """Apply whitelist defaults if no specific filters are active."""
         if not show_all and not self.applied_filters:
             # Default: only show photos from last 30 days
-            thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+            thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
             self.query = self.query.where(Photo.created_at >= thirty_days_ago)
             self.applied_filters["default_recent"] = True
         return self

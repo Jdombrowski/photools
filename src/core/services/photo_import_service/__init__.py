@@ -13,7 +13,7 @@ Designed for offline-first photo management with comprehensive security.
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -87,7 +87,7 @@ class ImportProgress:
     current_stage: str = "initializing"
 
     # Timing
-    start_time: datetime | None = None
+    start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     end_time: datetime | None = None
 
     # Error tracking
@@ -200,10 +200,13 @@ class PhotoImportService:
         progress = ImportProgress(
             import_id=import_id,
             status=ImportStatus.PENDING,
-            start_time=datetime.now(),
+            start_time=datetime.now(UTC),
             current_stage="initializing",
         )
         self._active_imports[import_id] = progress
+
+        if progress.start_time is None:
+            raise ValueError("Import progress start time must be set before processing")
 
         try:
             # Phase 1: Directory scanning
@@ -227,7 +230,7 @@ class PhotoImportService:
             # Phase 3: Completion
             progress.status = ImportStatus.COMPLETED
             progress.current_stage = "completed"
-            progress.end_time = datetime.now()
+            progress.end_time = datetime.now(UTC)
             self._update_progress(progress, options)
 
             return import_result
@@ -235,7 +238,7 @@ class PhotoImportService:
         except Exception as e:
             progress.status = ImportStatus.FAILED
             progress.current_stage = "failed"
-            progress.end_time = datetime.now()
+            progress.end_time = datetime.now(UTC)
             progress.errors.append(str(e))
             self._update_progress(progress, options)
 
@@ -280,7 +283,7 @@ class PhotoImportService:
             import_id=import_id,
             status=ImportStatus.IMPORTING,
             total_files=1,
-            start_time=datetime.now(),
+            start_time=datetime.now(UTC),
             current_file=str(file_path),
             current_stage="importing single photo",
         )
@@ -293,12 +296,17 @@ class PhotoImportService:
             # Upload photo through existing service (which handles duplicate detection)
             upload_result = await self._upload_photo_from_path(file_path, db_session)
 
+            if progress.start_time is None:
+                raise ValueError(
+                    "Import progress start time must be set for duration calculation"
+                )
+
             if upload_result.get("status") == "duplicate":
                 # Storage-level duplicate detected
                 progress.skipped_files = 1
                 progress.status = ImportStatus.COMPLETED
                 progress.current_stage = "completed - storage duplicate skipped"
-                progress.end_time = datetime.now()
+                progress.end_time = datetime.now(UTC)
                 self._update_progress(progress, options)
 
                 return ImportResult(
@@ -318,7 +326,7 @@ class PhotoImportService:
                 progress.failed_files = 1
                 progress.status = ImportStatus.FAILED
                 progress.current_stage = "failed - upload error"
-                progress.end_time = datetime.now()
+                progress.end_time = datetime.now(UTC)
                 progress.errors.append(
                     f"Upload failed: {upload_result.get('error', 'Unknown error')}"
                 )
@@ -345,7 +353,7 @@ class PhotoImportService:
             progress.imported_files = 1
             progress.status = ImportStatus.COMPLETED
             progress.current_stage = "completed"
-            progress.end_time = datetime.now()
+            progress.end_time = datetime.now(UTC)
             self._update_progress(progress, options)
 
             return ImportResult(
@@ -365,7 +373,7 @@ class PhotoImportService:
             progress.failed_files = 1
             progress.status = ImportStatus.FAILED
             progress.current_stage = "failed"
-            progress.end_time = datetime.now()
+            progress.end_time = datetime.now(UTC)
             progress.errors.append(str(e))
             self._update_progress(progress, options)
 
@@ -401,7 +409,7 @@ class PhotoImportService:
             if not progress.is_complete:
                 progress.status = ImportStatus.CANCELLED
                 progress.current_stage = "cancelled"
-                progress.end_time = datetime.now()
+                progress.end_time = datetime.now(UTC)
                 return True
         return False
 
@@ -495,7 +503,7 @@ class PhotoImportService:
             skipped_files=progress.skipped_files,
             failed_files=progress.failed_files,
             start_time=progress.start_time,
-            end_time=datetime.now(),
+            end_time=datetime.now(UTC),
             imported_photos=imported_photos,
             skipped_photos=skipped_photos,
             error_details=error_details,

@@ -1,6 +1,7 @@
 import hashlib
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -253,7 +254,7 @@ class PhotoUploadService:
         """Create Photo and PhotoMetadata database records."""
         # Extract basic image dimensions from metadata if available
         width = height = None
-        file_modified = datetime.utcnow()
+        file_modified = datetime.now(timezone.utc)
 
         if metadata_result:
             width = metadata_result.get("width")
@@ -326,18 +327,14 @@ class PhotoUploadService:
 
         return photo
 
-    def get_storage_info(self) -> dict:
+    def get_storage_info(self) -> dict[str, Any]:
         """Get information about the current storage backend."""
-        if hasattr(self.storage, "get_storage_stats"):
-            return (
-                self.storage.get_storage_stats()
-            )  # TODO: Implement this method in storage backends
-        else:
-            return {
-                "backend_type": type(self.storage).__name__,
-                "config": {
-                    "base_path": str(self.storage.config.base_path),
-                    "organize_by_date": self.storage.config.organize_by_date,
-                    "use_content_hash": self.storage.config.use_content_hash,
-                },
-            }
+        # Note: get_storage_stats method not yet implemented in storage backends
+        return {
+            "backend_type": type(self.storage).__name__,
+            "config": {
+                "base_path": str(self.storage.config.base_path),
+                "organize_by_date": self.storage.config.organize_by_date,
+                "use_content_hash": self.storage.config.use_content_hash,
+            },
+        }

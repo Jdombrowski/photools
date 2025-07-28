@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -343,7 +343,10 @@ async def set_photo_rating(
     update_stmt = (
         update(Photo)
         .where(Photo.id == photo_id)
-        .values(user_rating=rating_request.rating, rating_updated_at=datetime.utcnow())
+        .values(
+            user_rating=rating_request.rating,
+            rating_updated_at=datetime.now(UTC),
+        )
     )
 
     await db.execute(update_stmt)
@@ -354,7 +357,7 @@ async def set_photo_rating(
         "rating": rating_request.rating,
         "workflow_stage": WorkflowStage.get_name(rating_request.rating),
         "description": WorkflowStage.get_description(rating_request.rating),
-        "updated_at": datetime.utcnow(),
+        "updated_at": datetime.now(UTC),
     }
 
 

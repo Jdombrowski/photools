@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -165,7 +165,7 @@ async def update_collection(
         update_data["cover_photo_id"] = collection_update.cover_photo_id
 
     if update_data:
-        update_data["updated_at"] = datetime.utcnow()
+        update_data["updated_at"] = datetime.now(UTC)
         update_stmt = (
             update(Collection)
             .where(Collection.id == collection_id)
@@ -261,7 +261,7 @@ async def add_photos_to_collection(
             .where(Collection.id == collection_id)
             .values(
                 photo_count=Collection.photo_count + added_count,
-                updated_at=datetime.utcnow(),
+                updated_at=datetime.now(UTC),
             )
         )
         await db.execute(update_count_stmt)
@@ -309,7 +309,10 @@ async def remove_photo_from_collection(
     update_count_stmt = (
         update(Collection)
         .where(Collection.id == collection_id)
-        .values(photo_count=Collection.photo_count - 1, updated_at=datetime.utcnow())
+        .values(
+            photo_count=Collection.photo_count - 1,
+            updated_at=datetime.now(UTC),
+        )
     )
     await db.execute(update_count_stmt)
 

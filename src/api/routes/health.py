@@ -1,5 +1,5 @@
 import platform
-from datetime import datetime
+from datetime import UTC, datetime
 
 import psutil
 from fastapi import APIRouter
@@ -12,7 +12,7 @@ async def health_check():
     """Basic health check endpoint."""
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "service": "photools-api",
         "version": "0.1.0",
     }
@@ -27,7 +27,7 @@ async def detailed_health_check():
 
         return {
             "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "service": "photools-api",
             "version": "0.1.0",
             "system": {
@@ -62,6 +62,6 @@ async def detailed_health_check():
     except Exception as e:
         return {
             "status": "unhealthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "error": str(e),
         }

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -135,8 +135,8 @@ class SecureDirectoryScanner:
             ScanResult with file system information
 
         """
-        scan_id = f"fast_scan_{datetime.now().isoformat()}"
-        progress = ScanProgress(start_time=datetime.now())
+        scan_id = f"fast_scan_{datetime.now(UTC).isoformat()}"
+        progress = ScanProgress(start_time=datetime.now(UTC))
 
         try:
             self.validate_scan_request(directory_path, options)
@@ -190,7 +190,7 @@ class SecureDirectoryScanner:
                 files=results,
                 errors=progress.errors,
                 start_time=progress.start_time,
-                end_time=datetime.now(),
+                end_time=datetime.now(UTC),
             )
 
         except Exception as e:
@@ -207,7 +207,7 @@ class SecureDirectoryScanner:
                 files=[],
                 errors=[str(e)],
                 start_time=progress.start_time,
-                end_time=datetime.now(),
+                end_time=datetime.now(UTC),
             )
 
     def scan_directory_full(
@@ -223,8 +223,8 @@ class SecureDirectoryScanner:
             ScanResult with complete photo metadata
 
         """
-        scan_id = f"full_scan_{datetime.now().isoformat()}"
-        progress = ScanProgress(start_time=datetime.now())
+        scan_id = f"full_scan_{datetime.now(UTC).isoformat()}"
+        progress = ScanProgress(start_time=datetime.now(UTC))
 
         try:
             self.validate_scan_request(directory_path, options)
@@ -291,7 +291,7 @@ class SecureDirectoryScanner:
                 files=results,
                 errors=progress.errors,
                 start_time=progress.start_time,
-                end_time=datetime.now(),
+                end_time=datetime.now(UTC),
             )
 
         except Exception as e:
@@ -307,8 +307,8 @@ class SecureDirectoryScanner:
                 failed_files=1,
                 files=[],
                 errors=[str(e)],
-                start_time=datetime.now(),
-                end_time=datetime.now(),
+                start_time=datetime.now(UTC),
+                end_time=datetime.now(UTC),
             )
 
     def scan_directory(

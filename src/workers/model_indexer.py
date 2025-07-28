@@ -1,6 +1,6 @@
 # src/workers/model_indexer.py
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from celery import Task
@@ -39,7 +39,7 @@ def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
             "embedding_model": "mock-model-v1",
             "embedding_size": len(mock_embedding),
             "embedding": mock_embedding,
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "status": "completed",
         }
 
@@ -52,7 +52,7 @@ def generate_embeddings(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
             "ai_model": None,
             "features": {},
             "confidence": 0.0,
-            "extracted_at": datetime.utcnow().isoformat(),
+            "extracted_at": datetime.now(UTC).isoformat(),
             "status": "failed",
             "error": str(self.exception),
         }
@@ -79,7 +79,7 @@ def extract_ai_features(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
             "ai_model": "mock-vision-model-v1",
             "features": mock_features,
             "confidence": 0.85,
-            "extracted_at": datetime.utcnow().isoformat(),
+            "extracted_at": datetime.now(UTC).isoformat(),
             "status": "completed",
         }
 
@@ -92,7 +92,7 @@ def extract_ai_features(self, photo_metadata: dict[str, Any]) -> dict[str, Any]:
             "ai_model": None,
             "features": {},
             "confidence": 0.0,
-            "extracted_at": datetime.utcnow().isoformat(),
+            "extracted_at": datetime.now(UTC).isoformat(),
             "status": "failed",
             "error": str(self.exception),
         }
@@ -154,7 +154,7 @@ def update_search_index(photo_data: dict[str, Any]) -> dict[str, Any]:
 
         result = {
             "file_path": file_path,
-            "indexed_at": datetime.utcnow().isoformat(),
+            "indexed_at": datetime.now(UTC).isoformat(),
             "search_ready": True,
             "status": "completed",
         }

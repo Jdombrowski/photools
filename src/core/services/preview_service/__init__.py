@@ -3,9 +3,10 @@ from pathlib import Path
 
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
-from photo_upload_service import PhotoUploadService
-from preview_generator import PreviewGenerator, PreviewSize
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..photo_upload_service import PhotoUploadService
+from ..preview_generator import PreviewGenerator, PreviewSize
 
 logger = logging.getLogger(__name__)
 

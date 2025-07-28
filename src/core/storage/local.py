@@ -2,6 +2,7 @@ import hashlib
 import shutil
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import aiofiles
 
@@ -249,7 +250,7 @@ class LocalStorageBackend(StorageBackend):
         except Exception:
             pass  # Non-critical operation
 
-    def get_storage_stats(self) -> dict:
+    async def get_storage_stats(self) -> dict[str, Any]:
         """Get storage backend statistics."""
         try:
             total_size = 0

@@ -1,5 +1,5 @@
 import tempfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -143,7 +143,7 @@ class TestSecureDirectoryScanner:
                 size=100,
                 access_level=AccessLevel.READ_ONLY,
                 permissions="rw-r--r--",
-                last_modified=datetime.now().timestamp(),
+                last_modified=datetime.now(UTC).timestamp(),
                 is_symlink=False,
             )
             file_entries.append(entry)
@@ -165,7 +165,7 @@ class TestSecureDirectoryScanner:
                 file_size=100,
                 mime_type="image/jpeg",
                 dimensions=(100, 100),
-                date_taken=datetime.now(),
+                date_taken=datetime.now(UTC),
                 camera_make="Mock Camera",
                 camera_model="Mock Model",
             )
@@ -418,7 +418,7 @@ class TestSecureDirectoryScanner:
             size=100,
             access_level=AccessLevel.READ_ONLY,
             permissions="rw-r--r--",
-            last_modified=datetime.now().timestamp(),
+            last_modified=datetime.now(UTC).timestamp(),
             is_symlink=False,
         )
 

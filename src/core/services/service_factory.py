@@ -1,6 +1,7 @@
 """Service factory for centralized dependency injection and service management."""
 
 from functools import lru_cache
+from pathlib import Path
 
 from src.config.settings import get_settings
 from src.core.services.directory_scanner import SecureDirectoryScanner
@@ -8,6 +9,28 @@ from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_import_service import PhotoImportService
 from src.core.services.photo_upload_service import PhotoUploadService
 from src.core.storage.local import LocalStorageBackend
+
+
+def _convert_string_paths_to_path_objects(string_paths: list[str]) -> list[Path]:
+    """Helper function to convert string paths to Path objects.
+
+    Args:
+        string_paths: List of directory paths as strings
+
+    Returns:
+        List of Path objects, with invalid paths filtered out
+
+    """
+    path_objects = []
+    for str_path in string_paths:
+        try:
+            path_obj = Path(str_path).resolve()
+            if path_obj.exists() and path_obj.is_dir():
+                path_objects.append(path_obj)
+        except (OSError, ValueError):
+            # Skip invalid paths silently
+            continue
+    return path_objects
 
 
 class ServiceFactory:
@@ -21,8 +44,12 @@ class ServiceFactory:
     def get_file_system_service(self) -> SecureFileSystemService:
         """Get or create file system service instance."""
         if "file_system_service" not in self._instances:
+            # Convert string paths to Path objects for type safety
+            validated_dirs = self.settings.photos.get_validated_directories()
+            allowed_directories = _convert_string_paths_to_path_objects(validated_dirs)
+
             self._instances["file_system_service"] = SecureFileSystemService(
-                allowed_directories=self.settings.photos.get_validated_directories(),
+                allowed_directories=allowed_directories,
                 constraints=self.settings.photos.get_security_constraints(),
             )
         return self._instances["file_system_service"]

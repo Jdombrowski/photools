@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
@@ -68,8 +68,12 @@ class Photo(Base):
     user_rating = Column(Integer)  # 1-5 star rating
     rating_updated_at = Column(DateTime)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
+    )
 
     # Relationships
     photo_metadata = relationship(
@@ -146,7 +150,7 @@ class PhotoMetadata(Base):
     # Raw EXIF data (JSON storage for complete metadata)
     raw_exif = Column(JSON)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
 
     # Relationships
     photo = relationship("Photo", back_populates="photo_metadata")
@@ -170,7 +174,7 @@ class PhotoTag(Base):
     confidence = Column(Float)  # For AI-generated tags
     source = Column(String)  # Which system/model generated the tag
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
 
     # Relationships
     photo = relationship("Photo", back_populates="tags")
@@ -211,7 +215,7 @@ class PhotoAIAnalysis(Base):
 
     # Processing information
     processing_time_ms = Column(Integer)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
 
     # Relationships
     photo = relationship("Photo", back_populates="ai_analysis")
@@ -256,8 +260,12 @@ class DirectoryScan(Base):
     errors = Column(JSON)  # List of error messages
     directory_stats = Column(JSON)  # Additional directory statistics
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
+    )
 
     # Relationships
     photo_entries = relationship(
@@ -344,8 +352,12 @@ class BatchScan(Base):
     start_time = Column(DateTime, index=True)
     end_time = Column(DateTime)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
+    )
 
     def __repr__(self):
         return f"<BatchScan(id={self.batch_id}, directories={self.directories}, status={self.status})>"
@@ -377,7 +389,7 @@ class ProcessingAction(Base):
     batch_id = Column(String, index=True)  # Group related actions together
     user_notes = Column(Text)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
 
     # Relationships
     photo = relationship("Photo")
@@ -400,8 +412,12 @@ class Collection(Base):
     photo_count = Column(Integer, default=0)
     cover_photo_id = Column(String, ForeignKey("photos.id"))
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
+    )
 
     # Relationships
     photos = relationship(
@@ -424,7 +440,7 @@ class CollectionPhoto(Base):
     photo_id = Column(
         String, ForeignKey("photos.id", ondelete="CASCADE"), primary_key=True
     )
-    added_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    added_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
 
     # Relationships
     collection = relationship("Collection", back_populates="photos")

@@ -1,7 +1,7 @@
 import logging
 import os
 import stat
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -22,7 +22,7 @@ class SecurityConstraints:
     """Security constraints for file system access."""
 
     max_file_size_mb: int = 500  # Maximum file size in MB
-    allowed_extensions: set[str] = None
+    allowed_extensions: set[str] = field(default_factory=set)
     max_depth: int = 10  # Maximum directory traversal depth
     follow_symlinks: bool = False
     skip_hidden_files: bool = True
