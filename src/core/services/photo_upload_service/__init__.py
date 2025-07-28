@@ -1,5 +1,5 @@
 import hashlib
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -254,7 +254,7 @@ class PhotoUploadService:
         """Create Photo and PhotoMetadata database records."""
         # Extract basic image dimensions from metadata if available
         width = height = None
-        file_modified = datetime.now(timezone.utc)
+        file_modified = datetime.now(UTC)
 
         if metadata_result:
             width = metadata_result.get("width")

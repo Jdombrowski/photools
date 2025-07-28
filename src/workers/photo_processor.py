@@ -1,6 +1,6 @@
+import asyncio
 import hashlib
 import logging
-import asyncio
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -8,10 +8,9 @@ from typing import Any
 from celery import Task
 from PIL import Image
 
-from src.core.models.scan_result import ScanOptions
-from src.core.services.photo_import_service import ImportOptions, PhotoImportService
 from src.core.services.directory_scanner import SecureDirectoryScanner
 from src.core.services.file_system_service import SecureFileSystemService
+from src.core.services.photo_import_service import ImportOptions, PhotoImportService
 from src.core.services.photo_upload_service import PhotoUploadService
 from src.core.storage import LocalStorageBackend, StorageConfig
 from src.infrastructure.database.connection import DatabaseManager
@@ -27,7 +26,7 @@ _storage_backend: LocalStorageBackend | None = None
 def get_photo_upload_service() -> PhotoUploadService:
     """Get or create photo upload service singleton."""
     global _photo_upload_service, _storage_backend
-    
+
     if _photo_upload_service is None:
         # Create storage backend
         storage_config = StorageConfig(
@@ -37,27 +36,30 @@ def get_photo_upload_service() -> PhotoUploadService:
         )
         _storage_backend = LocalStorageBackend(storage_config)
         _photo_upload_service = PhotoUploadService(_storage_backend)
-    
+
     return _photo_upload_service
 
 
 def create_photo_import_service(allowed_directories: list[Path]) -> PhotoImportService:
     """Create PhotoImportService with required dependencies."""
     # Create file system service
-    file_system_service = SecureFileSystemService.create_readonly_photo_service(allowed_directories)
-    
+    file_system_service = SecureFileSystemService.create_readonly_photo_service(
+        allowed_directories
+    )
+
     # Create directory scanner
     directory_scanner = SecureDirectoryScanner(file_system_service)
-    
+
     # Get shared services
     photo_upload_service = get_photo_upload_service()
-    
-    
+
     # Ensure storage backend is available
     if _storage_backend is None:
         get_photo_upload_service()  # This will initialize _storage_backend
-    assert _storage_backend is not None, "Storage backend must be initialized before creating PhotoImportService"
-    
+    assert (
+        _storage_backend is not None
+    ), "Storage backend must be initialized before creating PhotoImportService"
+
     return PhotoImportService(
         directory_scanner=directory_scanner,
         photo_upload_service=photo_upload_service,
@@ -99,7 +101,7 @@ def process_single_photo(self, file_path: str) -> dict[str, Any]:
             async def import_photo():
                 # Get database session
                 database_manager = DatabaseManager()
-                
+
                 async with database_manager.get_async_session() as session:
                     # Create PhotoImportService efficiently using factory
                     import_service = create_photo_import_service([path_obj.parent])
@@ -127,16 +129,17 @@ def process_single_photo(self, file_path: str) -> dict[str, Any]:
                 "file_path": file_path,
                 "import_id": import_result.import_id,
                 "source_directory": import_result.source_directory,
-                "status": import_result.status,
-
                 # Summary counts
                 "total_files": import_result.total_files,
                 "imported_files": import_result.imported_files,
                 "skipped_files": import_result.skipped_files,
                 "failed_files": import_result.failed_files,
-
                 # Timing
-                "start_time": import_result.start_time.isoformat() if import_result.start_time else None,
+                "start_time": (
+                    import_result.start_time.isoformat()
+                    if import_result.start_time
+                    else None
+                ),
                 "end_time": datetime.now(UTC).isoformat(),
             }
 
@@ -192,7 +195,7 @@ def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any
     try:
         from pathlib import Path
 
-        from src.core.models.scan_result import ScanStrategy, ScanOptions
+        from src.core.models.scan_result import ScanOptions, ScanStrategy
         from src.core.services.directory_scanner import SecureDirectoryScanner
         from src.core.services.file_system_service import SecurityConstraints
 
@@ -215,9 +218,11 @@ def scan_directory(directory_path: str, recursive: bool = True) -> dict[str, Any
         )
 
         # Initialize secure directory scanner
-        
-        assert _photo_upload_service is not None, "Photo upload service must be initialized"
-        
+
+        assert (
+            _photo_upload_service is not None
+        ), "Photo upload service must be initialized"
+
         scanner = SecureDirectoryScanner(
             file_system_service=SecureFileSystemService.create_readonly_photo_service(
                 allowed_directories=[path_obj]
@@ -314,8 +319,6 @@ def generate_preview_task(
     from src.core.services.preview_generator import PreviewGenerator, PreviewSize
 
     # Set task priority metadata for monitoring
-    if requested_sizes is None:
-        requested_sizes = []
     if requested_sizes is None:
         requested_sizes = []
     self.update_state(

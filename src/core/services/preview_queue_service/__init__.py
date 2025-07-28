@@ -93,7 +93,7 @@ class PreviewQueueService:
 
         try:
             # Queue the task with priority-specific options
-            task = generate_preview_task.apply_async(
+            task = generate_preview_task.delay(
                 args=[
                     photo_id,
                     storage_path,
