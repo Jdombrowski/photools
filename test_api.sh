@@ -60,6 +60,9 @@ test_endpoint "GET" "$API_V1/health/detailed" "Detailed health check"
 test_endpoint "GET" "$API_V1/photos" "List photos (empty)"
 test_endpoint "GET" "$API_V1/photos?limit=10&offset=0" "List photos with pagination"
 test_endpoint "GET" "$API_V1/photos/test-photo-id" "Get specific photo (should 404)"
+test_endpoint "POST" "$API_V1/photos/import-directory?directory_path=./data" "Import photos from directory" '{"import_options": {"priority": "HIGH"}}'
+test_endpoint "GET" "$API_V1/photos" "List photos after import (should not be empty)"
+test_endpoint "DELETE" "$API_V1/photos/1" "Delete specific photo (should 404)"
 
 # Test directory scanning (use a safe directory)
 test_endpoint "POST" "$API_V1/photos/scan-directory?directory_path=/tmp" "Scan directory"

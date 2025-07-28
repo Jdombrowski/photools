@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.services.photo_query_builder import build_photo_query
 from src.core.services.photo_upload_service import PhotoUploadService
+from src.core.services.preview_service import PreviewService
 from src.infrastructure.database import get_db_session
 
 router = APIRouter()
@@ -146,7 +147,7 @@ async def list_photos(
             )
 
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Format response
     photos_data = []
@@ -378,8 +379,6 @@ async def delete_photo(photo_id: str, db: AsyncSession = Depends(get_db_session)
 
     TODO: Phase 2/3 - implement soft-delete with compaction.
     """
-    from src.core.services.preview_service import PreviewService
-
     preview_service = PreviewService(db)
 
     # Delete previews first

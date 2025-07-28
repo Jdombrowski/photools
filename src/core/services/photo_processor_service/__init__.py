@@ -2,10 +2,9 @@ import hashlib
 import logging
 import mimetypes
 import os
-from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any
 
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS
@@ -118,14 +117,16 @@ class PhotoProcessorService:
                     raise PhotoProcessingError(f"File access error: {file_info.error}")
 
             except FileSystemSecurityError as e:
-                raise PhotoProcessingError(f"Security validation failed: {e}")
+                raise PhotoProcessingError(f"Security validation failed: {e}") from e
         else:
             # Basic validation without file system service
             if not file_path.exists():
                 raise PhotoProcessingError(f"File not found: {file_path}")
 
             if not os.access(file_path, os.R_OK):
-                raise PhotoProcessingError(f"No read permission for file: {file_path}")
+                raise PhotoProcessingError(
+                    f"No read permission for file: {file_path}"
+                ) from None
 
             # Check file size
             try:
@@ -135,7 +136,7 @@ class PhotoProcessorService:
                         f"File too large: {file_size} bytes (max: {self.max_file_size_bytes})"
                     )
             except OSError as e:
-                raise PhotoProcessingError(f"Cannot access file stats: {e}")
+                raise PhotoProcessingError(f"Cannot access file stats: {e}") from e
 
     def is_supported_format(self, file_path: Path) -> bool:
         """Check if file format is supported."""
@@ -162,7 +163,7 @@ class PhotoProcessorService:
                     sha256_hash.update(chunk)
             return sha256_hash.hexdigest()
         except (OSError, PermissionError) as e:
-            raise PhotoProcessingError(f"Cannot read file for hashing: {e}")
+            raise PhotoProcessingError(f"Cannot read file for hashing: {e}") from e
 
     def extract_exif_datetime(self, exif_data: dict[str, Any]) -> datetime | None:
         """Extract and parse datetime from EXIF data."""
@@ -265,7 +266,7 @@ class PhotoProcessorService:
 
         except Exception as e:
             logger.error(f"Failed to process image {file_path}: {e}")
-            raise PhotoProcessingError(f"Cannot process image {file_path}: {e}")
+            raise PhotoProcessingError(f"Cannot process image {file_path}: {e}") from e
 
     def process_photo(self, file_path: Path) -> PhotoMetadata:
         """Main entry point for photo processing with security validation.
@@ -364,7 +365,7 @@ class PhotoProcessorService:
             try:
                 self.file_system_service.validate_path_access(directory_path)
             except FileSystemSecurityError as e:
-                raise PhotoProcessingError(f"Directory access denied: {e}")
+                raise PhotoProcessingError(f"Directory access denied: {e}") from e
         else:
             # Basic validation without file system service
             if not directory_path.exists() or not directory_path.is_dir():
@@ -388,7 +389,7 @@ class PhotoProcessorService:
         except (OSError, PermissionError) as e:
             raise PhotoProcessingError(
                 f"Error accessing directory {directory_path}: {e}"
-            )
+            ) from e
 
         logger.info(f"Processed {len(results)} photos from {directory_path}")
         return results

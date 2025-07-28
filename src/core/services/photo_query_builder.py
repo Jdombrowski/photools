@@ -85,7 +85,7 @@ class PhotoQueryBuilder:
             except ValueError:
                 raise ValueError(
                     "Invalid date_from format. Use ISO format (YYYY-MM-DD)."
-                )
+                ) from None
 
         if date_to:
             try:
@@ -95,7 +95,9 @@ class PhotoQueryBuilder:
                     Photo.photo_metadata.has(PhotoMetadata.date_taken <= date_to_parsed)
                 )
             except ValueError:
-                raise ValueError("Invalid date_to format. Use ISO format (YYYY-MM-DD).")
+                raise ValueError(
+                    "Invalid date_to format. Use ISO format (YYYY-MM-DD)."
+                ) from None
 
         return self
 

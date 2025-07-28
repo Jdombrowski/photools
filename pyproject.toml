@@ -47,6 +47,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 88
 
+## Ruff Configuration
+
 [tool.ruff]
 line-length = 88
 target-version = "py312"
@@ -86,6 +88,7 @@ ignore = [
     "D104",   # Missing docstring in public package (pylint handles better)
     "D105",   # Missing docstring in magic method (__repr__, etc)
     "D107",   # Missing docstring in __init__ method
+    "D205",   # 1 blank line required before class docstring (pylint handles better)
     "D401",   # First line should end with a period (pylint handles better)
     "D417",   # Missing argument descriptions (too verbose for simple functions)
     "C901",   # Complex function (pylint handles with better metrics)
@@ -105,7 +108,8 @@ ignore = [
 "scripts/*" = ["D", "S101"]  # Relaxed for utility scripts
 "src/infrastructure/*" = ["D100", "D101"]  # Infrastructure can have relaxed docs
 "src/api/main.py" = ["S104"]  # Allow binding to all interfaces in main
-"src/api/routes/*" = ["B008"]  # Allow FastAPI Depends() and Query() in function signatures
+"src/api/routes/*" = ["B008"]  # Allow FastAPI Depends() and Query() in function signaturesi
+"service_factory.py" = ["B019"] # Allow direct instantiation of services in factory, bypass lru_cache because Factory is stateless, created once, reused globally
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10  # Basic complexity threshold (pylint handles detailed analysis)

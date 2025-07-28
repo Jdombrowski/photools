@@ -1,9 +1,7 @@
 import asyncio
 import logging
-from collections.abc import Mapping
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Tuple
 
 from PIL import Image, ImageOps
 

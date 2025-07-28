@@ -214,7 +214,7 @@ class SecureFileSystemService:
             return resolved_path
 
         except (OSError, ValueError) as e:
-            raise FileSystemSecurityError(f"Invalid path: {path}, error: {e}")
+            raise FileSystemSecurityError(f"Invalid path: {path}, error: {e}") from e
 
     def _is_path_allowed(self, path: Path) -> bool:
         """Check if path is within allowed directories with strict validation.
@@ -515,7 +515,7 @@ class SecureFileSystemService:
         except (OSError, RuntimeError) as e:
             raise FileSystemSecurityError(
                 f"SECURITY VIOLATION: Cannot resolve path safely: {path}, error: {e}"
-            )
+            ) from e
 
         return True
 

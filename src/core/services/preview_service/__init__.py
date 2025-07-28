@@ -3,10 +3,9 @@ from pathlib import Path
 
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
+from photo_upload_service import PhotoUploadService
+from preview_generator import PreviewGenerator, PreviewSize
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from .photo_upload_service import PhotoUploadService
-from .preview_generator import PreviewGenerator, PreviewSize
 
 logger = logging.getLogger(__name__)
 
@@ -42,12 +41,12 @@ class PreviewService:
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid size. Must be one of: {', '.join([s.value for s in PreviewSize])}",
-            )
+            ) from None
 
         if format not in ["jpg", "webp"]:
             raise HTTPException(
                 status_code=400, detail="Format must be 'jpg' or 'webp'"
-            )
+            ) from None
 
         # Get photo from database
         photo = await self._get_photo_or_404(photo_id)
@@ -57,9 +56,7 @@ class PreviewService:
             photo_id, preview_size, format
         )
         if existing_preview:
-            return self._create_file_response(
-                existing_preview, photo.filename, size, format
-            )
+            return self._create_file_response(existing_preview, photo, size, format)
 
         # Generate preview - simple priority logic
         if is_user_request:
@@ -127,7 +124,9 @@ class PreviewService:
             raise
         except Exception as e:
             logger.error(f"Preview generation failed for photo {photo.id}: {e}")
-            raise HTTPException(status_code=500, detail="Preview generation failed")
+            raise HTTPException(
+                status_code=500, detail="Preview generation failed"
+            ) from e
 
     async def _queue_background_preview(
         self, photo, preview_size: PreviewSize, format: str
@@ -152,7 +151,8 @@ class PreviewService:
 
     async def generate_all_previews_for_photo(self, photo_id: str) -> dict:
         """Generate all preview sizes for a photo (admin/background use)."""
-        photo = await self._get_photo_or_404(photo_id)
+        ## TODO: fix issues around return type and error handling
+        _, _, photo = await self._get_photo_or_404(photo_id)
 
         try:
             # Get original file content
@@ -197,7 +197,9 @@ class PreviewService:
             raise
         except Exception as e:
             logger.error(f"Preview generation failed for photo {photo.id}: {e}")
-            raise HTTPException(status_code=500, detail="Preview generation failed")
+            raise HTTPException(
+                status_code=500, detail="Preview generation failed"
+            ) from e
 
     async def delete_photo_previews(self, photo_id: str) -> bool:
         """Delete all previews for a photo."""

@@ -22,7 +22,7 @@ class SecurityConstraints:
     """Security constraints for file system access."""
 
     max_file_size_mb: int = 500  # Maximum file size in MB
-    allowed_extensions: set[str] = None
+    allowed_extensions: set[str] = set()  # Set of allowed file extensions
     max_depth: int = 10  # Maximum directory traversal depth
     follow_symlinks: bool = False
     skip_hidden_files: bool = True
@@ -214,7 +214,7 @@ class SecureFileSystemService:
             return resolved_path
 
         except (OSError, ValueError) as e:
-            raise FileSystemSecurityError(f"Invalid path: {path}, error: {e}")
+            raise FileSystemSecurityError(f"Invalid path: {path}, error: {e}") from e
 
     def _is_path_allowed(self, path: Path) -> bool:
         """Check if path is within allowed directories with strict validation.
@@ -515,7 +515,7 @@ class SecureFileSystemService:
         except (OSError, RuntimeError) as e:
             raise FileSystemSecurityError(
                 f"SECURITY VIOLATION: Cannot resolve path safely: {path}, error: {e}"
-            )
+            ) from e
 
         return True
 
@@ -747,7 +747,8 @@ class SecureFileSystemService:
     def create_readonly_photo_service(
         allowed_directories: list[Path],
     ) -> "SecureFileSystemService":
-        """Create a SecureFileSystemService with the most restrictive security settings
+        """Create a SecureFileSystemService with the most restrictive security settingsi.
+
         for readonly photo access.
 
         Args:

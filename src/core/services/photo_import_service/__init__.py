@@ -16,11 +16,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from src.core.models.scan_result import ScanResult, ScanStrategy
 from src.core.services.directory_scanner import SecureDirectoryScanner
-from src.core.services.file_system_service import SecureFileSystemService
 from src.core.services.photo_upload_service import PhotoUploadService
 from src.core.storage.base import StorageBackend
 
@@ -154,7 +153,7 @@ class ImportResult:
         if self.total_files == 0:
             return 0.0
         return (self.imported_files / self.total_files) * 100
-    
+
     @property
     def files_per_second(self) -> float:
         """Calculate processing speed in files per second."""
@@ -501,7 +500,6 @@ class PhotoImportService:
             skipped_photos=skipped_photos,
             error_details=error_details,
         )
-
 
     async def _upload_photo_from_path(self, file_path: Path, db_session) -> dict:
         """Upload a photo file by reading it from disk and calling the upload service."""
