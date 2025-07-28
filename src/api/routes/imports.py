@@ -17,7 +17,6 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.models.scan_result import ScanStrategy
-from src.infrastructure.database import get_db_session
 from src.core.services.photo_import_service import (
     ImportOptions,
     ImportPriority,
@@ -25,6 +24,7 @@ from src.core.services.photo_import_service import (
     PhotoImportService,
 )
 from src.core.services.service_factory import get_service_factory
+from src.infrastructure.database import get_db_session
 
 router = APIRouter()
 

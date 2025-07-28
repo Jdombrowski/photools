@@ -197,9 +197,7 @@ class DatabaseSettings(BaseSettings):
         description="Database connection URL",
     )
 
-    pool_size: int = Field(
-        default=10, description="Database connection pool size"
-    )
+    pool_size: int = Field(default=10, description="Database connection pool size")
 
     max_overflow: int = Field(
         default=20, description="Maximum database connection pool overflow"

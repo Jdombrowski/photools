@@ -4,8 +4,8 @@ import os
 from datetime import datetime
 from typing import Any
 
-from celery import Task
 import PIL.Image
+from celery import Task
 
 from .celery_app import celery_app
 
@@ -53,7 +53,7 @@ def process_single_photo(self, file_path: str) -> dict[str, Any] | None:
         }
 
         logger.info(f"Successfully processed photo: {file_path}")
-        return result 
+        return result
 
     except Exception as e:
         logger.error(f"Error processing photo {file_path}: {str(e)}")
@@ -162,7 +162,7 @@ def generate_preview_task(
     storage_path: str,
     filename: str,
     priority: str = "normal",
-    requested_sizes: list = [],
+    requested_sizes: list = None,
 ) -> dict[str, Any]:
     """Generate preview(s) for a photo with priority-aware execution.
 
@@ -180,6 +180,8 @@ def generate_preview_task(
     from src.core.services.preview_generator import PreviewGenerator, PreviewSize
 
     # Set task priority metadata for monitoring
+    if requested_sizes is None:
+        requested_sizes = []
     self.update_state(
         state="PROGRESS",
         meta={"priority": priority, "photo_id": photo_id, "stage": "starting"},
@@ -330,7 +332,9 @@ def bulk_generate_previews_task(batch_size: int = 10) -> dict[str, Any]:
             for photo in photos:
                 try:
                     # Check if photo already has previews
-                    existing_previews = preview_generator.get_preview_info(str(photo.id))
+                    existing_previews = preview_generator.get_preview_info(
+                        str(photo.id)
+                    )
 
                     # Skip if all preview sizes exist
                     if len(existing_previews) >= 4:  # All 4 sizes

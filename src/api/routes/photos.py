@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -592,11 +591,12 @@ async def get_task_status(task_id: str):
 async def scan_directory(directory_path: str):
     """Scan a directory for photos to import."""
     from pathlib import Path
-    from src.core.services.service_factory import get_service_factory
+
     from src.core.models.scan_result import ScanOptions, ScanStrategy
-    
+    from src.core.services.service_factory import get_service_factory
+
     path = Path(directory_path)
-    
+
     if not path.exists():
         raise HTTPException(
             status_code=400, detail=f"Directory does not exist: {directory_path}"
@@ -611,7 +611,7 @@ async def scan_directory(directory_path: str):
         # Get directory scanner from service factory
         service_factory = get_service_factory()
         directory_scanner = service_factory.get_directory_scanner()
-        
+
         # First do a fast scan to get estimate
         scan_options = ScanOptions(
             strategy=ScanStrategy.FAST_METADATA_ONLY,
@@ -619,10 +619,10 @@ async def scan_directory(directory_path: str):
             max_files=None,
             batch_size=50,
         )
-        
+
         # Perform the scan
         scan_result = directory_scanner.scan_directory(path, scan_options)
-        
+
         return {
             "scan_id": scan_result.scan_id,
             "directory": scan_result.directory,
@@ -632,12 +632,16 @@ async def scan_directory(directory_path: str):
             "processed_files": scan_result.processed_files,
             "successful_files": scan_result.successful_files,
             "failed_files": scan_result.failed_files,
-            "start_time": scan_result.start_time.isoformat() if scan_result.start_time else None,
-            "end_time": scan_result.end_time.isoformat() if scan_result.end_time else None,
+            "start_time": (
+                scan_result.start_time.isoformat() if scan_result.start_time else None
+            ),
+            "end_time": (
+                scan_result.end_time.isoformat() if scan_result.end_time else None
+            ),
             "files": scan_result.files[:10],  # Return first 10 files as preview
             "errors": scan_result.errors,
         }
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Directory scan failed: {str(e)}"

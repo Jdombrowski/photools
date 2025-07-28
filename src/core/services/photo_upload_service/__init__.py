@@ -62,12 +62,10 @@ class PhotoUploadService:
         storage_result = None
 
         try:
-            # Skip metadata extraction temporarily to debug database issue
-            metadata_result = None
-            # TODO: Re-enable metadata extraction after fixing greenlet issue
-            # metadata_result = await self._extract_metadata_from_content(
-            #     file_content, filename
-            # )
+            # Extract metadata from uploaded file
+            metadata_result = await self._extract_metadata_from_content(
+                file_content, filename
+            )
 
             # Store file using storage backend
             storage_result = await self.storage.store_file(
